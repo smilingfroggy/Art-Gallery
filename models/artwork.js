@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Artwork.hasMany(models.ArtworkImage)
       Artwork.belongsTo(models.Medium)
+      Artwork.belongsToMany(models.Exhibition, {
+        through: models.ExhibitionArtwork,
+        foreignKey: 'ExhibitionId',
+        as: 'JoinedExhibitions'
+      })
     }
   }
   Artwork.init({
