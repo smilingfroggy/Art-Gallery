@@ -1,9 +1,8 @@
 'use strict';
 const xlsx = require('xlsx')
-const fs = require('fs')
 
 // read excel file
-const wb = xlsx.readFile('./seeders/artistSeeds.xlsx')
+const wb = xlsx.readFile('./seeders/seedsRawData.xlsx')
 const artists = wb.Sheets['artist']
 const data = xlsx.utils.sheet_to_json(artists)  // [ {name:, otherName:..}, {}, {}...]
 
