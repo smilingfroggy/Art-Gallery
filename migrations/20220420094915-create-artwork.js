@@ -8,11 +8,21 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      artistName: {
+        type: Sequelize.STRING
+      },
       name: {
         type: Sequelize.STRING
       },
+      serialNumber: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       creationTime: {
         type: Sequelize.DATE
+      },
+      creationTimeNote: {
+        type: Sequelize.STRING
       },
       height: {
         type: Sequelize.FLOAT
@@ -22,6 +32,9 @@ module.exports = {
       },
       depth: {
         type: Sequelize.FLOAT
+      },
+      piecesNum: {
+        type: Sequelize.INTEGER
       },
       introduction: {
         type: Sequelize.TEXT
