@@ -15,17 +15,21 @@ module.exports = (sequelize, DataTypes) => {
       Artwork.belongsTo(models.Medium)
       Artwork.belongsToMany(models.Exhibition, {
         through: models.ExhibitionArtwork,
-        foreignKey: 'ExhibitionId',
+        foreignKey: 'ArtworkId',
         as: 'JoinedExhibitions'
       })
     }
   }
   Artwork.init({
     name: DataTypes.STRING,
+    artistName: DataTypes.STRING,
+    serialNumber: DataTypes.STRING,
     creationTime: DataTypes.DATE,
+    creationTimeNote: DataTypes.STRING,
     height: DataTypes.FLOAT,
     width: DataTypes.FLOAT,
     depth: DataTypes.FLOAT,
+    piecesNum: DataTypes.INTEGER,
     introduction: DataTypes.TEXT,
     viewCount: DataTypes.INTEGER
   }, {

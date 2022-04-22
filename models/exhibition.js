@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Exhibition.hasMany(models.ExhibitionImage)
       Exhibition.belongsToMany(models.Artwork, {
         through: models.ExhibitionArtwork,
-        foreignKey: 'ArtworkId',
+        foreignKey: 'ExhibitionId',
         as: 'ContainedArtworks'
       })
     }
