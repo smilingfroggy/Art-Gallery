@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
         key: 'ArtworkId',
         as: 'SubjectTags'
       })
+      Artwork.belongsToMany(models.Artist, {
+        through: models.ArtworkArtist,
+        key: 'ArtworkId',
+        as: 'Creators'
+      })
     }
   }
   Artwork.init({

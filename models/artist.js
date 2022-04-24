@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Artist.hasMany(models.ArtistImage)
+      Artist.belongsToMany(models.Artwork, {
+        through: models.ArtworkArtist,
+        key: 'ArtistId',
+        as: 'Creations'
+      })
     }
   }
   Artist.init({
