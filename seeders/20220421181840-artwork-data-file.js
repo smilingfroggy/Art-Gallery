@@ -20,6 +20,7 @@ module.exports = {
       }).id
       delete work.media
       delete work.size
+      delete work.subjects
       return {
         ...work,
         creationTime: work.creationTime ? new Date(work.creationTime.toString()) : null,
