@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'JoinedExhibitions'
       })
       Artwork.belongsToMany(models.Subject, {
-        through: models.SubjectArtwork,
+        through: models.ArtworkSubject,
         key: 'ArtworkId',
         as: 'SubjectTags'
       })
