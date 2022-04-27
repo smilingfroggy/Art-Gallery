@@ -1,0 +1,43 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="dropdown mb-5" align="right">
+      <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown"
+        aria-expanded="false">
+        排序
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+        <li><a class="dropdown-item active" type="button" aria-current="true" href="#">Latest-Last | Default</a></li>
+        <li><a class="dropdown-item" type="button" href="#">Last-Latest</a></li>
+        <li><a class="dropdown-item" type="button" href="#">Name</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center">
+  {{#each exhibitionsData}}
+  
+  <div class="card mb-5 mx-3" style="max-width: 540px;">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <a href="/exhibitions/{{this.id}}">
+        <img src="{{this.ExhibitionImages}}" class="img-fluid rounded-start" alt="{{this.name}}">
+        </a>
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{this.name}} </h5>
+          
+          <p>開始日期：{{this.date_start}}</p>
+          <p>結束日期：{{this.date_end}}</p>
+          <p class="card-text">{{this.introduction}}</p>
+          <p class="card-text" align="right"><small class="text-muted">
+            <i class="fa-regular fa-image"></i> {{this.artwork_sum}}
+          </small></p>
+        
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{/each}}
+  </div>
+</div>
