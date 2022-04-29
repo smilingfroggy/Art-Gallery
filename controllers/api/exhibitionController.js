@@ -1,5 +1,6 @@
 const db = require('../../models');
 const Artwork = db.Artwork
+const ArtworkImage = db.ArtworkImage
 const Exhibition = db.Exhibition
 const ExhibitionImage = db.ExhibitionImage
 const Medium = db.Medium
@@ -37,18 +38,23 @@ const exhibitionController = {
         include: [
           { model: ExhibitionImage, attributes: ['url', 'type', 'description'] },
           {
-            model: Artwork, as: 'ContainedArtworks', attributes: ['id', 'artistName', 'name'], through: { attributes: [] },
-            include: { model: Medium, attributes: ['name'] }
+            model: Artwork, as: 'ContainedArtworks', attributes: ['id', 'artistName', 'name'],
+            through: { attributes: [] },
+            include: [
+              { model: Medium, attributes: ['name'] },
+              { model: ArtworkImage, attributes: ['url', 'type', 'description'] },
+            ]
           },
-          // TO ADD: artwork image
-        ],   // limit:10 - Error: Only HasMany associations support include.separate
+        ],
         attributes: { exclude: ['createdAt', 'updatedAt'] },
       })
 
       let result = exhibition_rawData.toJSON()
       result.ContainedArtworks.forEach(work => {
         work.medium = work.Medium.name
+        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
         delete work.Medium
+        delete work.ArtworkImages
       })
       return res.json(result)
     } catch (error) {

@@ -76,22 +76,20 @@ const exhibitionController = {
       const exhibitionArtworks_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
         where: { 'privacy': 2 },
         attributes: ['id', 'name'],
-        include: [
-          {
-            model: Artwork, as: 'ContainedArtworks',
-            attributes: ['id', 'artistName', 'name', 'creationTime', 'height', 'width', 'depth'],
-            through: { attributes: [] },
-            include: [
-              { model: Medium, attributes: ['name'] },
-              { model: ArtworkImage, attributes: ['url'] },  // TO ADD: artwork image
-              {
-                model: Artist, as: 'Creators', through: { attributes: [] },
-                attributes: ['id', 'name', 'birthYear', 'deathYear', 'introduction'],
-                include: { model: ArtistImage, attributes: { exclude: ['createdAt', 'updatedAt'] } }
-              }
-            ]
-          },
-        ],
+        include: {
+          model: Artwork, as: 'ContainedArtworks',
+          attributes: ['id', 'artistName', 'name', 'creationTime', 'height', 'width', 'depth'],
+          through: { attributes: [] },
+          include: [
+            { model: Medium, attributes: ['name'] },
+            { model: ArtworkImage, attributes: ['url'] },
+            {
+              model: Artist, as: 'Creators', through: { attributes: [] },
+              attributes: ['id', 'name', 'birthYear', 'deathYear', 'introduction'],
+              include: { model: ArtistImage, attributes: { exclude: ['createdAt', 'updatedAt'] } }
+            }
+          ]
+        },
       })
 
       if (!exhibitionArtworks_rawData) {
@@ -105,7 +103,9 @@ const exhibitionController = {
 
       result.ContainedArtworks.forEach(work => {
         work.medium = work.Medium.name
+        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
         delete work.Medium
+        delete work.ArtworkImages
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
       })
 
