@@ -8,6 +8,7 @@
     "rebuildDB": "npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all"
   },
   "dependencies": {
+    "@faker-js/faker": "^6.2.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",

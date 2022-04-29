@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   ArtworkImage.init({
+    ArtworkId: DataTypes.INTEGER,
     url: DataTypes.STRING,
     type: DataTypes.STRING,
     description: DataTypes.TEXT
