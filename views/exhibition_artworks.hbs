@@ -1,0 +1,72 @@
+<div class="container-fluid">
+  <h4 class="mb-5">{{exhibition.name}}</h4>
+
+  {{!-- nav tabs --}}
+  <ul class="nav nav-tabs mb-5">
+    <li class="nav-item">
+      <a class="nav-link" href="/exhibitions/{{exhibition.id}}">Introduction</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" aria-current="page" href="/exhibitions/{{exhibition.id}}/artworks">Artworks</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/exhibitions/{{exhibition.id}}/images">Images</a>
+    </li>
+  </ul>
+
+  <div class="row">
+    {{!-- artworks --}}
+    <div class="col-md-8">
+      <h4 class="mb-3"><i class="fa-solid fa-diamond fa-xs"></i> 參展作品</h4>
+      <hr class="mb-4">
+      <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+        {{#each exhibition.ContainedArtworks}}
+        <div class="col">
+          <div class="card h-100">
+            <a href="/artworks/{{this.id}}">
+              <img src="{{this.url}}https://loremflickr.com/320/200/artwork" class="card-img-top" alt="{{this.name}}">
+            </a>     
+            <span style="position: relative; top: -10%; right: 5%" align="right">
+              <a href="#" style="color:peru" class="mx-2"><i class="fa-solid fa-circle-plus"></i></a>  
+              <a href="#" style="color:tomato"><i class="fa-regular fa-heart"></i></a>
+            </span>
+
+            
+            <div class="card-body">
+              <h5 class="card-title">{{this.name}}</h5>
+              <p class="card-text">{{this.artistName}}｜{{this.medium}}｜{{this.size}}</p>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+
+      </div>
+      <p align="center">一共{{exhibition.artwork_sum}}件展品</p>
+      {{!-- <p class="mx-3 mb-5" align="right"><a href="exhibitions/{{exhibition.id}}/artworks"><i
+            class="fa-solid fa-angles-right"></i> More </a></p> --}}
+    </div>
+
+    {{!-- artists --}}
+    <div class="col-md-3 mx-auto">
+      <h4 class="mb-3"><i class="fa-solid fa-diamond fa-xs"></i> 藝術家</h4>
+      <hr class="mb-4">
+      {{#each exhibition.Creators}}
+        <div class="card mb-3" >
+          <div class="row g-0">
+            <div class="col-md-4">
+              <img src="{{this.ArtistImages}}" class="img-fluid artist-thumbnail" alt="{{this.name}}">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{this.name}}</h5>
+                <p class="card-text">{{this.introduction}}</p> 
+                <p class="mx-3" align="right"><a href="exhibitions/{{exhibition.id}}/artworks"><i class="fa-solid fa-angles-right"></i> More </a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
+  </div>
+</div>
