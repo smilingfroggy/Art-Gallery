@@ -8,4 +8,5 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/exhibitions/', exhibitionController.getExhibitions)
+router.get('/exhibitions/:exhibitionId', exhibitionController.getExhibitionInfo)
 module.exports = router;
