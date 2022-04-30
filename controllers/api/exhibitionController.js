@@ -67,22 +67,20 @@ const exhibitionController = {
       const exhibitionArtists_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
         where: { 'privacy': 2 },
         attributes: ['id', 'name'],
-        include: [
-          {
-            model: Artwork, as: 'ContainedArtworks',
-            attributes: ['id'],
-            through: { attributes: [] },
-            include: {
-              model: Artist, as: 'Creators', through: { attributes: [] },
-              attributes: ['id', 'name', 'birthYear', 'deathYear', 'introduction'],
-              include: { model: ArtistImage, attributes: { exclude: ['createdAt', 'updatedAt'] } }
-            }
-          },
-        ]
+        include: {
+          model: Artwork, as: 'ContainedArtworks',
+          attributes: ['id'],
+          through: { attributes: [] },
+          include: {
+            model: Artist, as: 'Creators', through: { attributes: [] },
+            attributes: ['id', 'name', 'birthYear', 'deathYear', 'introduction'],
+            include: { model: ArtistImage, attributes: { exclude: ['createdAt', 'updatedAt'] } }
+          }
+        },
       })
 
       if (!exhibitionArtists_rawData) {
-        return res.json({ status: 'failure', message: 'No artists found!'})
+        return res.json({ status: 'failure', message: 'No artists found!' })
       }
       // 去除重複的創作者；每件作品創作者可能不同、每件作品可有多個創作者
       const creators = []
