@@ -143,6 +143,25 @@ const exhibitionController = {
       console.log(error)
     }
   },
+  getExhibitionImages: async (req, res) => {
+    try {
+      const exhibitionImages_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
+        where: { 'privacy': 2 },
+        attributes: ['id', 'name'],
+        include: {
+          model: ExhibitionImage, attributes: ['id', 'url', 'type', 'description'],
+        },
+      })
+
+      const exhibitionImages = exhibitionImages_rawData.toJSON()
+
+      // return res.json(exhibitionImages)
+      res.render('exhibition_images', { exhibition: exhibitionImages })
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
 }
 
 module.exports = exhibitionController

@@ -1,0 +1,47 @@
+<div class="container-fluid">
+  <h4 class="mb-5">{{exhibition.name}}</h4>
+
+  {{!-- nav tabs --}}
+  <ul class="nav nav-tabs mb-5">
+    <li class="nav-item">
+      <a class="nav-link" href="/exhibitions/{{exhibition.id}}">Introduction</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/exhibitions/{{exhibition.id}}/artworks">Artworks</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active"  aria-current="page" href="/exhibitions/{{exhibition.id}}/images">Images</a>
+    </li>
+  </ul>
+
+  {{!-- exhibition images --}}
+  <div class="grid">
+    {{#each exhibition.ExhibitionImages}}
+    <div class="grid-item">
+      <img src="{{this.url}}" alt="">
+    </div>
+    {{/each}}
+  </div>
+
+
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+
+<script>
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 30,  // 欄與欄之間的距離
+    // horizontalOrder: true
+  });
+
+  $grid.imagesLoaded().progress(function () {  // trigger layout after loaded then initialize Masonry
+    $grid.masonry();
+  });  
+
+</script>
+

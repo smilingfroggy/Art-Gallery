@@ -6,3 +6,17 @@ body {
 a {
   color: #00B7FF;
 }
+
+.artist-thumbnail {
+  border-radius: 50%;
+}
+
+img {
+  width: 100%;
+} 
+
+.grid-item {
+  float: left;
+  width: 400px;
+  margin: 10px;
+}
