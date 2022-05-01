@@ -1,4 +1,5 @@
 'use strict';
+const { faker } = require('@faker-js/faker')
 
 // read excel file
 const xlsx = require('xlsx')
@@ -26,6 +27,7 @@ module.exports = {
         ...work,
         creationTime: work.creationTime ? new Date(work.creationTime.toString()) : null,
         MediumId: medium,
+        introduction: faker.lorem.paragraph(3),
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -33,12 +35,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
     await queryInterface.bulkDelete('Artworks', null, {})
   }
 };
