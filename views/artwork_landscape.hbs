@@ -1,0 +1,87 @@
+<div class="container-fluid">
+
+  <div class="card border-white mb-5 mx-auto" style="max-width: 1200px;">
+    <img class="card-img-top mx-auto mt-5" id="myImg" src="{{artwork.image}}"
+      alt="{{artwork.artistName}}  {{artwork.name}}" style="width:100%; max-width:540px">
+
+    <div class="card-body text-center">
+      <h5 class="card-title ">{{artwork.name}}</h5>
+      <h5 class="card-title mb-3">{{artwork.artistName}}</h5>
+      <div class="card-details">
+        <h5 class="card-title">創作年代：{{artwork.creationTime}} {{artwork.creationTimeNote}}</h5>
+        <h5 class="card-title">作品尺寸：{{artwork.size}}</h5>
+        <h5 class="card-title">作品媒材：{{artwork.Medium.name}}
+          <a href="/artworks/?medium={{artwork.Medium.name}}">
+            <span style="font-size: 12px; color: rgba(238, 153, 104, 0.952);"><i
+                class="fa-solid fa-square-arrow-up-right"></i>
+            </span>
+          </a>
+        </h5>
+      </div>
+
+      <p class="mt-5 card-text">{{artwork.introduction}}</p>
+      <p class="card-text">標籤：
+        {{#each artwork.SubjectTags}}
+        <a class="btn btn-outline-secondary btn-sm" id="artwork-tag"
+          href="/artworks/?subject={{this.id}}">{{this.name}}</a>
+        {{/each}}
+      </p>
+    </div>
+  </div>
+
+  <div class="container mx-30">
+    <h4 class="mb-3"><i class="fa-solid fa-diamond fa-xs"></i> 藝術家</h4>
+    <hr>
+    <div class="scrolling-wrapper mb-5">
+      {{#each artwork.Creators}}
+      <div class="card border-white mb-3 col-8 col-sm-6 col-lg-4 mx-3 ">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{this.ArtistImages}}" class="img-fluid artist-thumbnail" alt="{{this.name}}"
+              style="max-width: 200px;">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title"><a href="/artists/{{this.id}}">{{this.name}}</a></h5>
+              <p class="card-text">{{this.introduction}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <!-- Modal Content (The Image) -->
+    <img class="modal-content" id="img01">
+    <div id="caption"></div>
+  </div>
+
+</div>
+
+
+<script>
+  // Get the modal
+  const modal = document.getElementById("myModal");
+
+  // Get the image and insert it inside the modal
+  const img = document.getElementById("myImg");
+  const modalImg = document.getElementById("img01");
+  const captionText = document.getElementById("caption");
+  img.onclick = function () {
+    modal.style.display = "block";
+    modalImg.src = this.src;
+    captionText.innerHTML = this.alt;
+  }
+
+  // Get the <span> element that closes the modal
+  const span = document.getElementsByClassName("close")[0];
+
+  // close the modal
+  span.onclick = function () {
+    modal.style.display = "none";
+  }
+</script>
