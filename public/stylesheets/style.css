@@ -17,6 +17,23 @@ img {
 
 .grid-item {
   float: left;
-  width: 400px;
+  width: 360px;
   margin: 10px;
+}
+
+.banner {
+  position: relative;
+  z-index: -1;
+  margin: 0 -50px;
+  height: 150px;
+  background: #e9ceb6e1 center center url('https://i.imgur.com/LmOU17m.jpg');
+  background-size: cover;
+}
+
+.exhibition-name {
+  position: absolute;
+  top: 40%;
+  left: 5%;
+  color: #442810e1;
+  font-weight: 500;
 }
