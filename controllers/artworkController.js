@@ -47,6 +47,9 @@ const artworkController = {
     })
 
     // return res.json(artwork)
+    if (artwork.height > artwork.width) {
+      return res.render('artwork_portrait', { artwork })
+    }
     return res.render('artwork_landscape', { artwork })
   }
 }
