@@ -1,4 +1,4 @@
-<div class="banner mb-5">
+<div class="exhibition-banner mb-5">
   <h2 class="exhibition-name">{{exhibition.name}}</h2>
 </div>
 
@@ -20,7 +20,7 @@
   {{!-- exhibition images --}}
   <div class="grid">
     {{#each exhibition.ExhibitionImages}}
-    <div class="grid-item">
+    <div class="grid-item grid-item-exhImage">
       <img src="{{this.url}}" alt="">
     </div>
     {{/each}}
