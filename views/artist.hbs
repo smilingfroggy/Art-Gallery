@@ -1,0 +1,153 @@
+<div class="artist-banner mb-5">
+  <img src="{{artist.headImage}}" class="artist-thumbnail banner-avatar mt-3" alt="{{artist.name}}">
+  <div>
+    <h2 class="banner-title">{{artist.name}}</h2>
+    <p class="banner-details"><small>{{artist.birthYear}} - {{artist.deathYear}}</small></p>
+  </div>
+</div>
+
+<div class="container-fluid">
+
+
+  {{!-- artist info: image, intro, year --}}
+  <p class="mx-auto" style="max-width: 720px; line-height: 2">{{artist.introduction}}</p>
+
+  {{!-- artworks grid --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>創作</h4>
+  <hr class="mb-4">
+  <div class="grid mb-5">
+    {{#each artist.Creations}}
+    <a href="/artworks/{{this.id}}">
+      {{#compareLength this 10 }}
+        <div class="grid-item grid-item-artwork">
+          <img class="rounded" id="artworkImage" style="height: auto; max-height: 300px; object-fit: cover" src="{{this.image}}" alt="{{this.ArtworkImages.description}}">
+        </div>
+      {{else}}
+        <div class="grid-item grid-item-artwork-big">
+          <img class="rounded" id="artworkImage" style="height: auto; max-height: 400px; object-fit: cover" src="{{this.image}}"
+            alt="{{this.ArtworkImages.description}}">
+        </div>
+      {{/compareLength}}
+    </a>
+    {{/each}}
+  </div>
+
+
+  {{!-- media --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>媒材</h4>
+  <hr class="mb-4">
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each artist.allMedium}}
+    <div class="col">
+      <a href="/artworks/?mediumId={{this.id}}&artistId={{../artist.id}}">
+        <div class="card h-100">
+          <img src="{{this.represent_work.ArtworkImages.url}}" style="width: 100%; height: 100px; object-fit: cover" class="card-img-top" alt="{{this.represent_work.name}}">
+
+          <div class="card-body d-flex justify-content-between">
+            <h5 class="card-title">{{this.name}}</h5>
+            <small class="text-muted">{{this.count}}</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/each}}
+  </div>
+
+
+  {{!-- subjects --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>主題</h4>
+  <hr class="mb-4">
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each artist.allSubjects}}
+    <div class="col">
+      <a href="/artworks/?subjectId={{this.id}}&artistId={{../artist.id}}">
+        <div class="card h-100">
+          <img src="{{this.represent_work.ArtworkImages.url}}" style="width: 100%; height: 100px; object-fit: cover"
+            class="card-img-top" alt="{{this.represent_work.name}}">
+
+          <div class="card-body d-flex justify-content-between">
+            <h5 class="card-title">{{this.name}}</h5>
+            <small class="text-muted">{{this.count}}</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/each}}
+  </div>
+
+
+  {{!-- exhibitions --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>展覽</h4>
+  <hr class="mb-4">
+  <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center">
+    {{#each artist.allExhibitions}}
+    <div class="card mb-5 mx-3" style="max-width: 540px;">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <a href="/exhibitions/{{this.id}}">
+            {{#each this.info.ExhibitionImages}}
+            <img src="{{this.url}}" class="img-fluid rounded-start" alt="{{../this.info.name}}">
+            {{/each}}
+          </a>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">{{this.info.name}} </h5>
+  
+            <p>開始日期：{{this.info.date_start}}</p>
+            <p>結束日期：{{this.info.date_end}}</p>
+            <p class="card-text">{{this.info.introduction}}</p>
+            <p class="card-text" align="right"><small class="text-muted">
+                <i class="fa-regular fa-image"></i> {{this.count}}
+              </small></p>
+  
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+
+<script>
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 10,  // 欄與欄之間的距離
+    // horizontalOrder: true
+  });
+
+  $grid.imagesLoaded().progress(function () {  // trigger layout after loaded then initialize Masonry
+    $grid.masonry();
+  });
+
+</script>
+
+<script>
+  // Get the modal
+  const modal = document.getElementById("myModal");
+
+  // Get the image and insert it inside the modal
+  const img = document.getElementById("myImg");
+  const modalImg = document.getElementById("img01");
+  const captionText = document.getElementById("caption");
+  img.onclick = function () {
+    modal.style.display = "block";
+    modalImg.src = this.src;
+    captionText.innerHTML = this.alt;
+  }
+
+  // Get the <span> element that closes the modal
+  const span = document.getElementsByClassName("close")[0];
+
+  // close the modal
+  span.onclick = function () {
+    modal.style.display = "none";
+  }
+</script>

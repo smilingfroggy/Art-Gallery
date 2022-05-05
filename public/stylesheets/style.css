@@ -27,17 +27,37 @@ img {
   width: 100%;
 } 
 
-.grid-item {
+.grid-item-exhImage {
   float: left;
   width: 360px;
   margin: 10px;
 }
 
-.banner {
+.grid-item-artwork {
+  float: left;
+  width: 150px;
+  margin: 10px;
+}
+
+.grid-item-artwork-big {
+  float: left;
+  width: 210px;
+  margin: 8px;
+}
+
+.artist-banner, .exhibition-banner {
   position: relative;
   z-index: -1;
   margin: 0 -50px;
   height: 150px;
+}
+
+.artist-banner {
+  background: #f1f1f1e1 center center url('https://i.imgur.com/TeFpxHU.jpg?1');
+  background-size: cover;
+}
+
+.exhibition-banner {
   background: #e9ceb6e1 center center url('https://i.imgur.com/LmOU17m.jpg');
   background-size: cover;
 }
@@ -48,6 +68,29 @@ img {
   left: 5%;
   color: #442810e1;
   font-weight: 500;
+}
+
+.banner-title {
+  position: absolute;
+  top: 30%;
+  left: 180px;
+  color: #442810e1;
+  font-weight: 500;
+}
+
+.banner-details {
+  position: absolute;
+  top: 55%;
+  left: 185px;
+  color: #6e4e32e1;
+  font-weight: 200;
+}
+
+.banner-avatar {
+  max-width: 100px;
+  position: absolute;
+  top: 8%;
+  left: 3%
 }
 
 

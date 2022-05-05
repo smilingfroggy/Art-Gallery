@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const exhibitionController = require('../controllers/exhibitionController')
 const artworkController = require('../controllers/artworkController')
+const artistController = require('../controllers/artistController')
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -14,5 +15,7 @@ router.get('/exhibitions/:exhibitionId/artworks', exhibitionController.getExhibi
 router.get('/exhibitions/:exhibitionId/images', exhibitionController.getExhibitionImages)
 
 router.get('/artworks/:artworkId', artworkController.getArtwork)
+
+router.get('/artists/:artistId', artistController.getArtist)
 
 module.exports = router;
