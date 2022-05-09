@@ -1,0 +1,204 @@
+<div class="artworks-banner mb-5">
+  {{!-- <h2 class="exhibition-name">{{exhibition.name}}</h2> --}}
+  <div class="container">
+    {{!-- <form class="d-flex">
+      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form> --}}
+  </div>
+</div>
+
+<div class="container-fluid">
+  <h4 class="d-inline-block mb-3 me-3">Search</h4>
+  {{!-- searched keywords --}}
+  <small
+    class="mb-5">{{searching.medium}}　{{searching.artist}}　{{searching.artworkName}}　{{searching.subject}}　{{searching.height}}　{{searching.width}}　{{searching.depth}}　{{searching.shape}}
+  </small>
+
+  {{!-- selections --}}
+  <form class="row ms-2 mb-5">
+    <div class="col-12 col-md-11">
+      <div class="row">
+        {{!-- original layer --}}
+        <div class="col-12 col-sm-4 col-xl-2 mb-3">
+          <input name="medium" class="form-control form-control-sm" list="datalistOptions" id="exampleDataList"
+            placeholder="Search medium" value="{{searching.medium}}">
+          <datalist id="datalistOptions" size="2">
+            {{#each selections.media}}
+            <option value="{{this.name}}">
+              {{/each}}
+          </datalist>
+        </div>
+
+        <div class="col-12 col-sm-4 col-lg-2 mb-3">
+          <input name="artist" class="form-control form-control-sm" list="artistsOptions" id="exampleDataList"
+            placeholder="Search Artist" value="{{searching.artist}}">
+          <datalist id="artistsOptions">
+            {{#each selections.artists}}
+            <option value="{{this.name}}">
+              {{/each}}
+          </datalist>
+        </div>
+
+        <div class="col-12 col-sm-4 col-lg-2 mb-3">
+          <input name="artworkName" type="text" class="form-control form-control-sm" id="exampleInputEmail1"
+            placeholder="artworkName" value="{{searching.artworkName}}">
+        </div>
+
+        <div class="col-12 col-sm-4 col-lg-2 mb-3">
+          <input name="subject" class="form-control form-control-sm" list="subjectsOptions" id="exampleDataList"
+            placeholder="Search Subject" value="{{searching.subject}}">
+          <datalist id="subjectsOptions">
+            {{#each selections.subjects}}
+            <option value="{{this.name}}">
+              {{/each}}
+          </datalist>
+        </div>
+
+        <div class="col-auto  mb-3">
+          <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse"
+            data-bs-target="#sizeInput" aria-expanded="false" aria-controls="sizeInput">
+            Add size
+          </button>
+        </div>
+
+
+        <div class="col-12 col-md-8 collapse card-group mb-3" id="sizeInput">
+          <div class="card card-body">
+            <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" id="inputGroup-sizing-sm" style="width: 55px;">長<i
+                  class="fa-solid fa-arrows-up-down ms-2"></i></span>
+              <input name="height_lower" type="number" min="1" max="1000" class="form-control"
+                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="下限"
+                value="{{searching.height_lower}}">
+              <span class="input-group-text" id="inputGroup-sizing-sm"> - </span>
+              <input name="height_upper" type="number" min="1" max="1000" class="form-control"
+                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="上限"
+                value="{{searching.height_upper}}">
+            </div>
+
+            <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" id="inputGroup-sizing-sm" style="width: 55px;">寬 <i
+                  class="fa-solid fa-arrows-left-right ms-2"></i></span>
+              <input name="width_lower" type="number" min="1" max="1000" class="form-control"
+                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="下限"
+                value="{{searching.width_lower}}">
+              <span class="input-group-text" id="inputGroup-sizing-sm"> - </span>
+              <input name="width_upper" type="number" min="1" max="1000" class="form-control"
+                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="上限"
+                value="{{searching.width_upper}}">
+            </div>
+
+            <div class="input-group input-group-sm mb-3" title="立體作品深度篩選">
+              <span class="input-group-text" id="inputGroup-sizing-sm" style="width: 55px;">深<i
+                  class="fa-solid fa-arrows-up-down ms-2 fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i></span>
+              <input name="depth_lower" type="number" min="1" max="1000" class="form-control"
+                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="下限"
+                value="{{searching.depth_lower}}">
+              <span class="input-group-text" id="inputGroup-sizing-sm"> - </span>
+              <input name="depth_upper" type="number" min="1" max="1000" class="form-control"
+                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="上限"
+                value="{{searching.depth_upper}}">
+            </div>
+          </div>
+
+          <div class="card card-body">
+            <p>篩選直式或橫式</p>
+            <small class="mb-2">預設：包含兩者</small>
+            <div class="btn-group d-flex justify-content-evenly" role="group" aria-label="Basic checkbox toggle button group">
+
+              <input name="shape_portrait" type="checkbox" class="btn-check" value="true" id="portrait" autocomplete="off" {{#if searching.shape_portrait}} checked {{/if}}>
+              <label class="btn btn-outline-light" for="portrait" style="min-width: 55px; min-height: 55px"
+                title="Show Portrait only">
+                <svg width="20" height="30">
+                  <rect width="20" height="30" style="fill:rgb(168, 168, 166);stroke-width:1; stroke: rgb(20, 0, 0)">
+                </svg>
+              </label>
+
+              <input name="shape_landscape" type="checkbox" class="btn-check" value="true" id="landscape" autocomplete="off" {{#if searching.shape_landscape}} checked {{/if}}>
+              <label class="btn btn-outline-light" for="landscape" style="width: 55px; height: 55px"
+                title="Show Landscape only">
+                <svg width="30" height="20">
+                  <rect width="30" height="20" style="fill:rgb(168, 168, 166);stroke-width:1;stroke:rgb(0,0,0)" />
+                </svg>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-12 col-md-1">
+      <div class="row">
+        {{!-- original layer --}}
+        <div class="col-12 ms-auto mb-3">
+          {{!-- col-sm-auto col-auto --}}
+          <button type="submit" class="btn btn-success btn-sm">Submit</button>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+
+
+
+  {{!-- 還沒查 --}}
+  {{#if artwork_result.selections}}
+  <p>請搜尋</p>
+  {{/if}}
+
+  {{!-- 查到結果 --}}
+  {{#if artwork_result.rows }}
+  <p>共{{artwork_result.count}}件藝術品</p>
+  {{/if}}
+
+  {{#noResult artwork_result.count}}
+  <p align="center">查無藝術品，請重新搜尋</p>
+  {{/noResult}}
+
+
+  {{!-- artwork searching results --}}
+  <div class="grid mb-5">
+    {{#each artwork_result.rows}}
+    <div class="card grid-item grid-item-artwork-big">
+      <a href="/artworks/{{this.id}}">
+        <img src="{{this.image}}" class="card-img-top" alt="{{this.name}}"
+          style="height: auto; max-height: 600px; object-fit: cover">
+      </a>
+      <span style="position: absolute; bottom: 110px; right: 5%" align="right">
+        <a href="#" style="color:peru" class="mx-2"><i class="fa-solid fa-circle-plus"></i></a>
+        <a href="#" style="color:tomato"><i class="fa-regular fa-heart"></i></a>
+      </span>
+
+      <div class="card-body">
+        <h6 class="card-title">{{this.name}}</h6>
+        <small class="card-text d-inline-block">{{#each
+          this.Creators}}{{this.name}}{{/each}}　{{this.medium}}　{{this.creationTime}}</small>
+        <small class="card-text d-inline-block">{{this.size}}</small>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+
+<script>
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 10,  // 欄與欄之間的距離
+    // horizontalOrder: true
+  });
+
+  $grid.imagesLoaded().progress(function () {  // trigger layout after loaded then initialize Masonry
+    $grid.masonry();
+  });
+
+</script>

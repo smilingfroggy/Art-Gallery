@@ -45,7 +45,7 @@ img {
   margin: 8px;
 }
 
-.artist-banner, .exhibition-banner {
+.artist-banner, .exhibition-banner, .artworks-banner {
   position: relative;
   z-index: -1;
   margin: 0 -50px;
@@ -59,6 +59,11 @@ img {
 
 .exhibition-banner {
   background: #e9ceb6e1 center center url('https://i.imgur.com/LmOU17m.jpg');
+  background-size: cover;
+}
+
+.artworks-banner {
+  background: center center url('https://i.imgur.com/36NOAwu.jpg');
   background-size: cover;
 }
 
