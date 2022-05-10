@@ -30,33 +30,22 @@ const artworkController = {
       let { mediumId, subjectId, artistId, medium, subject, artist, artworkName,
         height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper, shape_portrait, shape_landscape } = req.query
 
-      function sizeQueryText(dimension, lower, upper) {
-        if (!lower && !upper) {
-          return undefined
-        }
-        return `${dimension} ${lower ? lower : ''} - ${upper ? upper : ''}`
-      }
-      let shape = ""
+      let shape
       if (shape_portrait && !shape_landscape) shape = '直式'
       if (!shape_portrait && shape_landscape) shape = '橫式'
 
       let searching = {
-        medium, subject, artist, artworkName,
+        medium: medium || (mediumId ? selections_medium.find(selection => selection.id === Number(mediumId)).name : undefined),
+        subject: subject || (subjectId ? selections_subject.find(selection => selection.id === Number(subjectId)).name : undefined),
+        artist: artist || (artistId ? selections_artist.find(selection => selection.id === Number(artistId)).name : undefined),
+        artworkName,
         height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper,
-        // length: length ? `長=${length}cm` : undefined, 
-        // height: `長： ${height_lower ? height_lower : ''} - ${height_upper ? height_upper : ''}}`,
         height: sizeQueryText('長', height_lower, height_upper),
         width: sizeQueryText('寬', width_lower, width_upper),
         depth: sizeQueryText('深', depth_lower, depth_upper),
         shape, shape_portrait, shape_landscape
       }
-      console.log('searching:', searching)
-      // {
-      //   medium: undefined,
-      //   subject: undefined,
-      //   artist: undefined,
-      //   artworkName: '養鴨', ...
-      // }
+      console.log(searching)
 
       let whereQuery = {}
       if (mediumId) whereQuery['$Medium.id$'] = Number(mediumId)
@@ -65,32 +54,14 @@ const artworkController = {
       if (medium) whereQuery['$Medium.name$'] = { [Op.like]: `%${medium}%` }
       if (subject) whereQuery['$SubjectTags.name$'] = { [Op.like]: `%${subject}%` }
       if (artist) whereQuery['$Creators.name$'] = { [Op.like]: `%${artist}%` }
-      if (artworkName) whereQuery['name'] = { [Op.like]: `%${artworkName}` }
-      if (height_lower && height_upper) {
-        whereQuery['height'] = { [Op.between]: [height_lower, height_upper] }
-      } else {
-        if (height_upper) whereQuery['height'] = { [Op.lte]: height_upper }
-        if (height_lower) whereQuery['height'] = { [Op.gte]: height_lower }
-      }
-      
-      if (width_lower && width_upper) {
-        whereQuery['width'] = { [Op.between]: [width_lower, width_upper] }
-      } else {
-        if (width_upper) whereQuery['width'] = { [Op.lte]: width_upper }
-        if (width_lower) whereQuery['width'] = { [Op.gte]: width_lower }
-      }
+      if (artworkName) whereQuery['name'] = { [Op.like]: `%${artworkName}%` }
+      sizeQuery('height', height_lower, height_upper, whereQuery)
+      sizeQuery('width', width_lower, width_upper, whereQuery)
+      sizeQuery('depth', depth_lower, depth_upper, whereQuery)
+      if (shape === "直式") whereQuery['height'] = { [Op.gte]: sequelize.col('width') }
+      if (shape === "橫式") whereQuery['height'] = { [Op.lte]: sequelize.col('width') }
 
-      if (depth_lower && depth_upper) {
-        whereQuery['depth'] = { [Op.between]: [depth_lower, depth_upper] }
-      } else {
-        if (depth_upper) whereQuery['depth'] = { [Op.lte]: depth_upper }
-        if (depth_lower) whereQuery['depth'] = { [Op.gte]: depth_lower }
-      }
-
-      if (shape === "直式") whereQuery['height'] = { [Op.gte]: sequelize.col('width')}
-      if (shape === "橫式") whereQuery['height'] = { [Op.lte]: sequelize.col('width')}
-
-      console.log(' whereQuery: ', whereQuery)
+      // console.log(' whereQuery: ', whereQuery)
 
       const artwork_rawData = await Artwork.findAndCountAll({
         nest: true,
@@ -110,8 +81,6 @@ const artworkController = {
       })
 
       let artwork_result = JSON.parse(JSON.stringify(artwork_rawData))
-      // console.log(artwork_result)
-
 
       // 整理藝術品資料: medium, size
       artwork_result.rows.forEach(work => {
@@ -123,13 +92,11 @@ const artworkController = {
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
       })
 
-      // return res.json({ selections, searching, artwork_result})
+      // return res.json({ selections, searching, artwork_result })
       return res.render('artworks', { selections, searching, artwork_result })
     } catch (error) {
       console.log(error)
     }
-
-    
   },
   getArtwork: async (req, res) => {
     try {
@@ -181,5 +148,20 @@ const artworkController = {
   }
 }
 
+function sizeQueryText(dimension, lower, upper) {
+  if (!lower && !upper) {
+    return undefined
+  }
+  return `${dimension} ${lower ? lower : ''} - ${upper ? upper : ''}`
+}
+
+function sizeQuery(dimension, lower, upper, whereQuery) {
+  if (lower && upper) {
+    whereQuery[dimension] = { [Op.between]: [lower, upper] }
+  } else {
+    if (lower) whereQuery[dimension] = { [Op.gte]: lower }
+    if (upper) whereQuery[dimension] = { [Op.lte]: upper }
+  }
+}
 
 module.exports = artworkController
