@@ -6,5 +6,9 @@ module.exports = {
   noResult: function (count, options) {
     if (count === 0) return options.fn(this)
     return options.inverse(this)
-  } 
+  },
+  passNoResult: function (count, options) {
+    if (count > 0) return options.fn(this)
+    return options.inverse(this)
+  }
 }

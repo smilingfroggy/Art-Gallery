@@ -14,7 +14,8 @@ router.get('/exhibitions/:exhibitionId', exhibitionController.getExhibitionInfo)
 router.get('/exhibitions/:exhibitionId/artworks', exhibitionController.getExhibitionArtworks)
 router.get('/exhibitions/:exhibitionId/images', exhibitionController.getExhibitionImages)
 
-router.get('/artworks', artworkController.getArtworks)
+router.get('/artworks', artworkController.getSelections)
+router.get('/artworks/search', artworkController.getArtworks)
 router.get('/artworks/:artworkId', artworkController.getArtwork)
 
 router.get('/artists/:artistId', artistController.getArtist)

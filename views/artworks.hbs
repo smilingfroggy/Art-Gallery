@@ -17,7 +17,7 @@
   </p>
 
   {{!-- selections --}}
-  <form class="row ms-2 mb-5">
+  <form class="row ms-2 mb-5" action="/artworks/search">
     <div class="col-12 col-md-11">
       <div class="row">
         <div class="col-12 col-sm-4 col-lg-3 mb-3">
@@ -173,11 +173,77 @@
   </form>
 
 
+  {{!-- 查詢前顯示各項代表作品 --}}
+  {{#unless artwork_result}}
+  {{!-- media --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>媒材</h4>
+  <hr class="mb-4">
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each selections.media}}
+    {{#passNoResult this.workCount}}
+    <div class="col">
+      <a href="/artworks/search?mediumId={{this.id}}">
+        <div class="card h-100">
+          <img src="{{this.Artworks.ArtworkImages.url}}" style="width: 100%; height: 100px; object-fit: cover"
+            class="card-img-top" alt="{{this.name}}">
 
-  {{!-- 還沒查 --}}
-  {{#if artwork_result.selections}}
-  <p>請搜尋</p>
-  {{/if}}
+          <div class="card-body d-flex justify-content-between">
+            <h5 class="card-title">{{this.name}}</h5>
+            <small class="text-muted">{{this.workCount}}</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/passNoResult}}
+    {{/each}}
+  </div>
+
+  {{!-- artists --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>藝術家</h4>
+  <hr class="mb-4">
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each selections.artists}}
+    {{#passNoResult this.workCount}}
+    <div class="col">
+      <a href="/artworks/search?artistId={{this.id}}">
+        <div class="card h-100">
+          <img src="{{this.Creations.ArtworkImages.url}}" style="width: 100%; height: 100px; object-fit: cover"
+            class="card-img-top" alt="{{this.name}}">
+
+          <div class="card-body d-flex justify-content-between">
+            <h5 class="card-title">{{this.name}}</h5>
+            <small class="text-muted">{{this.workCount}}</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/passNoResult}}
+    {{/each}}
+  </div>
+
+  {{!-- subjects --}}
+  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>主題</h4>
+  <hr class="mb-4">
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each selections.subjects}}
+    {{#passNoResult this.workCount}}
+    <div class="col">
+      <a href="/artworks/search?subjectId={{this.id}}">
+        <div class="card h-100">
+          <img src="{{this.ContainedArtworks.ArtworkImages.url}}" style="width: 100%; height: 100px; object-fit: cover"
+            class="card-img-top" alt="{{this.name}}">
+
+          <div class="card-body d-flex justify-content-between">
+            <h5 class="card-title">{{this.name}}</h5>
+            <small class="text-muted">{{this.workCount}}</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/passNoResult}}
+    {{/each}}
+  </div>
+  {{/unless}}
 
   {{!-- 查到結果 --}}
   {{#if artwork_result.rows }}
