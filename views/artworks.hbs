@@ -9,30 +9,30 @@
 </div>
 
 <div class="container-fluid">
-  <h4 class="d-inline-block mb-3 me-3">Search</h4>
   {{!-- searched keywords --}}
-  <small
-    class="mb-5">{{searching.medium}}　{{searching.artist}}　{{searching.artworkName}}　{{searching.subject}}　{{searching.height}}　{{searching.width}}　{{searching.depth}}　{{searching.shape}}
-  </small>
+  <h4 class="d-inline-block mb-3 me-3">Search</h4>
+  <p class="d-inline-block mb-3">
+    <small>{{searching.medium}}　{{searching.artist}}　{{searching.artworkName}}　{{searching.subject}}　{{searching.height}}　{{searching.width}}　{{searching.depth}}　{{searching.shape}}
+    </small>
+  </p>
 
   {{!-- selections --}}
   <form class="row ms-2 mb-5">
     <div class="col-12 col-md-11">
       <div class="row">
-        {{!-- original layer --}}
-        <div class="col-12 col-sm-4 col-xl-2 mb-3">
-          <input name="medium" class="form-control form-control-sm" list="datalistOptions" id="exampleDataList"
-            placeholder="Search medium" value="{{searching.medium}}">
-          <datalist id="datalistOptions" size="2">
+        <div class="col-12 col-sm-4 col-lg-3 mb-3">
+          <input name="medium" class="form-control form-control-sm" list="datalistOptions" placeholder="媒材"
+            value="{{searching.medium}}">
+          <datalist id="datalistOptions">
             {{#each selections.media}}
             <option value="{{this.name}}">
               {{/each}}
           </datalist>
         </div>
 
-        <div class="col-12 col-sm-4 col-lg-2 mb-3">
-          <input name="artist" class="form-control form-control-sm" list="artistsOptions" id="exampleDataList"
-            placeholder="Search Artist" value="{{searching.artist}}">
+        <div class="col-12 col-sm-4 col-lg-3 mb-3">
+          <input name="artist" class="form-control form-control-sm" list="artistsOptions" placeholder="作者姓名"
+            value="{{searching.artist}}">
           <datalist id="artistsOptions">
             {{#each selections.artists}}
             <option value="{{this.name}}">
@@ -40,14 +40,14 @@
           </datalist>
         </div>
 
-        <div class="col-12 col-sm-4 col-lg-2 mb-3">
-          <input name="artworkName" type="text" class="form-control form-control-sm" id="exampleInputEmail1"
-            placeholder="artworkName" value="{{searching.artworkName}}">
+        <div class="col-12 col-sm-4 col-lg-3 mb-3">
+          <input name="artworkName" type="text" class="form-control form-control-sm" placeholder="作品名稱"
+            value="{{searching.artworkName}}">
         </div>
 
-        <div class="col-12 col-sm-4 col-lg-2 mb-3">
-          <input name="subject" class="form-control form-control-sm" list="subjectsOptions" id="exampleDataList"
-            placeholder="Search Subject" value="{{searching.subject}}">
+        <div class="col-12 col-sm-4 col-lg-3 mb-3">
+          <input name="subject" class="form-control form-control-sm" list="subjectsOptions" placeholder="主題"
+            value="{{searching.subject}}">
           <datalist id="subjectsOptions">
             {{#each selections.subjects}}
             <option value="{{this.name}}">
@@ -57,57 +57,65 @@
 
         <div class="col-auto  mb-3">
           <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse"
-            data-bs-target="#sizeInput" aria-expanded="false" aria-controls="sizeInput">
-            Add size
+            data-bs-target="#moreOptions" aria-expanded="false" aria-controls="moreOptions">
+            More options
           </button>
         </div>
 
-
-        <div class="col-12 col-md-8 collapse card-group mb-3" id="sizeInput">
-          <div class="card card-body">
+        {{!-- Collapse Selections --}}
+        <div class="col-12 col-md-12 collapse card-group mb-3" id="moreOptions">
+          <div class="card card-body" style="min-width: 15rem;">
+            <label for="height_lower" class="form-label">作品尺寸 (cm) <small class="ms-2 text-muted">包含輸入尺寸　e.g.
+                80</small></label>
             <div class="input-group input-group-sm mb-3">
-              <span class="input-group-text" id="inputGroup-sizing-sm" style="width: 55px;">長<i
-                  class="fa-solid fa-arrows-up-down ms-2"></i></span>
-              <input name="height_lower" type="number" min="1" max="1000" class="form-control"
-                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="下限"
+              <span class="input-group-text" style="width: 55px;">
+                長<i class="fa-solid fa-arrows-up-down ms-2"></i>
+              </span>
+              <input name="height_lower" id="height_lower" type="number" min="1" max="1000" class="form-control"
+                aria-label="Height lower input" aria-describedby="height_lower" placeholder="下限"
                 value="{{searching.height_lower}}">
-              <span class="input-group-text" id="inputGroup-sizing-sm"> - </span>
-              <input name="height_upper" type="number" min="1" max="1000" class="form-control"
-                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="上限"
+              <span class="input-group-text"> - </span>
+              <input name="height_upper" id="height_upper" type="number" min="1" max="1000" class="form-control"
+                aria-label="Height upper input" aria-describedby="height_upper" placeholder="上限"
                 value="{{searching.height_upper}}">
             </div>
 
             <div class="input-group input-group-sm mb-3">
-              <span class="input-group-text" id="inputGroup-sizing-sm" style="width: 55px;">寬 <i
-                  class="fa-solid fa-arrows-left-right ms-2"></i></span>
+              <span class="input-group-text" id="width_lower" style="width: 55px;">
+                寬 <i class="fa-solid fa-arrows-left-right ms-2"></i>
+              </span>
               <input name="width_lower" type="number" min="1" max="1000" class="form-control"
-                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="下限"
+                aria-label="Width lower input" aria-describedby="width_lower" placeholder="下限"
                 value="{{searching.width_lower}}">
-              <span class="input-group-text" id="inputGroup-sizing-sm"> - </span>
-              <input name="width_upper" type="number" min="1" max="1000" class="form-control"
-                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="上限"
+              <span class="input-group-text"> - </span>
+              <input name="width_upper" id="width_upper" type="number" min="1" max="1000" class="form-control"
+                aria-label="Width upper input" aria-describedby="width_upper" placeholder="上限"
                 value="{{searching.width_upper}}">
             </div>
 
             <div class="input-group input-group-sm mb-3" title="立體作品深度篩選">
-              <span class="input-group-text" id="inputGroup-sizing-sm" style="width: 55px;">深<i
-                  class="fa-solid fa-arrows-up-down ms-2 fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i></span>
+              <span class="input-group-text" id="depth_lower" style="width: 55px;">
+                深<i class="fa-solid fa-arrows-up-down ms-2 fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i>
+              </span>
               <input name="depth_lower" type="number" min="1" max="1000" class="form-control"
-                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="下限"
+                aria-label="Depth lower input" aria-describedby="depth_lower" placeholder="下限"
                 value="{{searching.depth_lower}}">
-              <span class="input-group-text" id="inputGroup-sizing-sm"> - </span>
+              <span class="input-group-text" id="depth_upper"> - </span>
               <input name="depth_upper" type="number" min="1" max="1000" class="form-control"
-                aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" placeholder="上限"
+                aria-label="Depth upper input" aria-describedby="depth_upper" placeholder="上限"
                 value="{{searching.depth_upper}}">
             </div>
           </div>
 
-          <div class="card card-body">
+          <div class="card card-body"
+            style="min-width: 15rem; border-style: solid; border-width: 1px; border-color:rgba(0,0,0,0.125)">
             <p>篩選直式或橫式</p>
-            <small class="mb-2">預設：包含兩者</small>
-            <div class="btn-group d-flex justify-content-evenly" role="group" aria-label="Basic checkbox toggle button group">
+            <small class="mb-2 text-muted">預設包含兩者</small>
+            <div class="btn-group d-flex justify-content-evenly" role="group"
+              aria-label="Basic checkbox toggle button group">
 
-              <input name="shape_portrait" type="checkbox" class="btn-check" value="true" id="portrait" autocomplete="off" {{#if searching.shape_portrait}} checked {{/if}}>
+              <input name="shape_portrait" type="checkbox" class="btn-check" value="true" id="portrait"
+                autocomplete="off" {{#if searching.shape_portrait}} checked {{/if}}>
               <label class="btn btn-outline-light" for="portrait" style="min-width: 55px; min-height: 55px"
                 title="Show Portrait only">
                 <svg width="20" height="30">
@@ -115,7 +123,8 @@
                 </svg>
               </label>
 
-              <input name="shape_landscape" type="checkbox" class="btn-check" value="true" id="landscape" autocomplete="off" {{#if searching.shape_landscape}} checked {{/if}}>
+              <input name="shape_landscape" type="checkbox" class="btn-check" value="true" id="landscape"
+                autocomplete="off" {{#if searching.shape_landscape}} checked {{/if}}>
               <label class="btn btn-outline-light" for="landscape" style="width: 55px; height: 55px"
                 title="Show Landscape only">
                 <svg width="30" height="20">
@@ -132,12 +141,9 @@
 
     <div class="col-12 col-md-1">
       <div class="row">
-        {{!-- original layer --}}
         <div class="col-12 ms-auto mb-3">
-          {{!-- col-sm-auto col-auto --}}
           <button type="submit" class="btn btn-success btn-sm">Submit</button>
         </div>
-
       </div>
     </div>
 
