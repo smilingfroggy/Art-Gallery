@@ -28,7 +28,8 @@ const artworkController = {
 
       // organize query
       let { mediumId, subjectId, artistId, medium, subject, artist, artworkName,
-        height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper, shape_portrait, shape_landscape } = req.query
+        height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper,
+        shape_portrait, shape_landscape, createYear_lower, createYear_upper, createYear_includeNone } = req.query
 
       let shape
       if (shape_portrait && !shape_landscape) shape = '直式'
@@ -43,7 +44,9 @@ const artworkController = {
         height: sizeQueryText('長', height_lower, height_upper),
         width: sizeQueryText('寬', width_lower, width_upper),
         depth: sizeQueryText('深', depth_lower, depth_upper),
-        shape, shape_portrait, shape_landscape
+        shape, shape_portrait, shape_landscape,
+        createYear_lower, createYear_upper, createYear_includeNone,
+        year: (createYear_lower || createYear_upper) ? `${createYear_lower} - ${createYear_upper}` : undefined
       }
       console.log(searching)
 
@@ -60,6 +63,20 @@ const artworkController = {
       sizeQuery('depth', depth_lower, depth_upper, whereQuery)
       if (shape === "直式") whereQuery['height'] = { [Op.gte]: sequelize.col('width') }
       if (shape === "橫式") whereQuery['height'] = { [Op.lte]: sequelize.col('width') }
+      if (createYear_lower || createYear_upper) {
+        if (createYear_includeNone) {
+          whereQuery['creationTime'] = {
+            [Op.or]: [
+              { [Op.between]: [createYear_lower || '1600', createYear_upper || '2100'] },
+              null
+            ]
+          }
+        } else {  // exclude null
+          whereQuery['creationTime'] = { 
+            [Op.between]: [createYear_lower || '1600', createYear_upper || '2100']
+          }
+        }
+      }
 
       // console.log(' whereQuery: ', whereQuery)
 
