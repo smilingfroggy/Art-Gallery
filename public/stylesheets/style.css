@@ -3,6 +3,11 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+nav.trans {
+  background-color: #FFFFFF;
+  opacity: 0.8
+}
+
 a {
   color: #00B7FF;
 }
@@ -48,8 +53,10 @@ img {
 .artist-banner, .exhibition-banner, .artworks-banner {
   position: relative;
   z-index: -1;
-  margin: 0 -50px;
-  height: 150px;
+  /* margin: 0 -50px; */
+  margin: -50px -50px;
+  /* height: 150px; */
+  height: 200px;
 }
 
 .artist-banner {
@@ -69,24 +76,23 @@ img {
 
 .exhibition-name {
   position: absolute;
-  top: 40%;
+  top: 50%;
   left: 5%;
   color: #442810e1;
   font-weight: 500;
 }
 
+/* artist banner */
 .banner-title {
   position: absolute;
-  top: 30%;
-  left: 180px;
+  top: 50%;
   color: #442810e1;
   font-weight: 500;
 }
 
 .banner-details {
   position: absolute;
-  top: 55%;
-  left: 185px;
+  top: 70%;
   color: #6e4e32e1;
   font-weight: 200;
 }
@@ -94,8 +100,7 @@ img {
 .banner-avatar {
   max-width: 100px;
   position: absolute;
-  top: 8%;
-  left: 3%
+  top: 28%;
 }
 
 

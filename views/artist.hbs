@@ -1,8 +1,13 @@
 <div class="artist-banner mb-5">
-  <img src="{{artist.headImage}}" class="artist-thumbnail banner-avatar mt-3" alt="{{artist.name}}">
-  <div>
-    <h2 class="banner-title">{{artist.name}}</h2>
-    <p class="banner-details"><small>{{artist.birthYear}} - {{artist.deathYear}}</small></p>
+  <div class="row">
+    <div class="col-1"></div>
+    <div class="col-1" style="min-width: 100px">
+      <img src="{{artist.headImage}}" class="artist-thumbnail banner-avatar mt-3" alt="{{artist.name}}">
+    </div>
+    <div class="col-3 ms-5">
+      <h2 class="banner-title">{{artist.name}}</h2>
+      <p class="banner-details ms-2"><small>{{artist.birthYear}} - {{artist.deathYear}}</small></p>
+    </div>
   </div>
 </div>
 
