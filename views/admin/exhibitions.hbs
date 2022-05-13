@@ -1,0 +1,93 @@
+<div class="container-fluid mt-3">
+  <div class="d-flex mb-3 justify-content-end">
+    <a href="/admin/exhibitions/create"><button class="btn btn-success">Create</button></a>
+  </div>
+
+  {{!-- table of exhibitions --}}
+  <div class="table-responsive">
+  <table class="table table-striped table-hover ">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        {{!-- <th scope="col"></th> --}}
+        <th scope="col">展覽名稱</th>
+        <th scope="col" style="min-width: 70px;">開始日期</th>
+        <th scope="col" style="min-width: 70px;">結束日期</th>
+        <th class="d-none" scope="col">展覽地點</th>
+        <th class="d-none" scope="col">介紹</th>
+        <th scope="col">作品件數</th>
+        <th scope="col">照片張數</th>
+        <th scope="col">發布狀態</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each exhibitionsData}}
+      <tr>
+        <th scope="row">{{this.id}}</th>
+        <td>{{this.name}}</td>
+        <td>{{this.date_start}}</td>
+        <td>{{this.date_end}}</td>
+        <td class="d-none">{{this.location}}</td>
+        <td class="d-none">{{this.introduction}}</td>
+        <td>{{this.artwork_sum}}</td>
+        <td>{{this.image_sum}}</td>
+        <td>
+          <form action="/admin/exhibitions/{{this.id}}/togglePrivacy?_method=PUT" method="post">
+          {{#if this.privacy}}
+            <button type="submit" class="btn btn-outline-success btn-sm" title="已發布"><i class="fa-solid fa-unlock"></i></button>
+          {{else}}
+            <button type="submit" class="btn btn-outline-secondary btn-sm" title="未發布"><i class="fa-solid fa-lock"></i></button>
+          {{/if}}
+          </form>
+        </td>
+        <td>
+          <a href="/admin/exhibitions/{{this.id}}">
+            <button class="btn btn-outline-primary btn-sm">Info</button>
+          </a>
+        </td>
+        <td>
+          <a href="/admin/exhibitions/{{this.id}}/edit">
+            <button class="btn btn-outline-primary btn-sm">Edit</button>
+          </a>
+        </td>
+        <td>
+          <form action="/admin/exhibitions/{{this.id}}?_method=DELETE" method="post">
+          <button type="submit" class="btn btn-outline-danger btn-sm" onclick="deleteAlert()">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  </div>
+
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>  
+  function deleteAlert() {
+    event.preventDefault()
+    let form = event.target.parentElement
+    let name = form.parentElement.parentElement.children[1].innerText
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `確定要刪除？ ${name}` ,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '刪除！'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          '已刪除!',
+          `${name}`,
+          'success'
+        ).then(result => {
+          form.submit()
+        })
+      }
+    })
+  }
+</script>

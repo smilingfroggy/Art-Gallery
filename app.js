@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const express = require('express');
+const methodOverride = require('method-override')
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -7,6 +8,7 @@ const { engine } = require('express-handlebars')
 const hbsHelpers = require('./config/handlebars-helpers')
 const indexRouter = require('./routes/index');
 const apisRouter = require('./routes/apis');
+const adminRouter = require('./routes/admin')
 
 const app = express();
 
@@ -20,8 +22,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(methodOverride('_method'))
 app.use('/', indexRouter);
 app.use('/api', apisRouter);
+app.use('/admin', adminRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
