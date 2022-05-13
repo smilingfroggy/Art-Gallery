@@ -38,7 +38,18 @@ const adminController = {
       console.log(error)
     }
   },
-  
+  togglePrivacy: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      const { privacy } = req.body
+      await Exhibition.update({ privacy: (Number(privacy) ? 0 : 2) }, {
+        where: { id: exhibitionId },
+      })
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+    }
+  },
 
 }
 

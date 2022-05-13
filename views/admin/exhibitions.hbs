@@ -34,6 +34,7 @@
         <td>{{this.image_sum}}</td>
         <td>
           <form action="/admin/exhibitions/{{this.id}}/togglePrivacy?_method=PUT" method="post">
+          <input type="text" class="d-none" name="privacy" value="{{this.privacy}}">
           {{#if this.privacy}}
             <button type="submit" class="btn btn-outline-success btn-sm" title="已發布"><i class="fa-solid fa-unlock"></i></button>
           {{else}}
