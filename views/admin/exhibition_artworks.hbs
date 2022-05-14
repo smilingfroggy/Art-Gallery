@@ -1,0 +1,64 @@
+<div class="container-fluid mt-5">
+  <h4 class="mb-3">{{exhibition.name}}</h4>
+
+  <div class="card" id="exhibition_artworks" style="overflow-x: auto">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">展出藝術品</h5>
+      <a href="/admin/exhibitions/{{exhibition.id}}/artworks/"><button class="btn btn-success">Add</button></a>
+    </div>
+  
+    <table class="table table-bordered table-hover" style="min-width: 100%;">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col" style="min-width: 100px;">圖示</th>
+          <th scope="col">品號</th>
+          <th scope="col" style="min-width: 65px">藝術家</th>
+          <th scope="col">品名</th>
+          <th scope="col">創作時間</th>
+          <th scope="col">媒材</th>
+          <th scope="col">長</th>
+          <th scope="col">寬</th>
+          <th scope="col">深</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each exhibition.ContainedArtworks}}
+        <tr>
+          <th scope="row">{{@index}}</th>
+          <td>
+            <img src="{{this.ArtworkImages.[0].[url]}}" alt="{{this.name}}"
+              style="width: 100px; max-height: 150px; object-fit: cover">
+          </td>
+          <td>{{this.serialNumber}}</td>
+          <td>{{this.artistName}}</td>
+          <td>{{this.name}}</td>
+          <td>{{this.creationTime}} {{this.creationTimeNote}}</td>
+          <td>{{this.Medium.name}}</td>
+          <td>{{this.height}}</td>
+          <td>{{this.width}}</td>
+          <td>{{this.depth}}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <a href="/admin/artworks/{{this.id}}">
+                <button class="btn btn-outline-primary btn-sm">More</button>
+              </a>
+              <a href="/admin/artworks/{{this.id}}/edit">
+                <button class="btn btn-outline-success btn-sm">Edit</button>
+              </a>
+              <form action="/admin/exhibitions/{{../exhibition.id}}/artworks?_method=DELETE" method="post">
+                <input type="text" class="d-none" name="artworkId" value="{{this.id}}">
+                <button type="submit" class="btn btn-outline-danger btn-sm ">Remove</button>
+            </div>
+            </form>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+  
+    </table>
+  </div>
+
+
+</div>

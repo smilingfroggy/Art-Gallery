@@ -93,6 +93,37 @@ const adminController = {
       console.log(error)
     }
   },
+  getExhibitionArtworks: async (req, res) => {
+    try {
+      const exhibitionArtworks_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
+        attributes: ['id', 'name'],
+        include: {
+          model: Artwork, as: 'ContainedArtworks',
+          attributes: { exclude: ['piecesNum', 'viewCount', 'createdAt', 'updatedAt', 'introduction'] },
+          through: { attributes: [] },
+          include: [
+            { model: Medium, attributes: ['name'] },
+            { model: ArtworkImage, attributes: ['id', 'url'] },
+          ]
+        },
+      })
+
+      if (!exhibitionArtworks_rawData) {
+        return res.send('Oops! Exhibition artwork unavailable!')
+      }
+
+      let result = exhibitionArtworks_rawData.toJSON()
+      result.ContainedArtworks.forEach(work => {
+        work.creationTime = work.creationTime ? work.creationTime.toISOString().slice(0, 4) : null
+        if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })  // if no image in DB, use "no image"
+      })
+
+      // return res.json(result)
+      return res.render('admin/exhibition_artworks', { exhibition: result })
+    } catch (error) {
+      console.log(error)
+    }
+  },
 
 }
 
