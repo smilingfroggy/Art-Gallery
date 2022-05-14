@@ -38,7 +38,7 @@ img {
   margin: 10px;
 }
 
-.grid-item-artwork {
+.grid-item-artwork, .grid-item-exhImage-sm {
   float: left;
   width: 150px;
   margin: 10px;
@@ -105,13 +105,17 @@ img {
 
 
 /* Artwork Image Triggers Modal */
-#myImg {
+#myImg, .modal-original-img {
   border-radius: 5px;
   cursor: pointer;
   transition: 0.3s;
 }
 
 #myImg:hover {
+  opacity: 0.7;
+}
+
+.modal-original-img:hover {
   opacity: 0.7;
 }
 

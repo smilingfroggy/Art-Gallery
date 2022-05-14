@@ -3,6 +3,7 @@ const router = express.Router()
 const adminController = require('../controllers/adminController')
 
 router.get('/exhibitions', adminController.getExhibitions)
+router.get('/exhibitions/:exhibitionId', adminController.getExhibition)
 router.put('/exhibitions/:exhibitionId/togglePrivacy', adminController.togglePrivacy)
 
 

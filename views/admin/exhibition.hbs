@@ -1,0 +1,120 @@
+<div class="container-fluid mt-5">
+  <h4 class="mb-3">{{exhibition.name}}</h4>
+
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">展覽資訊</h5>
+      <a href="/admin/exhibitions/{{exhibition.id}}/edit">
+        <button class="btn btn-success">Edit</button>
+      </a>
+    </div>
+    <div class="card-body row d-flex justify-content-between">
+      <div class="col-12 col-lg-8">
+        <ul>
+          <li class="my-2"><strong>開始日期</strong> {{exhibition.date_start}}</li>
+          <li class="mb-2"><strong>結束日期</strong> {{exhibition.date_end}}</li>
+          <li class="mb-2"><strong>展覽地點</strong> {{exhibition.location}}</li>
+          <li class="mb-2"><strong>展覽介紹</strong> </li>
+          <p class="mb-2">{{exhibition.introduction}}</p>
+        </ul>
+      </div>
+
+      <div class="col-12 col-lg-4 d-flex justify-content-center">
+        <img class="mx-auto rounded" style="max-width: 500px; object-fit: contain" src="{{exhibition.poster}}"
+          alt="{{exhibition.name}}">
+      </div>
+    </div>
+  </div>
+
+
+
+  {{!-- exhibition images --}}
+  <div class="card">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">展覽圖片</h5>
+      <button class="btn btn-success" id="uploadBtn">Upload</button>
+    </div>
+    <div class="d-none card-body my-2 text-end" id="imageDiv">
+      <form action="/admin/exhibitions/{{exhibition.id}}/images" id="imageForm" class="d-inline-block" method="post"
+        enctype="multipart/form-data">
+        <input class="form-control form-control-sm" type="file" name="imageUrl" style="max-width: 700px;">
+      </form>
+      <button type="submit" form="imageForm" class="btn btn-outline-success btn-sm">送出</button>
+    </div>
+
+    <div class="card-body grid" id="exhibitionImagesDiv">
+      {{#each exhibition.ExhibitionImages}}
+      <div class="grid-item grid-item-exhImage-sm">
+
+        <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
+
+        {{!-- delete button --}}
+        <form action="/admin/exhibitions/{{../exhibition.id}}/images?_method=DELETE" method="post">
+          <input class="d-none" type="text" name="imageId" value="{{this.id}}">
+          <button type="submit" class="btn btn-sm">
+            <span style="color: #CC0000; position: absolute; top: 5px; right: 10px;">
+              <i class="fa-solid fa-xmark"></i>
+            </span>
+          </button>
+        </form>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <!-- Modal Content (The Image) -->
+    <img class="modal-content" id="modalImg">
+    <div id="caption"></div>
+  </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+
+<script>
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 30,
+  });
+
+  $grid.imagesLoaded().progress(function () {
+    $grid.masonry();
+  });
+
+  // show or hide upload form
+  const uploadBtn = document.getElementById('uploadBtn')
+  const imageDiv = document.getElementById('imageDiv')
+  uploadBtn.addEventListener('click', () => {
+    console.log('clicked')
+    imageDiv.classList.toggle('d-none')
+  })
+
+
+  // trigger the modal
+  const modal = document.getElementById("myModal");
+  const exhibitionImagesDiv = document.getElementById("exhibitionImagesDiv")
+  const modalImg = document.getElementById("modalImg");
+  const captionText = document.getElementById("caption");
+  exhibitionImagesDiv.addEventListener('click', (event) => {
+    let target = event.target
+    if (target.tagName === "IMG") {
+      modal.style.display = "block";
+      modalImg.src = target.src;
+      captionText.innerHTML = target.alt;
+    }
+  })
+
+  // close the modal
+  modal.addEventListener('click', (event) => {
+    if (event.target.id === "myModal") {
+      modal.style.display = "none";
+    }
+  })
+
+</script>

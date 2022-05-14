@@ -50,6 +50,49 @@ const adminController = {
       console.log(error)
     }
   },
+  getExhibition: async (req, res) => {
+    try {
+      const exhibition_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
+        include: [
+          { model: ExhibitionImage, attributes: ['id', 'url', 'type', 'description'] },
+          {
+            model: Artwork, as: 'ContainedArtworks',
+            attributes: { exclude: ['piecesNum', 'viewCount', 'createdAt', 'updatedAt', 'introduction'] },
+            through: { attributes: [] },
+            include: [
+              { model: ArtworkImage, attributes: ['id', 'url', 'type'] },
+              { model: Medium, attributes: ['name'] }
+            ]
+          },
+        ],
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      })
+
+      if (!exhibition_rawData) {
+        return res.send('Oops! Exhibition unavailable!')
+      }
+
+      let result = exhibition_rawData.toJSON()
+      result.artwork_sum = result.ContainedArtworks.length
+      result.date_start = result.date_start.toISOString().slice(0, 10)
+      result.date_end = result.date_end.toISOString().slice(0, 10)
+
+      // console.log(result.ContainedArtworks) 
+      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster').url
+      result.poster = usePoster
+
+      // ContainedArtworks
+      result.ContainedArtworks.forEach(work => {
+        work.creationTime = work.creationTime ? work.creationTime.toISOString().slice(0, 4) : null
+        if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })
+      })
+
+      // return res.json(result)
+      return res.render('admin/exhibition', { exhibition: result })
+    } catch (error) {
+      console.log(error)
+    }
+  },
 
 }
 
