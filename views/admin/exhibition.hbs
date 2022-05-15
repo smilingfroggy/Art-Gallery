@@ -63,11 +63,11 @@
         <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
 
         {{!-- delete button --}}
-        <form action="/admin/exhibitions/{{../exhibition.id}}/images?_method=DELETE" method="post">
+        <form action="/admin/exhibitions/{{../exhibition.id}}/images?_method=DELETE" method="post" style="position: absolute; top: 5px; right: 10px;">
           <input class="d-none" type="text" name="imageId" value="{{this.id}}">
-          <button type="submit" class="btn btn-sm">
-            <span style="color: #CC0000; position: absolute; top: 5px; right: 10px;">
-              <i class="fa-solid fa-xmark"></i>
+          <button type="submit" class="btn btn-sm delete">
+            <span class="delete" style="color: #CC0000;">
+              <i class="fa-solid fa-xmark delete"></i>
             </span>
           </button>
         </form>
@@ -89,6 +89,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script>
@@ -109,7 +110,7 @@
   })
 
 
-  // trigger the modal
+  // trigger the modal or delete confirm
   const modal = document.getElementById("myModal");
   const exhibitionImagesDiv = document.getElementById("exhibitionImagesDiv")
   const modalImg = document.getElementById("modalImg");
@@ -121,11 +122,34 @@
       modalImg.src = target.src;
       captionText.innerHTML = target.alt;
     }
+
+    if (target.classList.contains("delete")) {
+      event.preventDefault()
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `確定要刪除？`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '刪除！'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire(
+            '已刪除!',
+            ``,
+            'success'
+          ).then(result => {
+            form.submit()
+          })
+        }
+      })
+    }
   })
 
   // close the modal
   modal.addEventListener('click', (event) => {
-    if (event.target.id === "myModal") {
+    if (event.target.id === "myModal" || event.target.tagName === 'SPAN') {
       modal.style.display = "none";
     }
   })

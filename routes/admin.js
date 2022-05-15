@@ -9,5 +9,7 @@ router.get('/exhibitions/:exhibitionId/artworks', adminController.getExhibitionA
 router.put('/exhibitions/:exhibitionId/togglePrivacy', adminController.togglePrivacy)
 
 router.put('/exhibitions/:exhibitionId/images', upload.single('exhImage'), adminController.putExhibitionImage)
+router.delete('/exhibitions/:exhibitionId/images', adminController.deleteExhibitionImages)
+
 
 module.exports = router

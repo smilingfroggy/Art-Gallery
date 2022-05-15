@@ -120,6 +120,17 @@ const adminController = {
       console.log(error)
     }
   },
+  deleteExhibitionImages: async (req, res) => {
+    try {
+      const { imageId } = req.body
+      const image = await ExhibitionImage.findByPk(imageId)
+      if (!image) throw new Error('Exhibition image does not exist!')
+      await image.destroy()
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+    }
+  },
   getExhibitionArtworks: async (req, res) => {
     try {
       const exhibitionArtworks_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
