@@ -1,6 +1,9 @@
 const createError = require('http-errors');
 const express = require('express');
 const methodOverride = require('method-override')
+if (process.env.NODE_ENV !== "production") {
+  require('dotenv').config()
+}
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');

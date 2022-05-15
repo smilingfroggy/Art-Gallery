@@ -34,12 +34,26 @@
       <h5 class="mt-2">展覽圖片</h5>
       <button class="btn btn-success" id="uploadBtn">Upload</button>
     </div>
-    <div class="d-none card-body my-2 text-end" id="imageDiv">
-      <form action="/admin/exhibitions/{{exhibition.id}}/images" id="imageForm" class="d-inline-block" method="post"
-        enctype="multipart/form-data">
-        <input class="form-control form-control-sm" type="file" name="imageUrl" style="max-width: 700px;">
-      </form>
-      <button type="submit" form="imageForm" class="btn btn-outline-success btn-sm">送出</button>
+    <div class="d-none card-body my-2" id="imageDiv">
+      <div class="row justify-content-end">
+        <form action="/admin/exhibitions/{{exhibition.id}}/images?_method=PUT" id="imageForm"
+          class="col-9 col-sm-6 col-lg-4 d-inline-block needs-validation" method="post" enctype="multipart/form-data" novalidate>
+          <input class="form-control form-control-sm" type="file" name="exhImage" style="max-width: 400px;" required>
+          <div class="invalid-feedback">請上傳檔案</div>
+          <select class="form-select form-select-sm" name="type" aria-label=".form-select-sm" style="max-width: 400px;">
+            <option value="poster">Poster</option>
+            <option value="space">Space</option>
+            <option value="artist">Artist</option>
+            <option value="long poster">Long Poster</option>
+            <option value="introduction">Introduction</option>
+          </select>
+          <textarea class="form-control  form-control-sm" name="description" rows="1" placeholder="Description - Max 200 words"
+            style="max-width: 400px;" maxlength="200"></textarea>
+        </form>
+        <div class="col-3 col-sm-2 col-lg-1 align-self-end">
+          <button type="submit" form="imageForm" class="btn btn-outline-success btn-sm">送出</button>
+        </div>
+      </div>
     </div>
 
     <div class="card-body grid" id="exhibitionImagesDiv">
@@ -91,7 +105,6 @@
   const uploadBtn = document.getElementById('uploadBtn')
   const imageDiv = document.getElementById('imageDiv')
   uploadBtn.addEventListener('click', () => {
-    console.log('clicked')
     imageDiv.classList.toggle('d-none')
   })
 
@@ -116,5 +129,22 @@
       modal.style.display = "none";
     }
   })
+
+  // upload image validation
+  let forms = document.querySelectorAll('.needs-validation')
+
+  // loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+
 
 </script>

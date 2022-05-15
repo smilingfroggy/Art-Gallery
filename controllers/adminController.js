@@ -1,3 +1,4 @@
+const { imgurFileHandler } = require('../helpers/file-helpers')
 const db = require('../models');
 const Artwork = db.Artwork
 const Exhibition = db.Exhibition
@@ -89,6 +90,32 @@ const adminController = {
 
       // return res.json(result)
       return res.render('admin/exhibition', { exhibition: result })
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  putExhibitionImage: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      const { file } = req
+      const { type, description } = req.body
+
+      Promise.all([
+        Exhibition.findByPk(exhibitionId),
+        imgurFileHandler(file)
+      ])
+        .then(([exhibition, filePath]) => {
+          if (!exhibition) throw new Error('Exhibition does not exist!')
+          ExhibitionImage.create({
+            ExhibitionId: exhibitionId,
+            url: filePath,
+            type,
+            description
+          })
+          .then(() => {
+            res.redirect('back')
+          })
+        })
     } catch (error) {
       console.log(error)
     }
