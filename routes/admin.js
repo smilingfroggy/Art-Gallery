@@ -13,7 +13,7 @@ router.put('/exhibitions/:exhibitionId', adminController.putExhibition)
 router.get('/exhibitions/:exhibitionId/artworks', adminController.getExhibitionArtworks)
 router.put('/exhibitions/:exhibitionId/togglePrivacy', adminController.togglePrivacy)
 
-router.put('/exhibitions/:exhibitionId/images', upload.single('exhImage'), adminController.putExhibitionImage)
+router.put('/exhibitions/:exhibitionId/images', upload.array('exhImage', 10), adminController.putExhibitionImages)
 router.delete('/exhibitions/:exhibitionId/images', adminController.deleteExhibitionImages)
 
 

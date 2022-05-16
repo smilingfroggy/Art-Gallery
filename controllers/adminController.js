@@ -94,27 +94,28 @@ const adminController = {
       console.log(error)
     }
   },
-  putExhibitionImage: async (req, res) => {
+  putExhibitionImages: async (req, res) => {
     try {
       const { exhibitionId } = req.params
-      const { file } = req
+      const { files } = req
       const { type, description } = req.body
 
       Promise.all([
         Exhibition.findByPk(exhibitionId),
-        imgurFileHandler(file)
+        ...Array.from(files, file => imgurFileHandler(file))
       ])
-        .then(([exhibition, filePath]) => {
+        .then(async ([exhibition, ...filesPath]) => {
           if (!exhibition) throw new Error('Exhibition does not exist!')
-          ExhibitionImage.create({
-            ExhibitionId: exhibitionId,
-            url: filePath,
-            type,
-            description
-          })
-          .then(() => {
-            res.redirect('back')
-          })
+
+          for (let i = 0; i < filesPath.length; i++) {
+            await ExhibitionImage.create({
+              ExhibitionId: exhibitionId,
+              url: filesPath[i],
+              type,
+              description
+            })
+          }
+          res.redirect('back')
         })
     } catch (error) {
       console.log(error)
