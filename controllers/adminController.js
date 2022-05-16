@@ -79,7 +79,7 @@ const adminController = {
       result.date_end = result.date_end.toISOString().slice(0, 10)
 
       // console.log(result.ContainedArtworks) 
-      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster').url
+      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || 'https://i.imgur.com/nVNO3Kj.png'   // if no poster, use "no image"
       result.poster = usePoster
 
       // ContainedArtworks
@@ -120,6 +120,24 @@ const adminController = {
       console.log(error)
     }
   },
+  editExhibition: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      if (!exhibitionId) return res.render('admin/edit_exhibition')
+      
+      const exhibition = await Exhibition.findByPk(exhibitionId, {
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+        raw: true
+      })
+      exhibition.date_start = exhibition.date_start.toISOString().slice(0, 10)
+      exhibition.date_end = exhibition.date_end.toISOString().slice(0, 10)
+
+      // return res.json(exhibitionData)
+      return res.render('admin/edit_exhibition', { exhibition })
+    } catch (error) {
+      console.log(error)
+    }
+  },
   postExhibition: async (req, res) => {
     try {
       const { name, date_start, date_end, location, introduction } = req.body
@@ -132,6 +150,21 @@ const adminController = {
       const newExh = newExhData.toJSON()
 
       return res.redirect(`/admin/exhibitions/${newExh.id}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  putExhibition: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      const { name, date_start, date_end, location, introduction } = req.body
+      if (!name || !date_start || !date_end || !location) throw new Error('請輸入完整資訊')
+
+      const exhibitionData = await Exhibition.findByPk(exhibitionId)
+      await exhibitionData.update({
+        name, date_start, date_end, location, introduction
+      })
+      return res.redirect(`/admin/exhibitions/${exhibitionId}`)
     } catch (error) {
       console.log(error)
     }
