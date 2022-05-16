@@ -4,6 +4,9 @@ const adminController = require('../controllers/adminController')
 const upload = require('../middleware/multer')
 
 router.get('/exhibitions', adminController.getExhibitions)
+router.post('/exhibitions', adminController.postExhibition)
+router.get('/exhibitions/create', adminController.editExhibition)
+
 router.get('/exhibitions/:exhibitionId', adminController.getExhibition)
 router.get('/exhibitions/:exhibitionId/artworks', adminController.getExhibitionArtworks)
 router.put('/exhibitions/:exhibitionId/togglePrivacy', adminController.togglePrivacy)

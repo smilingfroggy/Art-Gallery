@@ -1,0 +1,112 @@
+<div class="container-fluid mt-5">
+
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">展覽資訊</h5>
+      <button class="btn btn-success" type="submit" form="exhibition-form">Submit</button>
+    </div>
+    <div class="card-body row d-flex justify-content-between">
+      {{#if exhibition}}
+      <form class="needs-validation" id="exhibition-form" action="/admin/exhibitions/{{exhibition.id}}?_method=PUT"
+        method="post" novalidate>
+        {{else}}
+        <form class="needs-validation" id="exhibition-form" action="/admin/exhibitions" method="post" novalidate>
+          {{/if}}
+          <div class="row">
+            <label for="exhibition-name" class="col-sm-2 col-form-label" align="center">展覽名稱
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">30字以內</small>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="exhibition-name" name="name" value="{{exhibition.name}}"
+                maxlength="30" required>
+              <div class="invalid-feedback">
+                請輸入展名
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="date_start" class="col-sm-2 col-form-label" align="center">開始日期<span
+                class="requiredInput">*</span></label>
+            <div class="col-sm-10">
+              <input type="date" class="form-control" id="date_start" name="date_start"
+                value="{{exhibition.date_start}}" required>
+              <div class="invalid-feedback">
+                請輸入開始日期
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="date_end" class="col-sm-2 col-form-label" align="center">結束日期<span
+                class="requiredInput">*</span></label>
+            <div class="col-sm-10">
+              <input type="date" class="form-control" id="date_end" name="date_end" value="{{exhibition.date_end}}"
+                required>
+              <div class="invalid-feedback">
+                請輸入結束日期
+              </div>
+              <div class="invalid-feedback d-none later-warning">
+                結束日期需晚於開始日期
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="location" class="col-sm-2 col-form-label" align="center">展覽地點
+              <span class="requiredInput">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="location" name="location" value="{{exhibition.location}}"
+                maxlength="30" required>
+              <div class="invalid-feedback">
+                請輸入地點
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="introduction" class="col-sm-2 col-form-label" align="center">展覽介紹<small
+                class="text-muted d-block">1000字以內</small></label>
+            <div class="col-sm-10">
+              <textarea class="form-control" id="introduction" name="introduction" maxlength="1000"
+                rows="5">{{exhibition.introduction}}</textarea>
+            </div>
+          </div>
+        </form>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // form validation
+  let forms = document.querySelectorAll('.needs-validation')
+  let date_start = document.querySelector('#date_start')
+  let date_end = document.querySelector('#date_end')
+  let later_warning = document.querySelector('.later-warning')
+
+  function checkDate() {
+    if (date_end.value < date_start.value) {
+      date_end.setCustomValidity('結束日期須晚於開始日期')
+      later_warning.classList.remove('d-none')
+      return
+    }
+    date_end.setCustomValidity('')
+  }
+
+  // loop over them and prevent submission
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity() || date_end.value < date_start.value) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        checkDate()
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+
+  date_end.addEventListener('change', checkDate())
+
+</script>

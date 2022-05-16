@@ -120,6 +120,22 @@ const adminController = {
       console.log(error)
     }
   },
+  postExhibition: async (req, res) => {
+    try {
+      const { name, date_start, date_end, location, introduction } = req.body
+      if (!name || !date_start || !date_end || !location) throw new Error('請輸入完整資訊')
+
+      const newExhData =  await Exhibition.create({
+        name, date_start, date_end, location, introduction,
+        privacy: 0  // default-private
+      })
+      const newExh = newExhData.toJSON()
+
+      return res.redirect(`/admin/exhibitions/${newExh.id}`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
   deleteExhibitionImages: async (req, res) => {
     try {
       const { imageId } = req.body
