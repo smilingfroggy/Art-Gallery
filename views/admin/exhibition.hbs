@@ -125,6 +125,13 @@
 
     if (target.classList.contains("delete")) {
       event.preventDefault()
+
+      function findForm(target) {
+        if (target.parentElement.tagName === "FORM")  return target.parentElement
+        return findForm(target.parentElement)
+      }
+      let form = findForm(target)
+
       Swal.fire({
         title: 'Are you sure?',
         text: `確定要刪除？`,
