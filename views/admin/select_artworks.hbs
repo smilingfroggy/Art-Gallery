@@ -1,4 +1,8 @@
 <div class="container-fluid mt-5">
+  <div class="d-flex justify-content-between">
+    <h4 class="mb-3">{{exhibition.name}}</h4>
+    <button class="btn btn-warning mb-3" type="submit" form="select_works">Add selected works</button>
+  </div>
   <table class="table table-bordered table-hover" style="min-width: 100%;">
     <thead>
       <tr>
@@ -13,7 +17,6 @@
         <th scope="col">深</th>
         <th scope="col">主題</th>
         <th scope="col">
-          <button class="btn btn-warning btn-sm" type="submit" form="select_works">Add selected works</button>
         </th>
       </tr>
       <tr id="query">
@@ -23,16 +26,16 @@
         <th scope="col" style="max-width: 100px;">
           <input type="text" class="form-control form-control-sm" id="sn">
         </th>
-        <th scope="col" style="max-width: 100px">
+        <th scope="col" style="max-width: 150px">
           <input type="text" class="form-control form-control-sm" id="artist">
         </th>
-        <th scope="col" style="max-width: 240px">
+        <th scope="col" style="max-width: 150px">
           <input type="text" class="form-control form-control-sm" id="name">
         </th>
         <th scope="col" style="max-width: 100px">
           <input type="text" class="form-control form-control-sm" id="year">
         </th>
-        <th scope="col" style="max-width: 240px">
+        <th scope="col" style="max-width: 150px">
           <input type="text" class="form-control form-control-sm" id="medium">
         </th>
         <th scope="col" style="max-width: 80px">
@@ -51,7 +54,7 @@
       </tr>
     </thead>
     <tbody>
-      <form action="/admin/exhibitions/{{exhibitionId}}/artworks?_method=PUT" method="post" id="select_works">
+      <form action="/admin/exhibitions/{{exhibition.id}}/artworks?_method=PUT" method="post" id="select_works">
         {{#each artworks }}
 
 

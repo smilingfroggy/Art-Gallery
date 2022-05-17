@@ -217,6 +217,9 @@ const adminController = {
   selectExhibitionArtworks: async (req, res) => {
     try {
       const { exhibitionId } = req.params
+      const exhibition = await Exhibition.findByPk(exhibitionId, {
+        raw: true, attributes: ['id', 'name']
+      })
       const artwork_rawData = await Artwork.findAll({
         attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
         include: [
@@ -235,7 +238,7 @@ const adminController = {
       })
 
       // return res.json({ exhibitionId, artworks: artworkData })
-      return res.render('admin/select_artworks', { exhibitionId, artworks: artworkData })
+      return res.render('admin/select_artworks', { exhibition , artworks: artworkData })
     } catch (error) {
       console.log(error)
     }
