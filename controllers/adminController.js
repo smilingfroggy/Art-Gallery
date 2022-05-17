@@ -7,6 +7,8 @@ const Medium = db.Medium
 const Artist = db.Artist
 const ArtistImage = db.ArtistImage
 const ArtworkImage = db.ArtworkImage
+const Subject = db.Subject
+const { Op } = require('sequelize')
 
 const adminController = {
   getExhibitions: async (req, res) => {
@@ -212,7 +214,32 @@ const adminController = {
       console.log(error)
     }
   },
+  selectExhibitionArtworks: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      const artwork_rawData = await Artwork.findAll({
+        attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
+        include: [
+          { model: Medium, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+          { model: Subject, as: 'SubjectTags', through: { attributes: [] } },
+          {
+            model: Exhibition, as: 'JoinedExhibitions', attributes: ['id', 'name'], through: { attributes: [] },
+            where: { id: { [Op.not]: exhibitionId} }, // exclude originally joined artworks
+          }
+        ]
+      })
+      const artworkData = JSON.parse(JSON.stringify(artwork_rawData))
 
+      artworkData.forEach(work => {
+        work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
+      })
+
+      // return res.json({ exhibitionId, artworks: artworkData })
+      return res.render('admin/select_artworks', { exhibitionId, artworks: artworkData })
+    } catch (error) {
+      console.log(error)
+    }
+  },
 }
 
 module.exports = adminController

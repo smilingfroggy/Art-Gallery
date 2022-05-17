@@ -1,0 +1,142 @@
+<div class="container-fluid mt-5">
+  <table class="table table-bordered table-hover" style="min-width: 100%;">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">品號</th>
+        <th scope="col">藝術家</th>
+        <th scope="col">品名</th>
+        <th scope="col">創作時間</th>
+        <th scope="col">媒材</th>
+        <th scope="col">長</th>
+        <th scope="col">寬</th>
+        <th scope="col">深</th>
+        <th scope="col">主題</th>
+        <th scope="col">
+          <button class="btn btn-warning btn-sm" type="submit" form="select_works">Add selected works</button>
+        </th>
+      </tr>
+      <tr id="query">
+        <th scope="col" style="max-width: 50px;">
+          <input type="text" class="form-control form-control-sm" id="id">
+        </th>
+        <th scope="col" style="max-width: 100px;">
+          <input type="text" class="form-control form-control-sm" id="sn">
+        </th>
+        <th scope="col" style="max-width: 100px">
+          <input type="text" class="form-control form-control-sm" id="artist">
+        </th>
+        <th scope="col" style="max-width: 240px">
+          <input type="text" class="form-control form-control-sm" id="name">
+        </th>
+        <th scope="col" style="max-width: 100px">
+          <input type="text" class="form-control form-control-sm" id="year">
+        </th>
+        <th scope="col" style="max-width: 240px">
+          <input type="text" class="form-control form-control-sm" id="medium">
+        </th>
+        <th scope="col" style="max-width: 80px">
+          <input type="text" class="form-control form-control-sm" id="height">
+        </th>
+        <th scope="col" style="max-width: 80px">
+          <input type="text" class="form-control form-control-sm" id="width">
+        </th>
+        <th scope="col" style="max-width: 80px">
+          <input type="text" class="form-control form-control-sm" id="depth">
+        </th>
+        <th scope="col" style="max-width: 240px">
+          <input type="text" class="form-control form-control-sm" id="tag">
+        </th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <form action="/admin/exhibitions/{{exhibitionId}}/artworks?_method=PUT" method="post" id="select_works">
+        {{#each artworks }}
+
+
+        <tr>
+          <th scope="row">
+            <label class="form-check-label" for="work_{{this.id}}">
+              {{this.id}}
+            </label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="{{this.id}}" id="work_{{this.id}}">
+            </div>
+          </th>
+          <td class="sn">{{this.serialNumber}}</td>
+          <td class="artist">{{this.artistName}}</td>
+          <td class="name">{{this.name}}</td>
+          <td class="year">{{this.creationTime}} {{this.creationTimeNote}}</td>
+          <td class="medium">{{this.Medium.name}}</td>
+          <td class="height">{{this.height}}</td>
+          <td class="width">{{this.width}}</td>
+          <td class="depth">{{this.depth}}</td>
+          <td class="tag">{{#each this.SubjectTags}} {{this.name}} {{/each}}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <a href="/admin/artworks/{{this.id}}">
+                <button class="btn btn-outline-primary btn-sm">More</button>
+              </a>
+              <a href="/admin/artworks/{{this.id}}/edit">
+                <button class="btn btn-outline-success btn-sm">Edit</button>
+              </a>
+              
+            </div>
+          </td>
+        </tr>
+        {{/each}}
+      </form>
+    </tbody>
+  </table>
+
+</div>
+
+
+<script>
+  let query = document.getElementById('query')
+  let tr = document.querySelectorAll('tbody > tr')
+
+  let id_td = document.querySelectorAll('th > label')
+  let sn_td = document.querySelectorAll('td.sn')
+  let artist_td = document.querySelectorAll('td.artist')
+  let name_td = document.querySelectorAll('td.name')
+  let year_td = document.querySelectorAll('td.year')
+  let medium_td = document.querySelectorAll('td.medium')
+  let height_td = document.querySelectorAll('td.height')
+  let width_td = document.querySelectorAll('td.width')
+  let depth_td = document.querySelectorAll('td.depth')
+  let tag_td = document.querySelectorAll('td.tag')
+
+  query.addEventListener('input', (event) => {
+    let id_input = document.getElementById('id')
+    let sn_input = document.getElementById('sn')
+    let artist_input = document.getElementById('artist')
+    let name_input = document.getElementById('name')
+    let year_input = document.getElementById('year')
+    let medium_input = document.getElementById('medium')
+    let height_input = document.getElementById('height')
+    let width_input = document.getElementById('width')
+    let depth_input = document.getElementById('depth')
+    let tag_input = document.getElementById('tag')
+
+    for (let i = 0; i < tr.length; i++) {
+      if (id_td[i].innerText.includes(id_input.value) && 
+        sn_td[i].innerText.includes(sn_input.value) &&
+        artist_td[i].innerText.includes(artist_input.value) &&
+        name_td[i].innerText.includes(name_input.value) &&
+        year_td[i].innerText.includes(year_input.value) &&
+        medium_td[i].innerText.includes(medium_input.value) &&
+        height_td[i].innerText.includes(height_input.value) &&
+        width_td[i].innerText.includes(width_input.value) &&
+        depth_td[i].innerText.includes(depth_input.value) &&
+        tag_td[i].innerText.includes(tag_input.value)
+      ) {
+        tr[i].style.display = ""
+      } else {
+        tr[i].style.display = "none"
+      }
+    }
+  })
+
+</script>
