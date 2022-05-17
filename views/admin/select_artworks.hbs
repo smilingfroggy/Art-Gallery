@@ -139,4 +139,19 @@
     }
   })
 
+  // check if any work selected
+  let check_inputs = document.querySelectorAll('input[type=checkbox]')
+  let form = document.getElementById('select_works')
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    for (let input of check_inputs ) {  
+      if (input.checked) {
+        return form.submit()
+      }
+    }
+    alert('Please selected at least one work')
+  }, false)
+
 </script>
