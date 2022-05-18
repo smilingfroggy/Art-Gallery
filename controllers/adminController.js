@@ -128,7 +128,7 @@ const adminController = {
     try {
       const { exhibitionId } = req.params
       if (!exhibitionId) return res.render('admin/edit_exhibition')
-      
+
       const exhibition = await Exhibition.findByPk(exhibitionId, {
         attributes: { exclude: ['createdAt', 'updatedAt'] },
         raw: true
@@ -147,7 +147,7 @@ const adminController = {
       const { name, date_start, date_end, location, introduction } = req.body
       if (!name || !date_start || !date_end || !location) throw new Error('請輸入完整資訊')
 
-      const newExhData =  await Exhibition.create({
+      const newExhData = await Exhibition.create({
         name, date_start, date_end, location, introduction,
         privacy: 0  // default-private
       })
@@ -240,14 +240,25 @@ const adminController = {
       const exhibition = await Exhibition.findByPk(exhibitionId, {
         raw: true, attributes: ['id', 'name']
       })
+
+      // find out selected artwork to be excluded
+      const selected_artwork_rawData = await Artwork.findAll({
+        raw: true, nest: true, attributes: ['id'],
+        include: {
+          model: Exhibition, as: 'JoinedExhibitions', attributes: [],
+          through: { attributes: [] }, where: { id: exhibitionId }
+        }
+      })
+      const selected_artworkId = selected_artwork_rawData.map(value => value.id)
+
       const artwork_rawData = await Artwork.findAll({
         attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
+        where: { id: { [Op.notIn]: selected_artworkId }},  // exclude originally selected artworks
         include: [
           { model: Medium, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-          { model: Subject, as: 'SubjectTags', through: { attributes: [] } },
+          { model: Subject, as: 'SubjectTags', attributes: ['id', 'name'], through: { attributes: [] } },
           {
             model: Exhibition, as: 'JoinedExhibitions', attributes: ['id', 'name'], through: { attributes: [] },
-            where: { id: { [Op.not]: exhibitionId} }, // exclude originally joined artworks
           }
         ]
       })
@@ -257,7 +268,7 @@ const adminController = {
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
       })
 
-      // return res.json({ exhibitionId, artworks: artworkData })
+      // return res.json({ exhibition , artworks: artworkData })
       return res.render('admin/select_artworks', { exhibition , artworks: artworkData })
     } catch (error) {
       console.log(error)
