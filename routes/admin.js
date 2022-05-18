@@ -10,6 +10,8 @@ router.get('/exhibitions/create', adminController.editExhibition)
 router.get('/exhibitions/:exhibitionId', adminController.getExhibition)
 router.get('/exhibitions/:exhibitionId/edit', adminController.editExhibition)
 router.put('/exhibitions/:exhibitionId', adminController.putExhibition)
+router.delete('/exhibitions/:exhibitionId', adminController.deleteExhibition)
+
 router.get('/exhibitions/:exhibitionId/artworks', adminController.getExhibitionArtworks)
 router.get('/exhibitions/:exhibitionId/select_artworks', adminController.selectExhibitionArtworks)
 router.put('/exhibitions/:exhibitionId/artworks', adminController.putExhibitionArtworks)

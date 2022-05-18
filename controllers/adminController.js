@@ -173,6 +173,24 @@ const adminController = {
       console.log(error)
     }
   },
+  deleteExhibition: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      if (!exhibitionId) throw new Error('Exhibition does not exist')
+      Promise.all([
+        ExhibitionImage.destroy({ where: { ExhibitionId: exhibitionId }}),
+        ExhibitionArtwork.destroy({ where: { ExhibitionId: exhibitionId }})
+      ])
+        .then(([images, artworks]) => {  // deleted numbers
+          Exhibition.destroy({ where: { id: exhibitionId } })
+            .then(() => {
+              return res.redirect('back')
+            })
+        })
+    } catch (error) {
+      console.log(error)
+    }
+  },
   deleteExhibitionImages: async (req, res) => {
     try {
       const { imageId } = req.body

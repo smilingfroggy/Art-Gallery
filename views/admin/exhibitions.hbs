@@ -71,9 +71,10 @@
     event.preventDefault()
     let form = event.target.parentElement
     let name = form.parentElement.parentElement.children[1].innerText
+    let image_sum = form.parentElement.parentElement.children[7].innerText
     Swal.fire({
       title: 'Are you sure?',
-      text: `確定要刪除？ ${name}` ,
+      text: `確定要刪除 ${name}及${image_sum}張照片？` ,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -83,7 +84,7 @@
       if (result.isConfirmed) {
         Swal.fire(
           '已刪除!',
-          `${name}`,
+          `${name}及${image_sum}張照片`,
           'success'
         ).then(result => {
           form.submit()
