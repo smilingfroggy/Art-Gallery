@@ -7,6 +7,7 @@ const Medium = db.Medium
 const Artist = db.Artist
 const ArtistImage = db.ArtistImage
 const ArtworkImage = db.ArtworkImage
+const ExhibitionArtwork = db.ExhibitionArtwork
 const Subject = db.Subject
 const { Op } = require('sequelize')
 
@@ -243,6 +244,39 @@ const adminController = {
       console.log(error)
     }
   },
+  putExhibitionArtworks: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      const artworks = Object.keys(req.body)  //eg. ['49','53','94','100']
+      const addedWorks = await ExhibitionArtwork.bulkCreate(Array.from(artworks, id => {
+        return { 
+          ExhibitionId: exhibitionId,
+          ArtworkId: id
+        }
+      }, { validate: true }))
+
+      return res.redirect(`/admin/exhibitions/${exhibitionId}/artworks`)
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  deleteExhibitionArtworks: async (req, res) => {
+    try {
+      const { exhibitionId } = req.params
+      const { artworkId } = req.body
+      console.log(`exhibitionId, ${exhibitionId}, artworkId, ${artworkId}`)
+      await ExhibitionArtwork.destroy({
+        where: {
+          ExhibitionId: exhibitionId,
+          ArtworkId: artworkId
+        }
+      })
+      
+      return res.redirect(`/admin/exhibitions/${exhibitionId}/artworks`)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 module.exports = adminController
