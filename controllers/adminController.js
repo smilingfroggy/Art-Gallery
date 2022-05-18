@@ -226,6 +226,7 @@ const adminController = {
         work.creationTime = work.creationTime ? work.creationTime.toISOString().slice(0, 4) : null
         if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })  // if no image in DB, use "no image"
       })
+      result.artwork_sum = result.ContainedArtworks.length
 
       // return res.json(result)
       return res.render('admin/exhibition_artworks', { exhibition: result })

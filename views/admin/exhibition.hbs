@@ -1,5 +1,12 @@
 <div class="container-fluid mt-5">
-  <h4 class="mb-3">{{exhibition.name}}</h4>
+  <div class="d-flex justify-content-between">
+    <h4 class="mb-3">{{exhibition.name}}</h4>
+    <p>共{{exhibition.artwork_sum}}件作品
+      <a class="ms-2" href="/admin/exhibitions/{{exhibition.id}}/artworks">
+        <span style="font-size: small;"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+      </a>
+    </p>
+  </div>
 
   <div class="card mb-5">
     <div class="card-header d-flex justify-content-between">

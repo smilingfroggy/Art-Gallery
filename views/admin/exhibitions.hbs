@@ -30,7 +30,11 @@
         <td>{{this.date_end}}</td>
         <td class="d-none">{{this.location}}</td>
         <td class="d-none">{{this.introduction}}</td>
-        <td>{{this.artwork_sum}}</td>
+        <td>{{this.artwork_sum}}
+          <a class="ms-2" href="/admin/exhibitions/{{this.id}}/artworks">
+            <span style="font-size: small;"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+          </a>
+        </td>
         <td>{{this.image_sum}}</td>
         <td>
           <form action="/admin/exhibitions/{{this.id}}/togglePrivacy?_method=PUT" method="post">
