@@ -40,8 +40,11 @@ const exhibitionController = {
   },
   getExhibitionInfo: async (req, res) => {
     try {
-      const exhibition_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
-        where: { 'privacy': 2 },
+      const exhibition_rawData = await Exhibition.findOne({
+        where: {
+          privacy: 2,
+          id: req.params.exhibitionId
+        },
         include: [
           { model: ExhibitionImage, attributes: ['url', 'type', 'description'] },
           {
@@ -53,9 +56,7 @@ const exhibitionController = {
         attributes: { exclude: ['createdAt', 'updatedAt'] },
       })
 
-      if (!exhibition_rawData) {
-        return res.send('Oops! Exhibition unavailable!')
-      }
+      if (!exhibition_rawData) throw new Error('Exhibition unavailable')
 
       let result = exhibition_rawData.toJSON()
       const count_work = result.ContainedArtworks.length
@@ -73,9 +74,12 @@ const exhibitionController = {
   },
   getExhibitionArtworks: async (req, res) => {
     try {
-      const exhibitionArtworks_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
-        where: { 'privacy': 2 },
-        attributes: ['id', 'name'],
+      const exhibitionArtworks_rawData = await Exhibition.findOne({
+        where: {
+          privacy: 2,
+          id: req.params.exhibitionId
+        },
+        attributes: ['id', 'name', 'privacy'],
         include: {
           model: Artwork, as: 'ContainedArtworks',
           attributes: ['id', 'artistName', 'name', 'creationTime', 'height', 'width', 'depth'],
@@ -92,9 +96,7 @@ const exhibitionController = {
         },
       })
 
-      if (!exhibitionArtworks_rawData) {
-        return res.send('Oops! Exhibition artwork unavailable!')
-      }
+      if (!exhibitionArtworks_rawData) throw new Error('Exhibition artwork unavailable')
 
       let result = exhibitionArtworks_rawData.toJSON()
       // 整理藝術品資料: medium, size
@@ -145,14 +147,17 @@ const exhibitionController = {
   },
   getExhibitionImages: async (req, res) => {
     try {
-      const exhibitionImages_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
-        where: { 'privacy': 2 },
+      const exhibitionImages_rawData = await Exhibition.findOne({
+        where: {
+          privacy: 2,
+          id: req.params.exhibitionId
+        },
         attributes: ['id', 'name'],
         include: {
           model: ExhibitionImage, attributes: ['id', 'url', 'type', 'description'],
         },
       })
-
+      if (!exhibitionImages_rawData) throw new Error('Exhibition images unavailable')
       const exhibitionImages = exhibitionImages_rawData.toJSON()
 
       // return res.json(exhibitionImages)
