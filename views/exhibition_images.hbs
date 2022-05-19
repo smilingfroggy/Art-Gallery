@@ -19,6 +19,9 @@
 
   {{!-- exhibition images --}}
   <div class="grid">
+    {{#unless exhibition.ExhibitionImages}}
+    <h5 align="center">No image available!</h5>
+    {{/unless}}
     {{#each exhibition.ExhibitionImages}}
     <div class="grid-item grid-item-exhImage">
       <img src="{{this.url}}" alt="">
@@ -39,7 +42,6 @@
   const $grid = $('.grid').masonry({
     itemSelector: '.grid-item',
     columnWidth: 30,  // 欄與欄之間的距離
-    // horizontalOrder: true
   });
 
   $grid.imagesLoaded().progress(function () {  // trigger layout after loaded then initialize Masonry

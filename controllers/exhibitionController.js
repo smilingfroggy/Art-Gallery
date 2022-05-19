@@ -23,7 +23,7 @@ const exhibitionController = {
       let exhibitionsData = exhibitions_rawData.map(exhibition => {
         let count = exhibition.ContainedArtworks.length
         delete exhibition.dataValues.ContainedArtworks
-        let useImage = exhibition.dataValues.ExhibitionImages.find(images => images.type === 'poster').url
+        let useImage = exhibition.dataValues.ExhibitionImages.find(images => images.type === 'poster')?.url || 'https://i.imgur.com/nVNO3Kj.png'   // if no poster, use "no image"
         return {
           ...exhibition.dataValues,
           date_start: exhibition.dataValues.date_start.toISOString().slice(0, 10),
@@ -63,7 +63,7 @@ const exhibitionController = {
       result.artwork_sum = count_work
 
       // console.log(result.ContainedArtworks) 
-      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster').url
+      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || 'https://i.imgur.com/nVNO3Kj.png'   // if no poster, use "no image"
       result.poster = usePoster
 
       // return res.json(result)
@@ -105,7 +105,7 @@ const exhibitionController = {
 
       result.ContainedArtworks.forEach(work => {
         work.medium = work.Medium.name
-        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
+        work.image = work.ArtworkImages[0]?.url || 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
         delete work.Medium
         delete work.ArtworkImages
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")

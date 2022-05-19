@@ -12,6 +12,10 @@
       </ul>
     </div>
   </div>
+
+  {{#unless exhibitionsData}}
+  <h5 align="center">No exhibition available!</h5>
+  {{/unless}}
   <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center">
   {{#each exhibitionsData}}
   
@@ -26,12 +30,13 @@
         <div class="card-body">
           <h5 class="card-title">{{this.name}} </h5>
           
-          <p>開始日期：{{this.date_start}}</p>
-          <p>結束日期：{{this.date_end}}</p>
+          <p><small>展期：{{this.date_start}} - {{this.date_end}}</small></p>
           <p class="card-text">{{this.introduction}}</p>
+          <a href="/exhibitions/{{this.id}}/artworks" title="瀏覽展出作品">
           <p class="card-text" align="right"><small class="text-muted">
             <i class="fa-regular fa-image"></i> {{this.artwork_sum}}
           </small></p>
+          </a>
         
         </div>
       </div>
