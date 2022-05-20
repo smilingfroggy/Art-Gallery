@@ -8,7 +8,7 @@ const ArtistImage = db.ArtistImage
 const ArtworkImage = db.ArtworkImage
 
 const exhibitionController = {
-  getExhibitions: async (req, res) => {
+  getExhibitions: async (req, res, next) => {
     try {
       const exhibitions_rawData = await Exhibition.findAll({
         where: { 'privacy': 2 },
@@ -36,9 +36,10 @@ const exhibitionController = {
       return res.render('exhibitions', { exhibitionsData })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  getExhibitionInfo: async (req, res) => {
+  getExhibitionInfo: async (req, res, next) => {
     try {
       const exhibition_rawData = await Exhibition.findOne({
         where: {
@@ -70,9 +71,10 @@ const exhibitionController = {
       return res.render('exhibition_info', { exhibition: result })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  getExhibitionArtworks: async (req, res) => {
+  getExhibitionArtworks: async (req, res, next) => {
     try {
       const exhibitionArtworks_rawData = await Exhibition.findOne({
         where: {
@@ -143,9 +145,10 @@ const exhibitionController = {
       return res.render('exhibition_artworks', { exhibition: result })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  getExhibitionImages: async (req, res) => {
+  getExhibitionImages: async (req, res, next) => {
     try {
       const exhibitionImages_rawData = await Exhibition.findOne({
         where: {
@@ -164,6 +167,7 @@ const exhibitionController = {
       res.render('exhibition_images', { exhibition: exhibitionImages })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
 

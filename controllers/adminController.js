@@ -12,7 +12,7 @@ const Subject = db.Subject
 const { Op } = require('sequelize')
 
 const adminController = {
-  getExhibitions: async (req, res) => {
+  getExhibitions: async (req, res, next) => {
     try {
       const exhibitions_rawData = await Exhibition.findAll({
         include: [
@@ -40,21 +40,24 @@ const adminController = {
       return res.render('admin/exhibitions', { exhibitionsData })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  togglePrivacy: async (req, res) => {
+  togglePrivacy: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       const { privacy } = req.body
+      if (!exhibitionId || !privacy) throw new Error('Please provide valid exhibition ID and privacy')
       await Exhibition.update({ privacy: (Number(privacy) ? 0 : 2) }, {
         where: { id: exhibitionId },
       })
       return res.redirect('back')
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  getExhibition: async (req, res) => {
+  getExhibition: async (req, res, next) => {
     try {
       const exhibition_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
         include: [
@@ -72,9 +75,7 @@ const adminController = {
         attributes: { exclude: ['createdAt', 'updatedAt'] },
       })
 
-      if (!exhibition_rawData) {
-        return res.send('Oops! Exhibition unavailable!')
-      }
+      if (!exhibition_rawData) throw new Error('Exhibition unavailable')
 
       let result = exhibition_rawData.toJSON()
       result.artwork_sum = result.ContainedArtworks.length
@@ -95,13 +96,16 @@ const adminController = {
       return res.render('admin/exhibition', { exhibition: result })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  putExhibitionImages: async (req, res) => {
+  putExhibitionImages: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       const { files } = req
       const { type, description } = req.body
+      if (!files.length) throw new Error('Please provide image files')
+      if (!exhibitionId) throw new Error('Please provide valid exhibition ID')
 
       Promise.all([
         Exhibition.findByPk(exhibitionId),
@@ -122,9 +126,10 @@ const adminController = {
         })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  editExhibition: async (req, res) => {
+  editExhibition: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       if (!exhibitionId) return res.render('admin/edit_exhibition')
@@ -133,6 +138,7 @@ const adminController = {
         attributes: { exclude: ['createdAt', 'updatedAt'] },
         raw: true
       })
+      if (!exhibition) throw new Error('Exhibition does not exist!')
       exhibition.date_start = exhibition.date_start.toISOString().slice(0, 10)
       exhibition.date_end = exhibition.date_end.toISOString().slice(0, 10)
 
@@ -140,9 +146,10 @@ const adminController = {
       return res.render('admin/edit_exhibition', { exhibition })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  postExhibition: async (req, res) => {
+  postExhibition: async (req, res, next) => {
     try {
       const { name, date_start, date_end, location, introduction } = req.body
       if (!name || !date_start || !date_end || !location) throw new Error('請輸入完整資訊')
@@ -156,27 +163,30 @@ const adminController = {
       return res.redirect(`/admin/exhibitions/${newExh.id}`)
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  putExhibition: async (req, res) => {
+  putExhibition: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       const { name, date_start, date_end, location, introduction } = req.body
-      if (!name || !date_start || !date_end || !location) throw new Error('請輸入完整資訊')
+      if (!exhibitionId || !name || !date_start || !date_end || !location) throw new Error('請輸入完整資訊')
 
       const exhibitionData = await Exhibition.findByPk(exhibitionId)
+      if (!exhibitionData) throw new Error('Exhibition does not exist')
       await exhibitionData.update({
         name, date_start, date_end, location, introduction
       })
       return res.redirect(`/admin/exhibitions/${exhibitionId}`)
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  deleteExhibition: async (req, res) => {
+  deleteExhibition: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
-      if (!exhibitionId) throw new Error('Exhibition does not exist')
+      if (!exhibitionId) throw new Error('Please provide valid exhibition ID')
       Promise.all([
         ExhibitionImage.destroy({ where: { ExhibitionId: exhibitionId }}),
         ExhibitionArtwork.destroy({ where: { ExhibitionId: exhibitionId }})
@@ -189,9 +199,10 @@ const adminController = {
         })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  deleteExhibitionImages: async (req, res) => {
+  deleteExhibitionImages: async (req, res, next) => {
     try {
       const { imageId } = req.body
       const image = await ExhibitionImage.findByPk(imageId)
@@ -200,11 +211,14 @@ const adminController = {
       return res.redirect('back')
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
   getExhibitionArtworks: async (req, res) => {
     try {
-      const exhibitionArtworks_rawData = await Exhibition.findByPk(req.params.exhibitionId, {
+      const { exhibitionId } = req.params
+      if (!exhibitionId) throw new Error('Please provide valid exhibition ID')
+      const exhibitionArtworks_rawData = await Exhibition.findByPk(exhibitionId, {
         attributes: ['id', 'name'],
         include: {
           model: Artwork, as: 'ContainedArtworks',
@@ -217,9 +231,7 @@ const adminController = {
         },
       })
 
-      if (!exhibitionArtworks_rawData) {
-        return res.send('Oops! Exhibition artwork unavailable!')
-      }
+      if (!exhibitionArtworks_rawData) throw new Error('Exhibition artwork unavailable!')
 
       let result = exhibitionArtworks_rawData.toJSON()
       result.ContainedArtworks.forEach(work => {
@@ -232,14 +244,16 @@ const adminController = {
       return res.render('admin/exhibition_artworks', { exhibition: result })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  selectExhibitionArtworks: async (req, res) => {
+  selectExhibitionArtworks: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       const exhibition = await Exhibition.findByPk(exhibitionId, {
         raw: true, attributes: ['id', 'name']
       })
+      if (!exhibition) throw new Error('Exhibition does not exist')
 
       // find out selected artwork to be excluded
       const selected_artwork_rawData = await Artwork.findAll({
@@ -262,6 +276,7 @@ const adminController = {
           }
         ]
       })
+      if (!artwork_rawData) throw new Error('No other artwork has not been selected')
       const artworkData = JSON.parse(JSON.stringify(artwork_rawData))
 
       artworkData.forEach(work => {
@@ -272,12 +287,15 @@ const adminController = {
       return res.render('admin/select_artworks', { exhibition , artworks: artworkData })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  putExhibitionArtworks: async (req, res) => {
+  putExhibitionArtworks: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       const artworks = Object.keys(req.body)  //eg. ['49','53','94','100']
+      if (!artworks.length) throw new Error('Please select one work at least')
+      if (!exhibitionId) throw new Error('Please provide valid exhibition ID')
       const addedWorks = await ExhibitionArtwork.bulkCreate(Array.from(artworks, id => {
         return { 
           ExhibitionId: exhibitionId,
@@ -288,13 +306,14 @@ const adminController = {
       return res.redirect(`/admin/exhibitions/${exhibitionId}/artworks`)
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  deleteExhibitionArtworks: async (req, res) => {
+  deleteExhibitionArtworks: async (req, res, next) => {
     try {
       const { exhibitionId } = req.params
       const { artworkId } = req.body
-      console.log(`exhibitionId, ${exhibitionId}, artworkId, ${artworkId}`)
+      if (!exhibitionId || !artworkId) throw new Error('Please provide valid exhibition ID')
       await ExhibitionArtwork.destroy({
         where: {
           ExhibitionId: exhibitionId,
@@ -305,6 +324,7 @@ const adminController = {
       return res.redirect(`/admin/exhibitions/${exhibitionId}/artworks`)
     } catch (error) {
       console.log(error)
+      next(error)
     }
   }
 }

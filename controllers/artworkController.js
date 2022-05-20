@@ -9,7 +9,7 @@ const ArtistImage = db.ArtistImage
 const ArtworkImage = db.ArtworkImage
 
 const artworkController = {
-  getSelections: async (req, res) => {
+  getSelections: async (req, res, next) => {
     try {
       const selections_artist = await Artist.findAll({
         include: {
@@ -57,9 +57,10 @@ const artworkController = {
       return res.render('artworks', { selections })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  getArtworks: async (req, res) => {
+  getArtworks: async (req, res, next) => {
     try {
       // get selections
       const selections_artist = await Artist.findAll({ attributes: ['id', 'name'], raw: true, order: ['name'] })
@@ -85,10 +86,25 @@ const artworkController = {
       if (shape_portrait && !shape_landscape) shape = '直式'
       if (!shape_portrait && shape_landscape) shape = '橫式'
 
+      let warning_messages = []
+      let mediumId_search, subjectId_search, artistId_search
+      if (mediumId) {
+        mediumId_search = selections_medium.find(selection => selection.id === Number(mediumId))
+        if (!mediumId_search) warning_messages.push({ message: `Cannot find medium Id: ${mediumId}` })
+      }
+      if (subjectId) {
+        subjectId_search = selections_subject.find(selection => selection.id === Number(subjectId))
+        if (!subjectId_search) warning_messages.push({ message: `Cannot find subject Id: ${subjectId}` })
+      }
+      if (artistId) {
+        artistId_search = selections_artist.find(selection => selection.id === Number(artistId))
+        if (!artistId_search) warning_messages.push({ message: `Cannot find artist Id: ${artistId}` })
+      }
+      
       let searching = {
-        medium: medium || (mediumId ? selections_medium.find(selection => selection.id === Number(mediumId)).name : undefined),
-        subject: subject || (subjectId ? selections_subject.find(selection => selection.id === Number(subjectId)).name : undefined),
-        artist: artist || (artistId ? selections_artist.find(selection => selection.id === Number(artistId)).name : undefined),
+        medium: medium || (mediumId ? (mediumId_search?.name || undefined) : undefined),
+        subject: subject || (subjectId ? (subjectId_search?.name || undefined) : undefined),
+        artist: artist || (artistId ? (artistId_search?.name || undefined) : undefined),
         artworkName,
         height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper,
         height: sizeQueryText('長', height_lower, height_upper),
@@ -122,7 +138,7 @@ const artworkController = {
             ]
           }
         } else {  // exclude null
-          whereQuery['creationTime'] = { 
+          whereQuery['creationTime'] = {
             [Op.between]: [createYear_lower || '1600', createYear_upper || '2100']
           }
         }
@@ -160,12 +176,13 @@ const artworkController = {
       })
 
       // return res.json({ selections, searching, artwork_result })
-      return res.render('artworks', { selections, searching, artwork_result })
+      return res.render('artworks', { selections, searching, artwork_result, warning_messages })
     } catch (error) {
       console.log(error)
+      next(error)
     }
   },
-  getArtwork: async (req, res) => {
+  getArtwork: async (req, res, next) => {
     try {
       const artwork_rawData = await Artwork.findByPk(req.params.artworkId, {
         attributes: { exclude: ['MediumId', 'viewCount', 'createdAt', 'updatedAt', 'piecesNum'] },
@@ -180,6 +197,7 @@ const artworkController = {
           }
         ]
       })
+      if (!artwork_rawData) throw new Error('Artwork unavailable')
       let artwork = artwork_rawData.toJSON()
       // console.log(artwork)
 
@@ -211,6 +229,7 @@ const artworkController = {
 
     } catch (error) {
       console.log(error)
+      next(error)
     }
   }
 }
