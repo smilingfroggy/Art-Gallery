@@ -3,11 +3,10 @@ const router = express.Router();
 const exhibitionController = require('../controllers/exhibitionController')
 const artworkController = require('../controllers/artworkController')
 const artistController = require('../controllers/artistController')
+const { generalErrorHandler } = require('../middleware/error-handler')
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+router.get('/', exhibitionController.getExhibitions)
 
 router.get('/exhibitions/', exhibitionController.getExhibitions)
 router.get('/exhibitions/:exhibitionId', exhibitionController.getExhibitionInfo)
@@ -19,5 +18,6 @@ router.get('/artworks/search', artworkController.getArtworks)
 router.get('/artworks/:artworkId', artworkController.getArtwork)
 
 router.get('/artists/:artistId', artistController.getArtist)
+router.use('/', generalErrorHandler)
 
 module.exports = router;

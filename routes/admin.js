@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../controllers/adminController')
 const upload = require('../middleware/multer')
+const { generalErrorHandler } = require('../middleware/error-handler')
 
 router.get('/exhibitions', adminController.getExhibitions)
 router.post('/exhibitions', adminController.postExhibition)
@@ -20,6 +21,6 @@ router.put('/exhibitions/:exhibitionId/togglePrivacy', adminController.togglePri
 
 router.put('/exhibitions/:exhibitionId/images', upload.array('exhImage', 10), adminController.putExhibitionImages)
 router.delete('/exhibitions/:exhibitionId/images', adminController.deleteExhibitionImages)
-
+router.use('/', generalErrorHandler)
 
 module.exports = router

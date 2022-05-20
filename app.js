@@ -6,6 +6,8 @@ if (process.env.NODE_ENV !== "production") {
 }
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const flash = require('connect-flash')
+const session = require('express-session')
 const logger = require('morgan');
 const { engine } = require('express-handlebars')
 const hbsHelpers = require('./config/handlebars-helpers')
@@ -14,6 +16,7 @@ const apisRouter = require('./routes/apis');
 const adminRouter = require('./routes/admin')
 
 const app = express();
+const SESSION_SECRET = 'secret'
 
 // view engine setup
 app.engine('hbs', engine({ defaultLayout: 'main', extname: '.hbs', helpers: hbsHelpers}))
@@ -24,6 +27,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false} ))
+app.use(flash())
+app.use( function (req, res, next) {
+  res.locals.success_messages = req.flash('success_messages')
+  res.locals.error_messages = req.flash('error_messages')
+  res.locals.warning_messages = req.flash('warning_messages')
+  next()
+})
 
 app.use(methodOverride('_method'))
 app.use('/', indexRouter);
