@@ -14,6 +14,7 @@ const hbsHelpers = require('./config/handlebars-helpers')
 const indexRouter = require('./routes/index');
 const apisRouter = require('./routes/apis');
 const adminRouter = require('./routes/admin')
+const userRouter = require('./routes/user')
 
 const app = express();
 const SESSION_SECRET = 'secret'
@@ -40,6 +41,7 @@ app.use(methodOverride('_method'))
 app.use('/', indexRouter);
 app.use('/api', apisRouter);
 app.use('/admin', adminRouter)
+app.use('/user', userRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
