@@ -29,6 +29,19 @@ const userController = {
       next(error)
     }
   },
+  login: async (req, res, next) => {
+    req.flash('success_messages', 'Log in successfully')
+    res.redirect('/artworks')
+  },
+  logout: (req, res, next) => {
+    try {
+      req.flash('success_messages', 'Log out successfully')
+      req.logOut(() => res.redirect('/user/login'));
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  }
 }
 
 

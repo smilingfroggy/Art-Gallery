@@ -8,6 +8,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash')
 const session = require('express-session')
+const passport = require('./config/passport')
 const logger = require('morgan');
 const { engine } = require('express-handlebars')
 const hbsHelpers = require('./config/handlebars-helpers')
@@ -29,6 +30,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false} ))
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(flash())
 app.use( function (req, res, next) {
   res.locals.success_messages = req.flash('success_messages')
