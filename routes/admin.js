@@ -22,6 +22,8 @@ router.put('/exhibitions/:exhibitionId/togglePrivacy', authenticatedAdmin, admin
 
 router.put('/exhibitions/:exhibitionId/images', authenticatedAdmin, upload.array('exhImage', 10), adminController.putExhibitionImages)
 router.delete('/exhibitions/:exhibitionId/images', authenticatedAdmin, adminController.deleteExhibitionImages)
+
+router.get('/artworks', adminController.getArtworks)
 router.use('/', generalErrorHandler)
 
 module.exports = router

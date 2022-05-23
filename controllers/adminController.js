@@ -326,7 +326,33 @@ const adminController = {
       console.log(error)
       next(error)
     }
-  }
+  },
+  getArtworks: async (req, res, next) => {
+    try {
+      const artwork_rawData = await Artwork.findAll({
+        attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
+        include: [
+          { model: Medium, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+          { model: Subject, as: 'SubjectTags', attributes: ['id', 'name'], through: { attributes: [] } },
+          {
+            model: Exhibition, as: 'JoinedExhibitions', attributes: ['id', 'name'], through: { attributes: [] },
+          }
+        ]
+      })
+      if (!artwork_rawData) throw new Error('No artwork created')
+      const artworks = JSON.parse(JSON.stringify(artwork_rawData))
+
+      artworks.forEach(work => {
+        work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
+      })
+
+      // res.json(artworks)
+      res.render('admin/select_artworks', { artworks })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
 }
 
 module.exports = adminController
