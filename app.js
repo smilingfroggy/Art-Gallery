@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const flash = require('connect-flash')
 const session = require('express-session')
 const passport = require('./config/passport')
+const { getUser } = require('./helpers/auth-helpers')
 const logger = require('morgan');
 const { engine } = require('express-handlebars')
 const hbsHelpers = require('./config/handlebars-helpers')
@@ -37,6 +38,7 @@ app.use( function (req, res, next) {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
   res.locals.warning_messages = req.flash('warning_messages')
+  res.locals.user = getUser(req)
   next()
 })
 

@@ -12,46 +12,43 @@
     {{!-- Navbar --}}
     <nav class="navbar navbar-expand-lg fixed-top navbar-light trans">
       <div class="container-fluid mx-5">
-        <a class="navbar-brand col-6" href="#"><i class="fa-solid fa-palette"></i>  ART GALLERY  </a>
+        <a class="navbar-brand" href="/"> GALLERY </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-2 mb-2 mb-lg-0">
-            <li class="nav-item mx-2">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <ul class="navbar-nav ms-auto me-2 mb-2 mb-lg-0">
+            <li class="nav-item mx-2 d-flex">
+              <a class="nav-link" href="/exhibitions">Exhibitions</a>
+              {{#if user.isAdmin}}
+              <a class="nav-link" href="/admin/exhibitions"><i class="fa-solid fa-square-pen"></i></a>
+              {{/if}}
             </li>
-            <li class="nav-item dropdown mx-2">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                Exhibitions
-              </a>
-              <ul class="dropdown-menu mx-2" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Latest</a></li>
-                <li><a class="dropdown-item" href="#">Past Exhibitions</a></li>
-              </ul>
+            <li class="nav-item mx-2 d-flex">
+              <a class="nav-link" href="/artworks">Artworks</a>
+              {{#if user.isAdmin}}
+              <a class="nav-link" href="/admin/artworks"><i class="fa-solid fa-square-pen"></i></a>
+              {{/if}}
             </li>
-            <li class="nav-item mx-2">
-              <a class="nav-link" href="#">Artists</a>
-            </li>
-            <li class="nav-item mx-2">
-              <a class="nav-link" href="#">Artworks</a>
-            </li>
+            {{#unless user.isAdmin}}
             <li class="nav-item mx-2">
               <a class="nav-link" href="#">Collection</a>
             </li>
+            {{/unless}}
+            {{#if user}}
             <li class="nav-item mx-2">
-              <a class="nav-link" href="#"><i class="fa-solid fa-circle-user"></i> </a>
-            </li>
-            <li class="nav-item mx-2">
-              <form action="/user/logout" method="post" id="logout">
+              <form action="/user/logout" method="post" id="logout" title="Logout">
                 <button class="btn" type="submit" form="logout">
                   <i class="fa-solid fa-arrow-right-from-bracket"></i> 
                 </button>
               </form>
             </li>
-
+            {{else}}
+            <li class="nav-item mx-2">
+              <a class="nav-link" href="/user/login"><i class="fa-solid fa-circle-user"></i></a>
+            </li>
+            {{/if}}
           </ul>
         </div>
       </div>
