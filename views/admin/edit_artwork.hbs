@@ -1,0 +1,197 @@
+<div class="container-fluid mt-5">
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">作品資訊</h5>
+      <button class="btn btn-success" type="submit" form="artwork_form">Submit</button>
+    </div>
+    <div class="card-body row d-flex justify-content-between">
+      {{#if artwork}}
+      <form class="needs-validation" id="artwork_form" action="/admin/artworks/{{artwork.id}}?_method=PUT"
+        method="post" >
+        {{!-- novalidate --}}
+      {{else}}
+      <form class="needs-validation" id="artwork_form" action="/admin/artworks" method="post" novalidate>
+      {{/if}}
+          <div class="row">
+            <label for="serialNumber" class="col-sm-2 col-form-label" align="center">品號
+              <small class="text-muted d-block">8碼</small>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="serialNumber" name="serialNumber" value="{{artwork.serialNumber}}" maxlength="8">
+            </div>
+          </div>
+          <div class="row">
+            <label for="name" class="col-sm-2 col-form-label" align="center">作品名稱
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">20字以內</small>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="name" name="name" value="{{artwork.name}}" maxlength="20" required>
+              <div class="invalid-feedback">
+                請輸入展名
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="artist" class="col-sm-2 col-form-label" align="center">作者
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">請輸入或擇一藝術家</small>
+            </label>
+            <div class="col-sm-10">
+              <div class="input-group">
+                <select class="selectpicker show-tick border rounded-start" name="artist_select" id="artist_select" data-size="5" data-live-search="true" data-width="50%" multiple required>
+                  {{#each artist_selections}}
+                  <option value="{{this.id}}" {{#ifInclude this.name ../artwork.Creators}}selected{{/ifInclude}}>{{this.id}}_{{this.name}}</option>
+                  {{/each}}
+                </select>
+
+                <span class="input-group-text" id="artistName_text">已選</span>
+                <input type="text" class="form-control" id="artistName" name="artistName" value="{{artwork.artistName}}"
+                  aria-describedby="artistName_text" disabled>
+                <div class="invalid-feedback">
+                  請選擇藝術家
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="creationTime" class="col-sm-2 col-form-label" align="center">創作年份</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="creationTime" name="creationTime" value="{{artwork.creationTime}}" max="2099" min="1200" step="1">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="creationTimeNote" class="col-sm-2 col-form-label" align="center">年份說明</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="creationTimeNote" name="creationTimeNote" value="{{artwork.creationTimeNote}}" placeholder="例：壬寅">
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="medium" class="col-sm-2 col-form-label" align="center">作品媒材
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">請輸入或擇一媒材</small>
+            </label>
+            <div class="col-sm-10">
+              <input class="form-control" list="medium_datalistOptions" id="medium" name="medium" placeholder="例：水墨絹本" value="{{artwork.Medium.name}}" required>
+              <datalist id="medium_datalistOptions">
+                {{#each medium_selections}}
+                <option value="{{this.name}}">
+                {{/each}}
+              </datalist>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="height" class="col-sm-2 col-form-label" align="center">作品尺寸
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">(cm)</small>
+            </label>
+            <div class="col-sm-10">
+              <div class="input-group">
+                <span class="input-group-text" id="height-text">長*</span>
+                <input type="number" class="form-control" id="height" name="height" value="{{artwork.height}}" min="1" aria-describedby="height-text" required>
+                <span class="input-group-text" id="width-text">寬*</span>
+                <input type="number" class="form-control" id="width" name="width" value="{{artwork.width}}" min="1" aria-describedby="width-text" required>
+                <span class="input-group-text" id="depth-text">深</span>
+                <input type="number" class="form-control" id="width" name="depth" value="{{artwork.depth}}" aria-describedby="depth-text">
+                <div class="invalid-feedback">
+                  請輸入尺寸
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-3 row">
+            <label for="piecesNum" class="col-sm-2 col-form-label" align="center">數量
+              <span class="requiredInput">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="piecesNum" name="piecesNum" value="{{#if artwork.piecesNum}}{{artwork.piecesNum}}{{else}}1{{/if}}" min="1" step="1" placeholder="1" required>
+              <div class="invalid-feedback">
+                請輸入組合數量
+              </div>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="introduction" class="col-sm-2 col-form-label" align="center">作品介紹
+              <small class="text-muted d-block">1000字以內</small>
+            </label>
+            <div class="col-sm-10">
+              <textarea class="form-control" id="introduction" name="introduction" maxlength="1000"
+                rows="5">{{artwork.introduction}}</textarea>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label" for="image" align="center">作品圖示  <span class="requiredInput">*</span>
+              <small class="text-muted d-block">一次最多10張</small></label>
+            </label>
+            <div class="col-sm-10">
+              <input class="form-control form-control-sm" type="file" name="image" id="image" multiple required>
+              <div class="invalid-feedback">請至少上傳一個檔案，勿超過10張</div>
+            </div> 
+          </div>
+
+          
+      </form>
+  
+    </div>
+  </div>
+
+  {{#if artwork.ArtworkImages}}
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">作品圖片</h5>
+    </div>
+    <div class="card-body grid row d-flex justify-content-between" id="ArtworkImages">
+      {{#each artwork.ArtworkImages}}
+      <div class="grid-item grid-item-exhImage-sm">
+
+        <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
+
+        {{!-- delete button --}}
+        <form action="/admin/artworks/{{this.ArtworkId}}/images?_method=DELETE" method="post" style="position: absolute; top: 5px; right: 10px;">
+          <input class="d-none" type="text" name="imageId" value="{{this.id}}">
+          <button type="submit" class="btn btn-sm delete">
+            <span class="delete" style="color: #CC0000;">
+              <i class="fa-solid fa-xmark delete"></i>
+            </span>
+          </button>
+        </form>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <!-- Modal Content (The Image) -->
+    <img class="modal-content" id="modalImg">
+    <div id="caption"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // form validation
+  let form = document.getElementById('artwork_form')
+
+  form.addEventListener('submit', function (event) {
+    if (!form.checkValidity()) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    form.classList.add('was-validated')
+  })
+
+  
+
+</script>

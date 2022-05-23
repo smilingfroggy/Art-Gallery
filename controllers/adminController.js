@@ -353,6 +353,36 @@ const adminController = {
       next(error)
     }
   },
+  editArtworks: async (req, res, next) => {
+    try {
+      const { artworkId } = req.params
+      Promise.all([
+        Medium.findAll({ raw: true, attributes: ['id', 'name'] }),
+        Artist.findAll({ raw: true, attributes: ['id', 'name']})
+      ])
+        .then( async ([medium_selections, artist_selections]) => {
+          if (!artworkId) return res.render('admin/edit_artwork', { medium_selections, artist_selections })
+          const artwork_rawData = await Artwork.findByPk(artworkId, {
+            include: [
+              { model: Medium, attributes: ['name'] },
+              { model: Artist, as: 'Creators', attributes: ['name'], through: { attributes: [] } },
+              { model: ArtworkImage, attributes: { exclude: ['createdAt', 'updatedAt'] } }
+            ]
+          })
+
+          const artwork = JSON.parse(JSON.stringify(artwork_rawData))
+
+          artwork.creationTime = artwork.creationTime ? new Date(artwork.creationTime).getFullYear() : ""
+          if (!artwork.ArtworkImages.length) artwork.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })  // if no image in DB, use "no image"
+
+          // res.json({ medium_selections, artist_selections, artwork })
+          return res.render('admin/edit_artwork', { medium_selections, artist_selections, artwork })
+        })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
 }
 
 module.exports = adminController

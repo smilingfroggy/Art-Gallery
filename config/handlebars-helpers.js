@@ -10,5 +10,10 @@ module.exports = {
   passNoResult: function (count, options) {
     if (count > 0) return options.fn(this)
     return options.inverse(this)
+  },
+  // find selected creators of artwork
+  ifInclude: function (data, arrayData, options) {
+    if (arrayData.find(element => element.name === data)) return options.fn(this)
+    return options.inverse(this)
   }
 }
