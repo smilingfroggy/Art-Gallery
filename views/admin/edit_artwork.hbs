@@ -7,8 +7,7 @@
     <div class="card-body row d-flex justify-content-between">
       {{#if artwork}}
       <form class="needs-validation" id="artwork_form" action="/admin/artworks/{{artwork.id}}?_method=PUT"
-        method="post" >
-        {{!-- novalidate --}}
+        method="post" novalidate>
       {{else}}
       <form class="needs-validation" id="artwork_form" action="/admin/artworks" method="post" novalidate>
       {{/if}}
@@ -42,7 +41,7 @@
               <div class="input-group">
                 <select class="selectpicker show-tick border rounded-start" name="artist_select" id="artist_select" data-size="5" data-live-search="true" data-width="50%" multiple required>
                   {{#each artist_selections}}
-                  <option value="{{this.id}}" {{#ifInclude this.name ../artwork.Creators}}selected{{/ifInclude}}>{{this.id}}_{{this.name}}</option>
+                  <option value="{{this.id}}" {{#if ../artwork}}{{#ifInclude this.name ../artwork.Creators}}selected{{/ifInclude}}{{/if}}>{{this.id}}_{{this.name}}</option>
                   {{/each}}
                 </select>
 
@@ -92,11 +91,14 @@
             <div class="col-sm-10">
               <div class="input-group">
                 <span class="input-group-text" id="height-text">長*</span>
-                <input type="number" class="form-control" id="height" name="height" value="{{artwork.height}}" min="1" aria-describedby="height-text" required>
+                <input type="number" class="form-control" id="height" name="height" value="{{artwork.height}}" min="1" step="0.01" aria-describedby="height-text" required>
+                <div class="invalid-feedback">
+                  請輸入尺寸
+                </div>
                 <span class="input-group-text" id="width-text">寬*</span>
-                <input type="number" class="form-control" id="width" name="width" value="{{artwork.width}}" min="1" aria-describedby="width-text" required>
+                <input type="number" class="form-control" id="width" name="width" value="{{artwork.width}}" min="1" step="0.01" aria-describedby="width-text" required>
                 <span class="input-group-text" id="depth-text">深</span>
-                <input type="number" class="form-control" id="width" name="depth" value="{{artwork.depth}}" aria-describedby="depth-text">
+                <input type="number" class="form-control" id="width" name="depth" value="{{artwork.depth}}" step="0.01" aria-describedby="depth-text">
                 <div class="invalid-feedback">
                   請輸入尺寸
                 </div>
@@ -126,12 +128,12 @@
           </div>
 
           <div class="mb-3 row">
-            <label class="col-sm-2 col-form-label" for="image" align="center">作品圖示  <span class="requiredInput">*</span>
+            <label class="col-sm-2 col-form-label" for="image" align="center">作品圖示
               <small class="text-muted d-block">一次最多10張</small></label>
             </label>
             <div class="col-sm-10">
-              <input class="form-control form-control-sm" type="file" name="image" id="image" multiple required>
-              <div class="invalid-feedback">請至少上傳一個檔案，勿超過10張</div>
+              <input class="form-control form-control-sm" type="file" name="image" id="image_upload" multiple>
+              <div class="invalid-feedback">請勿超過10張</div>
             </div> 
           </div>
 
@@ -146,20 +148,20 @@
     <div class="card-header d-flex justify-content-between">
       <h5 class="mt-2">作品圖片</h5>
     </div>
-    <div class="card-body grid row d-flex justify-content-between" id="ArtworkImages">
+    <div class="card-body grid" id="ArtworkImages">
       {{#each artwork.ArtworkImages}}
       <div class="grid-item grid-item-exhImage-sm">
 
         <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
 
         {{!-- delete button --}}
-        <form action="/admin/artworks/{{this.ArtworkId}}/images?_method=DELETE" method="post" style="position: absolute; top: 5px; right: 10px;">
-          <input class="d-none" type="text" name="imageId" value="{{this.id}}">
+        <form action="/admin/artworks/{{this.ArtworkId}}/images?_method=DELETE" method="post" style="position: absolute; top: 5px; right: 10px; width: 20px">
+          <input class="d-none" type="text" name="imageId" id="images" value="{{this.id}}">
           <button type="submit" class="btn btn-sm delete">
             <span class="delete" style="color: #CC0000;">
               <i class="fa-solid fa-xmark delete"></i>
             </span>
-          </button>
+          </button> 
         </form>
       </div>
       {{/each}}
@@ -176,22 +178,98 @@
   </div>
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   // form validation
-  let form = document.getElementById('artwork_form')
+  const artwork_form = document.getElementById('artwork_form')
 
-  form.addEventListener('submit', function (event) {
-    if (!form.checkValidity()) {
+  artwork_form.addEventListener('submit', function (event) {
+    if (!artwork_form.checkValidity()) {
       event.preventDefault()
       event.stopPropagation()
     }
-    form.classList.add('was-validated')
+    artwork_form.classList.add('was-validated')
   })
 
+  // check images input validity
+  const image_upload = document.getElementById('image_upload')
+  function checkFilesNum() {
+    console.log('waiting for upload')
+    if (image_upload.files.length > 10) {
+      image_upload.setCustomValidity('超過數量限制')
+      event.preventDefault()
+      return;
+    }
+    image_upload.setCustomValidity('')
+  }
+  image_upload.addEventListener('change', (event) => {
+    checkFilesNum()
+  })
+
+  // trigger the modal or delete confirm
+  const modal = document.getElementById("myModal");
+  const ArtworkImages = document.getElementById("ArtworkImages")
+  const modalImg = document.getElementById("modalImg");
+  const captionText = document.getElementById("caption");
+  ArtworkImages.addEventListener('click', (event) => {
+    console.log('clicked!', event.target)
+    let target = event.target
+    if (target.tagName === "IMG") {
+      modal.style.display = "block";
+      modalImg.src = target.src;
+      captionText.innerHTML = target.alt;
+    }
+
+    if (target.classList.contains("delete")) {
+      event.preventDefault()
+
+      function findForm(target) {
+        if (target.parentElement.tagName === "FORM") return target.parentElement
+        return findForm(target.parentElement)
+      }
+      let form = findForm(target)
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `確定要刪除？`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '刪除！'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire(
+            '已刪除!',
+            ``,
+            'success'
+          ).then(result => {
+            form.submit()
+          })
+        }
+      })
+    }
+  })
+
+  // close the modal
+  modal.addEventListener('click', (event) => {
+    if (event.target.id === "myModal" || event.target.tagName === 'SPAN') {
+      modal.style.display = "none";
+    }
+  })
   
+  // masonry images
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 30,
+  })
+
+  $grid.imagesLoaded().progress(function () {
+    $grid.masonry();
+  })
 
 </script>
