@@ -8,6 +8,7 @@ const Artist = db.Artist
 const ArtistImage = db.ArtistImage
 const ArtworkImage = db.ArtworkImage
 const ArtworkArtist = db.ArtworkArtist
+const ArtworkSubject = db.ArtworkSubject
 const ExhibitionArtwork = db.ExhibitionArtwork
 const Subject = db.Subject
 const { Op } = require('sequelize')
@@ -446,6 +447,103 @@ const adminController = {
           return res.redirect('/admin/artworks')
         }
       }).catch(error => console.log(error))
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  putArtworks: async (req, res, next) => {
+    try {
+      const { artworkId } = req.params
+      let { name, artist_select, serialNumber, creationTime, creationTimeNote, MediumId, height, width, depth, piecesNum, introduction, type, description, SubjectTags_select } = req.body
+      const { files } = req
+      if (!artworkId || !name || !artist_select || !MediumId || !height || !piecesNum) throw new Error('Please provide complete messages')
+
+      Promise.all([
+        Medium.findByPk(MediumId, {
+          raw: true, attributes: ['id', 'name'],
+        }),
+        Artist.findAll({
+          raw: true, attributes: ['name'],
+          where: { id: artist_select }, order: [['id']]
+        }),
+        Artwork.findByPk(artworkId)
+      ]).then(([mediumData, artist_array, artwork]) => {
+        if (!mediumData) throw new Error('Cannot find this medium')
+        if (!artist_array.length) throw new Error('Cannot find artists')
+        if (!artwork) throw new Error('Cannot find this artwork')
+        let artistName = artist_array.map(arr => arr.name).join(', ')
+        creationTime = creationTime ? new Date(creationTime, 0) : null
+
+        Promise.all([
+          artwork.update({
+            name, artistName: artistName, serialNumber, creationTime, creationTimeNote, MediumId, height, width, depth: depth || 0, piecesNum, introduction
+          }),
+          ArtworkArtist.findAll({
+            where: { ArtworkId: artwork.id },
+            attributes: ['id', 'ArtworkId', 'ArtistId']
+          }),
+          ArtworkSubject.findAll({
+            where: { ArtworkId: artwork.id },
+          })
+        ]).then(([artwork, artworkArtist, artworkSubject]) => {
+          // add or remove artworkArtist, artworkSubject
+          const artistId_array = artworkArtist.map(data => data.ArtistId)  
+          const subjectId_array = artworkSubject.map(data => data.SubjectId)
+          // 若數量只有一個也轉換成陣列
+          artist_select = artist_select.length === 1 ? [artist_select] : artist_select
+          SubjectTags_select = SubjectTags_select.length === 1 ? [SubjectTags_select] : SubjectTags_select
+
+          // 多的要建立、少的要刪除
+          const toAddArtists = artist_select.filter(id => !artistId_array.includes(Number(id)))
+          const toRemoveArtists = artistId_array.filter(id => !artist_select.includes(String(id)))
+          console.log('toAddArtists', toAddArtists, 'toRemoveArtists', toRemoveArtists)
+
+          const toAddTags = SubjectTags_select.filter(id => !subjectId_array.includes(Number(id)))
+          const toRemoveTags = subjectId_array.filter(id => !SubjectTags_select.includes(String(id)))
+          console.log('toAddTags:', toAddTags, 'toRemoveTags: ', toRemoveTags)
+          
+          Promise.all([
+            ...toAddArtists.map(id => ArtworkArtist.create({
+              ArtworkId: artwork.id,
+              ArtistId: id
+            })),
+            ...toRemoveArtists.map(id => ArtworkArtist.destroy({
+              where: {
+                ArtworkId: artwork.id, 
+                ArtistId: id,
+              }
+            })),
+            ...toAddTags.map(id => ArtworkSubject.create({
+              ArtworkId: artwork.id,
+              SubjectId: id
+            })),
+            ...toRemoveTags.map(id => ArtworkSubject.destroy({
+              where: {
+                SubjectId: id,
+                ArtworkId: artwork.id
+              }
+            }))
+          ])
+
+          if (files) {
+            Promise.all(Array.from(files, file => imgurFileHandler(file)))
+              .then(async (filesPath) => {
+                for (let i = 0; i < filesPath.length; i++) {
+                  await ArtworkImage.create({
+                    ArtworkId: artwork.id,
+                    url: filesPath[i],
+                    type,
+                    description
+                  })
+                }
+              })
+              .catch(error => console.log(error))
+          }
+          return res.redirect('/admin/artworks')
+          
+        })
+      })
     } catch (error) {
       console.log(error)
       next(error)
