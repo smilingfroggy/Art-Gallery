@@ -24,6 +24,7 @@ router.put('/exhibitions/:exhibitionId/images', authenticatedAdmin, upload.array
 router.delete('/exhibitions/:exhibitionId/images', authenticatedAdmin, adminController.deleteExhibitionImages)
 
 router.get('/artworks', adminController.getArtworks)
+router.post('/artworks', upload.array('image', 10), adminController.postArtworks)
 router.get('/artworks/create', adminController.editArtworks)
 router.get('/artworks/:artworkId/edit', adminController.editArtworks)
 router.use('/', generalErrorHandler)

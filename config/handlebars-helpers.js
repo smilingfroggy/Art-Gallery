@@ -15,5 +15,9 @@ module.exports = {
   ifInclude: function (data, arrayData, options) {
     if (arrayData.find(element => element.name === data)) return options.fn(this)
     return options.inverse(this)
+  },
+  ifEqual: function (data1, data2, options) {
+    if (data1 === data2) return options.fn(this)
+    return options.inverse(this)
   }
 }

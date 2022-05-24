@@ -7,6 +7,7 @@ const Medium = db.Medium
 const Artist = db.Artist
 const ArtistImage = db.ArtistImage
 const ArtworkImage = db.ArtworkImage
+const ArtworkArtist = db.ArtworkArtist
 const ExhibitionArtwork = db.ExhibitionArtwork
 const Subject = db.Subject
 const { Op } = require('sequelize')
@@ -381,8 +382,70 @@ const adminController = {
 
           // res.json({ medium_selections, artist_selections, subject_selections, artwork })
           return res.render('admin/edit_artwork', { medium_selections, artist_selections, subject_selections, artwork })
-
         })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  postArtworks: async (req, res, next) => {
+    try {
+      let { name, artist_select, serialNumber, creationTime, creationTimeNote, MediumId, height, width, depth, piecesNum, introduction, type, description, SubjectTags_select } = req.body
+      const { files } = req
+      if (!name || !artist_select || !MediumId || !height || !piecesNum) throw new Error('Please provide complete messages')
+
+      Promise.all([
+        Medium.findByPk(MediumId, {
+          raw: true, attributes: ['id', 'name'],
+        }),
+        Artist.findAll({
+          raw: true, attributes: ['name'],
+          where: { id: artist_select }, order: [['id']]
+        })
+      ]).then( ([mediumData, artist_array]) => {
+        if (!mediumData) throw new Error('Cannot find this medium')
+        if (!artist_array.length) throw new Error('Cannot find artists')
+        let artistName = artist_array.map(arr => arr.name).join(', ')
+        creationTime = creationTime ? new Date(creationTime, 0) : null
+
+        return Artwork.create({
+          name, artistName: artistName, serialNumber, creationTime, creationTimeNote, MediumId, height, width, depth: depth || 0, piecesNum, introduction
+        })
+      }).then((newWork)=> {
+        // create artworkArtist, artworkTags
+        // 若數量只有一個也轉換成陣列
+        artist_select = artist_select.length === 1 ? [artist_select] : artist_select
+        SubjectTags_select = SubjectTags_select.length === 1 ? [SubjectTags_select] : SubjectTags_select
+
+        Promise.all([
+          ...artist_select.map(id => ArtworkArtist.create({
+            ArtworkId: newWork.id,
+            ArtistId: id
+          })),
+          ...SubjectTags_select.map(id => ArtworkSubject.create({
+            ArtworkId: newWork.id,
+            SubjectId: id
+          }))
+        ])
+
+        if (files) {
+          Promise.all(Array.from(files, file => imgurFileHandler(file)))
+            .then(async (filesPath) => {
+              for (let i = 0; i < filesPath.length; i++) {
+                await ArtworkImage.create({
+                  ArtworkId: newWork.id,
+                  url: filesPath[i],
+                  type,
+                  description
+                })
+              }
+              return res.redirect('/admin/artworks')
+            })
+            .catch(error => console.log(error))
+        } else {
+          return res.redirect('/admin/artworks')
+        }
+      }).catch(error => console.log(error))
     } catch (error) {
       console.log(error)
       next(error)
