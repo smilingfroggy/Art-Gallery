@@ -403,7 +403,7 @@ const adminController = {
           raw: true, attributes: ['name'],
           where: { id: artist_select }, order: [['id']]
         })
-      ]).then( ([mediumData, artist_array]) => {
+      ]).then(([mediumData, artist_array]) => {
         if (!mediumData) throw new Error('Cannot find this medium')
         if (!artist_array.length) throw new Error('Cannot find artists')
         let artistName = artist_array.map(arr => arr.name).join(', ')
@@ -412,13 +412,16 @@ const adminController = {
         return Artwork.create({
           name, artistName: artistName, serialNumber, creationTime, creationTimeNote, MediumId, height, width, depth: depth || 0, piecesNum, introduction
         })
-      }).then((newWork)=> {
+      }).then((newWork) => {
         // create artworkArtist, artworkTags
         // 若數量只有一個也轉換成陣列
         artist_select = artist_select.length === 1 ? [artist_select] : artist_select
         SubjectTags_select = SubjectTags_select.length === 1 ? [SubjectTags_select] : SubjectTags_select
 
+        const filesUpload = files ? Promise.all(files.map(file => imgurFileHandler(file))) : Promise.resolve()
+
         Promise.all([
+          filesUpload,
           ...artist_select.map(id => ArtworkArtist.create({
             ArtworkId: newWork.id,
             ArtistId: id
@@ -427,25 +430,19 @@ const adminController = {
             ArtworkId: newWork.id,
             SubjectId: id
           }))
-        ])
-
-        if (files) {
-          Promise.all(Array.from(files, file => imgurFileHandler(file)))
-            .then(async (filesPath) => {
-              for (let i = 0; i < filesPath.length; i++) {
-                await ArtworkImage.create({
-                  ArtworkId: newWork.id,
-                  url: filesPath[i],
-                  type,
-                  description
-                })
-              }
-              return res.redirect('/admin/artworks')
-            })
-            .catch(error => console.log(error))
-        } else {
+        ]).then(([filesPath, ...results]) => {
+          const createData = filesPath.map(path => {
+            return {
+              ArtworkId: newWork.id,
+              url: path,
+              type,
+              description
+            }
+          })
+          return ArtworkImage.bulkCreate(createData)
+        }).then(() => {
           return res.redirect('/admin/artworks')
-        }
+        }).catch(error => next(error))
       }).catch(error => console.log(error))
     } catch (error) {
       console.log(error)
@@ -488,7 +485,7 @@ const adminController = {
           })
         ]).then(([artwork, artworkArtist, artworkSubject]) => {
           // add or remove artworkArtist, artworkSubject
-          const artistId_array = artworkArtist.map(data => data.ArtistId)  
+          const artistId_array = artworkArtist.map(data => data.ArtistId)
           const subjectId_array = artworkSubject.map(data => data.SubjectId)
           // 若數量只有一個也轉換成陣列
           artist_select = artist_select.length === 1 ? [artist_select] : artist_select
@@ -502,15 +499,18 @@ const adminController = {
           const toAddTags = SubjectTags_select.filter(id => !subjectId_array.includes(Number(id)))
           const toRemoveTags = subjectId_array.filter(id => !SubjectTags_select.includes(String(id)))
           console.log('toAddTags:', toAddTags, 'toRemoveTags: ', toRemoveTags)
-          
+
+          const filesUpload = files ? Promise.all(files.map(file => imgurFileHandler(file))) : Promise.resolve()
+
           Promise.all([
+            filesUpload,
             ...toAddArtists.map(id => ArtworkArtist.create({
               ArtworkId: artwork.id,
               ArtistId: id
             })),
             ...toRemoveArtists.map(id => ArtworkArtist.destroy({
               where: {
-                ArtworkId: artwork.id, 
+                ArtworkId: artwork.id,
                 ArtistId: id,
               }
             })),
@@ -524,24 +524,19 @@ const adminController = {
                 ArtworkId: artwork.id
               }
             }))
-          ])
-
-          if (files) {
-            Promise.all(Array.from(files, file => imgurFileHandler(file)))
-              .then(async (filesPath) => {
-                for (let i = 0; i < filesPath.length; i++) {
-                  await ArtworkImage.create({
-                    ArtworkId: artwork.id,
-                    url: filesPath[i],
-                    type,
-                    description
-                  })
-                }
-              })
-              .catch(error => console.log(error))
-          }
-          return res.redirect('/admin/artworks')
-          
+          ]).then(([filesPath, ...results]) => {
+            const createData = filesPath.map(path => {
+              return {
+                ArtworkId: artwork.id,
+                url: path,
+                type,
+                description
+              }
+            })
+            return ArtworkImage.bulkCreate(createData)
+          }).then(() => {
+            return res.redirect('/admin/artworks')
+          }).catch(error => next(error))
         })
       })
     } catch (error) {
