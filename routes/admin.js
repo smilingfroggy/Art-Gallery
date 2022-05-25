@@ -23,14 +23,14 @@ router.put('/exhibitions/:exhibitionId/togglePrivacy', authenticatedAdmin, admin
 router.put('/exhibitions/:exhibitionId/images', authenticatedAdmin, upload.array('exhImage', 10), adminController.putExhibitionImages)
 router.delete('/exhibitions/:exhibitionId/images', authenticatedAdmin, adminController.deleteExhibitionImages)
 
-router.get('/artworks', adminController.getArtworks)
-router.post('/artworks', upload.array('image', 10), adminController.postArtworks)
-router.get('/artworks/create', adminController.editArtworks)
-router.get('/artworks/:artworkId', adminController.getArtwork)
-router.get('/artworks/:artworkId/edit', adminController.editArtworks)
-router.put('/artworks/:artworkId', upload.array('image', 10), adminController.putArtworks)
-router.delete('/artworks/:artworkId', adminController.deleteArtwork)
-router.delete('/artworks/:artworkId/images', adminController.deleteArtworkImages)
+router.get('/artworks', authenticatedAdmin, adminController.getArtworks)
+router.post('/artworks', authenticatedAdmin, upload.array('image', 10), adminController.postArtworks)
+router.get('/artworks/create', authenticatedAdmin, adminController.editArtworks)
+router.get('/artworks/:artworkId', authenticatedAdmin, adminController.getArtwork)
+router.get('/artworks/:artworkId/edit', authenticatedAdmin, adminController.editArtworks)
+router.put('/artworks/:artworkId', authenticatedAdmin, upload.array('image', 10), adminController.putArtworks)
+router.delete('/artworks/:artworkId', authenticatedAdmin, adminController.deleteArtwork)
+router.delete('/artworks/:artworkId/images', authenticatedAdmin, adminController.deleteArtworkImages)
 router.use('/', generalErrorHandler)
 
 module.exports = router
