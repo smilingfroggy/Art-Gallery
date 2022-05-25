@@ -1,0 +1,121 @@
+<div class="container-fluid mt-5">
+  <div class="mb-3">
+    <a href="/admin/artworks">
+      <span class="text-muted"><i class="fa-solid fa-caret-left me-2"></i>Back to Inventory</span>
+    </a>
+  </div>
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">作品資訊</h5>
+      <a href="/admin/artworks/{{artwork.id}}/edit">
+        <button class="btn btn-success">Edit</button>
+      </a>
+    </div>
+    <div class="card-body row">
+      <div class="col-sm-6">
+        <div class="row">
+          <div class="col-sm-4 mb-2"><strong>品號</strong></div>
+          <div class="col-sm-8">{{artwork.serialNumber}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>作品名稱</strong></div>
+          <div class="col-sm-8">{{artwork.name}}</div>
+
+          <div class="col-sm-4 mb-2"><strong>作者</strong></div>
+          <div class="col-sm-8">{{artwork.artistName}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>創作年份</strong></div>
+          <div class="col-sm-8">{{artwork.creationTime}}{{artwork.creationTimeNote}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>作品媒材</strong></div>
+          <div class="col-sm-8">{{artwork.Medium.name}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>長度</strong></div>
+          <div class="col-sm-8">{{artwork.height}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>寬度</strong></div>
+          <div class="col-sm-8">{{artwork.width}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>深度</strong></div>
+          <div class="col-sm-8">{{artwork.depth}}</div>
+          
+          <div class="col-sm-4 mb-2"><strong>數量</strong></div>
+          <div class="col-sm-8">{{artwork.piecesNum}}</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <img class="mx-auto rounded" style="max-height: 280px; object-fit: contain" src="{{artwork.ArtworkImages.[0].[url]}}" alt="{{artwork.ArtworkImages.[0].[type]}}">
+      </div>
+      
+      <div class="col-sm-2 mb-2"><strong>作品介紹</strong></div>
+      <div class="col-sm-10 mb-2">{{artwork.introduction}}</div>
+      
+      <div class="col-sm-2 mb-2"><strong>主題標籤</strong></div>
+      <div class="col-sm-10">{{artwork.SubjectTags_text}}</div>
+    </div>
+  </div>
+
+  {{#if artwork.ArtworkImages}}
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">作品圖片</h5>
+    </div>
+    <div class="card-body grid" id="ArtworkImages">
+      {{#each artwork.ArtworkImages}}
+      <div class="grid-item grid-item-exhImage-sm">
+        <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <!-- Modal Content (The Image) -->
+    <img class="modal-content" id="modalImg">
+    <div id="caption"></div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // trigger the modal or delete confirm
+  const modal = document.getElementById("myModal");
+  const ArtworkImages = document.getElementById("ArtworkImages")
+  const modalImg = document.getElementById("modalImg");
+  const captionText = document.getElementById("caption");
+  if (ArtworkImages) {
+    ArtworkImages.addEventListener('click', (event) => {
+      let target = event.target
+      if (target.tagName === "IMG") {
+        modal.style.display = "block";
+        modalImg.src = target.src;
+        captionText.innerHTML = target.alt;
+      }
+    }) 
+  }
+
+  // close the modal
+  modal.addEventListener('click', (event) => {
+    if (event.target.id === "myModal" || event.target.tagName === 'SPAN') {
+      modal.style.display = "none";
+    }
+  })
+  
+  // masonry images
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 30,
+  })
+
+  $grid.imagesLoaded().progress(function () {
+    $grid.masonry();
+  })
+
+</script>

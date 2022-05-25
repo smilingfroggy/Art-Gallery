@@ -355,6 +355,28 @@ const adminController = {
       next(error)
     }
   },
+  getArtwork: async (req, res, next) => {
+    try {
+      const { artworkId } = req.params
+      const artwork_rawData = await Artwork.findByPk(artworkId, {
+        include: [
+          { model: Medium, attributes: ['name'] },
+          { model: Artist, as: 'Creators', attributes: ['name'], through: { attributes: [] } },
+          { model: ArtworkImage, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+          { model: Subject, as: 'SubjectTags', attributes: ['name'], through: { attributes: [] } }
+        ]
+      })
+      if (!artwork_rawData) throw new Error('Please provide valid artwork Id')
+      const artwork = JSON.parse(JSON.stringify(artwork_rawData))
+
+      artwork.SubjectTags_text = artwork.SubjectTags.map(tag => tag.name).join(', ')
+
+      // return res.json(artwork_rawData)
+      return res.render('admin/artwork', { artwork: artwork })
+    } catch (error) {
+      next(error)
+    }
+  },
   editArtworks: async (req, res, next) => {
     try {
       const { artworkId } = req.params
