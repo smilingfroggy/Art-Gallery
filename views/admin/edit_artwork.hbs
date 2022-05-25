@@ -1,4 +1,7 @@
 <div class="container-fluid mt-5">
+  <div class="mb-3">
+    <a href="/admin/artworks"><span class="text-muted"><i class="fa-solid fa-caret-left me-2"></i>Back to Inventory</span></a>
+  </div>
   <div class="card mb-5">
     <div class="card-header d-flex justify-content-between">
       <h5 class="mt-2">作品資訊</h5>
@@ -37,7 +40,7 @@
           </div>
 
           <div class="row">
-            <label for="artist" class="col-sm-2 col-form-label" align="center">作者
+            <label for="artist_select" class="col-sm-2 col-form-label" align="center">作者
               <span class="requiredInput">*</span>
               <small class="text-muted d-block">請輸入或擇一藝術家</small>
             </label>
@@ -132,7 +135,7 @@
           </div>
 
           <div class="row">
-            <label class="col-sm-2 col-form-label" for="image" align="center">作品圖示
+            <label class="col-sm-2 col-form-label" for="image_upload" align="center">作品圖示
               <small class="text-muted d-block">一次最多10張</small></label>
             </label>
             <div class="col-sm-10">
@@ -147,7 +150,7 @@
           </div>
 
           <div class="mb-3 row">
-            <label class="col-sm-2 col-form-label" for="image" align="center">圖片說明
+            <label class="col-sm-2 col-form-label" for="description" align="center">圖片說明
               <small class="text-muted d-block">請隨圖片上傳</small></label>
             </label>
             <div class="col-sm-10">
@@ -157,7 +160,7 @@
           </div>
 
           <div class="mb-3 row">
-            <label class="col-sm-2 col-form-label" for="subjectTags" align="center">主題標籤</label>
+            <label class="col-sm-2 col-form-label" for="SubjectTags_select" align="center">主題標籤</label>
             <div class="col-sm-10">
               <div class="input-group">
                 <select class="selectpicker show-tick border rounded-start" name="SubjectTags_select" id="SubjectTags_select" data-size="5"
@@ -178,11 +181,11 @@
     </div>
   </div>
 
-  {{#if artwork.ArtworkImages}}
   <div class="card mb-5">
     <div class="card-header d-flex justify-content-between">
       <h5 class="mt-2">作品圖片</h5>
     </div>
+    {{#if artwork.ArtworkImages}}
     <div class="card-body grid" id="ArtworkImages">
       {{#each artwork.ArtworkImages}}
       <div class="grid-item grid-item-exhImage-sm">
@@ -201,8 +204,14 @@
       </div>
       {{/each}}
     </div>
+    {{else}}
+      <div align="center">
+        <label for="image_upload" >
+        <h5 style="line-height: 80px;" >Please upload artwork images</h5>
+        </label>
+      </div>
+    {{/if}}
   </div>
-  {{/if}}
 
   <!-- The Modal -->
   <div id="myModal" class="modal">

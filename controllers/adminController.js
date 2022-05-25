@@ -385,15 +385,16 @@ const adminController = {
               { model: Subject, as: 'SubjectTags', attributes: ['name'], through: { attributes: [] } }
             ]
           })
+          if (!artwork_rawData) throw new Error('Please provide valid artwork Id')
           const artwork = JSON.parse(JSON.stringify(artwork_rawData))
 
           artwork.creationTime = artwork.creationTime ? new Date(artwork.creationTime).getFullYear() : ""
-          if (!artwork.ArtworkImages.length) artwork.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })  // if no image in DB, use "no image"
           artwork.SubjectTags_text = artwork.SubjectTags.map(tag => tag.name).join(', ')
 
           // res.json({ medium_selections, artist_selections, subject_selections, artwork })
           return res.render('admin/edit_artwork', { medium_selections, artist_selections, subject_selections, artwork })
         })
+        .catch(error => next(error))
     } catch (error) {
       console.log(error)
       next(error)
