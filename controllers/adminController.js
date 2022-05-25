@@ -438,7 +438,14 @@ const adminController = {
         // create artworkArtist, artworkTags
         // 若數量只有一個也轉換成陣列
         artist_select = artist_select.length === 1 ? [artist_select] : artist_select
-        SubjectTags_select = SubjectTags_select.length === 1 ? [SubjectTags_select] : SubjectTags_select
+        switch (typeof SubjectTags_select) {
+          case 'undefined':
+            SubjectTags_select = []
+            break
+          case 'string':
+            SubjectTags_select = [SubjectTags_select]
+            break
+        }
 
         const filesUpload = files ? Promise.all(files.map(file => imgurFileHandler(file))) : Promise.resolve()
 
@@ -511,7 +518,14 @@ const adminController = {
           const subjectId_array = artworkSubject.map(data => data.SubjectId)
           // 若數量只有一個也轉換成陣列
           artist_select = artist_select.length === 1 ? [artist_select] : artist_select
-          SubjectTags_select = SubjectTags_select.length === 1 ? [SubjectTags_select] : SubjectTags_select
+          switch (typeof SubjectTags_select) {
+            case 'undefined':
+              SubjectTags_select = []
+              break
+            case 'string':
+              SubjectTags_select = [SubjectTags_select]
+              break
+          }
 
           // 多的要建立、少的要刪除
           const toAddArtists = artist_select.filter(id => !artistId_array.includes(Number(id)))
@@ -559,8 +573,8 @@ const adminController = {
           }).then(() => {
             return res.redirect('/admin/artworks')
           }).catch(error => next(error))
-        })
-      })
+        }).catch(error => next(error))
+      }).catch(error => next(error))
     } catch (error) {
       console.log(error)
       next(error)
