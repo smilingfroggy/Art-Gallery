@@ -25,7 +25,7 @@
         </th>
       </tr>
       <tr id="query">
-        <th scope="col" style="max-width: 50px;">
+        <th scope="col" style="max-width: 50px; min-width: 60px">
           <input type="text" class="form-control form-control-sm" id="id">
         </th>
         <th scope="col" style="max-width: 100px;">
@@ -37,10 +37,10 @@
         <th scope="col" style="max-width: 150px">
           <input type="text" class="form-control form-control-sm" id="name">
         </th>
-        <th scope="col" style="max-width: 100px">
+        <th scope="col" style="max-width: 100px; min-width: 80px">
           <input type="text" class="form-control form-control-sm" id="year">
         </th>
-        <th scope="col" style="max-width: 150px">
+        <th scope="col" style="max-width: 150px; min-width: 80px">
           <input type="text" class="form-control form-control-sm" id="medium">
         </th>
         <th scope="col" style="max-width: 80px">
@@ -82,11 +82,11 @@
           <td class="height">{{this.height}}</td>
           <td class="width">{{this.width}}</td>
           <td class="depth">{{this.depth}}</td>
-          <td class="tag">{{#each this.SubjectTags}} {{this.name}} {{/each}}</td>
+          <td class="tag"><p><small>{{#each this.SubjectTags}} {{this.name}} {{/each}}</small></p></td>
           <td>
             <div class="btn-group" role="group">
               <a href="/admin/artworks/{{this.id}}">
-                <button class="btn btn-outline-primary btn-sm">More</button>
+                <button type="button" class="btn btn-outline-primary btn-sm">More</button>
               </a>
               <a href="/admin/artworks/{{this.id}}/edit">
                 <button type="button" class="btn btn-outline-success btn-sm">Edit</button>
