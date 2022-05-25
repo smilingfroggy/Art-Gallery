@@ -70,7 +70,7 @@
             </label>
             {{#if ../exhibition}}
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="{{this.id}}" id="work_{{this.id}}">
+              <input class="form-check-input" type="checkbox" form="select_works" name="{{this.id}}" id="work_{{this.id}}">
             </div>
             {{/if}}
           </th>
@@ -89,8 +89,13 @@
                 <button class="btn btn-outline-primary btn-sm">More</button>
               </a>
               <a href="/admin/artworks/{{this.id}}/edit">
-                <button class="btn btn-outline-success btn-sm">Edit</button>
+                <button type="button" class="btn btn-outline-success btn-sm">Edit</button>
               </a>
+              {{#unless ../exhibition}}
+              <form action="/admin/artworks/{{this.id}}?_method=DELETE" method="post" id="delete_works">
+                <button type="submit" class="btn btn-outline-danger btn-sm" for="delete_works" id="delete_works_btn" >Delete</button>
+              </form>
+              {{/unless}}
               
             </div>
           </td>
@@ -102,8 +107,9 @@
 
 </div>
 
-
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  // search artworks
   let query = document.getElementById('query')
   let tr = document.querySelectorAll('tbody > tr')
 
@@ -153,15 +159,46 @@
   let check_inputs = document.querySelectorAll('input[type=checkbox]')
   let form = document.getElementById('select_works')
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    for (let input of check_inputs ) {  
-      if (input.checked) {
-        return form.submit()
+  if (form) {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      for (let input of check_inputs) {
+        if (input.checked) {
+          return form.submit()
+        }
       }
-    }
-    alert('Please selected at least one work')
-  }, false)
+      alert('Please selected at least one work')
+    }, false)
+  }
+  
+  // alert before delete 
+  let deleteForms = document.querySelectorAll('.btn-group > form')    
+  if (deleteForms) {
+    deleteForms.forEach(form => form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      let name = form.parentElement.parentElement.parentElement.children[3].innerText
+      let artistName = form.parentElement.parentElement.parentElement.children[2].innerText
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `確定要刪除 ${artistName}-${name}？`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '刪除！'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire(
+            '已刪除!',
+            ` ${artistName}-${name}`,
+            'success'
+          ).then(result => {
+            form.submit()
+          })
+        }
+      })
+    }))
+  }
 
 </script>

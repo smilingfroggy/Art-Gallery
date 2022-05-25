@@ -544,6 +544,42 @@ const adminController = {
       next(error)
     }
   },
+  deleteArtwork: async (req, res, next) => {
+    try {
+      const { artworkId } = req.params
+      const artwork_data = await Artwork.findByPk(artworkId)
+      if (!artwork_data) throw new Error('Please provide valid artworkId')
+
+      Promise.all([
+        ArtworkImage.destroy({ where: { ArtworkId: artworkId } }),
+        ArtworkSubject.destroy({ where: { ArtworkId: artworkId } }),
+        ArtworkArtist.destroy({ where: { ArtworkId: artworkId } }),
+      ]).then((results) => {
+        req.flash('success_messages', `Deleted 1 work and ${results[0]} image`)
+        return artwork_data.destroy()
+      }).then(() => {
+        return res.redirect('back')
+      })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  deleteArtworkImages: async (req, res, next) => {
+    try {
+      const { imageId } = req.body
+      const { artworkId } = req.params
+      const artworkImages = await ArtworkImage.findOne({
+        where: { ArtworkId: artworkId, id: imageId }
+      })
+      if (!artworkImages) throw new Error('Please provide valid imageId')
+      await artworkImages.destroy()
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  }
 }
 
 module.exports = adminController

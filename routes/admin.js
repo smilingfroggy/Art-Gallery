@@ -28,6 +28,8 @@ router.post('/artworks', upload.array('image', 10), adminController.postArtworks
 router.get('/artworks/create', adminController.editArtworks)
 router.get('/artworks/:artworkId/edit', adminController.editArtworks)
 router.put('/artworks/:artworkId', upload.array('image', 10), adminController.putArtworks)
+router.delete('/artworks/:artworkId', adminController.deleteArtwork)
+router.delete('/artworks/:artworkId/images', adminController.deleteArtworkImages)
 router.use('/', generalErrorHandler)
 
 module.exports = router
