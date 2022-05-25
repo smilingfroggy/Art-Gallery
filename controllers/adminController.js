@@ -1,16 +1,6 @@
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const db = require('../models');
-const Artwork = db.Artwork
-const Exhibition = db.Exhibition
-const ExhibitionImage = db.ExhibitionImage
-const Medium = db.Medium
-const Artist = db.Artist
-const ArtistImage = db.ArtistImage
-const ArtworkImage = db.ArtworkImage
-const ArtworkArtist = db.ArtworkArtist
-const ArtworkSubject = db.ArtworkSubject
-const ExhibitionArtwork = db.ExhibitionArtwork
-const Subject = db.Subject
+const { Artwork, Exhibition, ExhibitionImage, Medium, Artist, ArtworkImage, ArtworkArtist, ArtworkSubject, ExhibitionArtwork, Subject } = db
 const { Op } = require('sequelize')
 
 const adminController = {
@@ -190,8 +180,8 @@ const adminController = {
       const { exhibitionId } = req.params
       if (!exhibitionId) throw new Error('Please provide valid exhibition ID')
       Promise.all([
-        ExhibitionImage.destroy({ where: { ExhibitionId: exhibitionId }}),
-        ExhibitionArtwork.destroy({ where: { ExhibitionId: exhibitionId }})
+        ExhibitionImage.destroy({ where: { ExhibitionId: exhibitionId } }),
+        ExhibitionArtwork.destroy({ where: { ExhibitionId: exhibitionId } })
       ])
         .then(([images, artworks]) => {  // deleted numbers
           Exhibition.destroy({ where: { id: exhibitionId } })
@@ -269,7 +259,7 @@ const adminController = {
 
       const artwork_rawData = await Artwork.findAll({
         attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
-        where: { id: { [Op.notIn]: selected_artworkId }},  // exclude originally selected artworks
+        where: { id: { [Op.notIn]: selected_artworkId } },  // exclude originally selected artworks
         include: [
           { model: Medium, attributes: { exclude: ['createdAt', 'updatedAt'] } },
           { model: Subject, as: 'SubjectTags', attributes: ['id', 'name'], through: { attributes: [] } },
@@ -286,7 +276,7 @@ const adminController = {
       })
 
       // return res.json({ exhibition , artworks: artworkData })
-      return res.render('admin/select_artworks', { exhibition , artworks: artworkData })
+      return res.render('admin/select_artworks', { exhibition, artworks: artworkData })
     } catch (error) {
       console.log(error)
       next(error)
@@ -299,7 +289,7 @@ const adminController = {
       if (!artworks.length) throw new Error('Please select one work at least')
       if (!exhibitionId) throw new Error('Please provide valid exhibition ID')
       const addedWorks = await ExhibitionArtwork.bulkCreate(Array.from(artworks, id => {
-        return { 
+        return {
           ExhibitionId: exhibitionId,
           ArtworkId: id
         }
@@ -322,7 +312,6 @@ const adminController = {
           ArtworkId: artworkId
         }
       })
-      
       return res.redirect(`/admin/exhibitions/${exhibitionId}/artworks`)
     } catch (error) {
       console.log(error)
@@ -383,20 +372,19 @@ const adminController = {
       Promise.all([
         Medium.findAll({ raw: true, attributes: ['id', 'name'] }),
         Artist.findAll({ raw: true, attributes: ['id', 'name'] }),
-        Subject.findAll({ raw: true, attributes: ['id', 'name']})
+        Subject.findAll({ raw: true, attributes: ['id', 'name'] })
       ])
         .then(async ([medium_selections, artist_selections, subject_selections]) => {
           if (!artworkId) return res.render('admin/edit_artwork', { medium_selections, artist_selections, subject_selections })
-          
+
           const artwork_rawData = await Artwork.findByPk(artworkId, {
             include: [
               { model: Medium, attributes: ['name'] },
               { model: Artist, as: 'Creators', attributes: ['name'], through: { attributes: [] } },
               { model: ArtworkImage, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-              { model: Subject, as: 'SubjectTags', attributes: ['name'], through: { attributes: [] }}
+              { model: Subject, as: 'SubjectTags', attributes: ['name'], through: { attributes: [] } }
             ]
           })
-
           const artwork = JSON.parse(JSON.stringify(artwork_rawData))
 
           artwork.creationTime = artwork.creationTime ? new Date(artwork.creationTime).getFullYear() : ""
