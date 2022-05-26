@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const User = db.User
+const Collection = db.Collection
 
 const userController = {
   signUp: async (req, res, next) => {
@@ -15,11 +16,17 @@ const userController = {
       })
       if (userRecord) throw new Error('Email has been registered')
 
-      // create new user
-      await User.create({
+      // create new user and default collection
+      const newUser = await User.create({
         name, 
         email,
         password: bcrypt.hashSync(password, 10),
+      })
+
+      await Collection.create({
+        UserId: newUser.id,
+        name: 'Favorite List',
+        privacy: 0
       })
 
       req.flash('success_messages', 'Registered Successfully')
