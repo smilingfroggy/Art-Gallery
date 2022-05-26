@@ -19,6 +19,22 @@ module.exports = {
         isAdmin: false,
         createdAt: new Date(),
         updatedAt: new Date()
+      },
+      {
+        name: 'user2',
+        email: 'user2@example.com',
+        password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
+        isAdmin: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'user3',
+        email: 'user3@example.com',
+        password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
+        isAdmin: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ])
   },
