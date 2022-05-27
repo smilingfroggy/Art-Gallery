@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       Collection.belongsToMany(models.Artwork, {
         through: models.CollectionArtwork,
         foreignKey: 'CollectionId',
-        as: 'JoinedCollections'
+        as: 'JoinedArtworks'
       })
     }
   }
