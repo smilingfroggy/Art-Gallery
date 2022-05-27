@@ -1,0 +1,74 @@
+<div class="artworks-banner mb-5"></div>
+
+<div class="container-fluid">
+  {{#if user}}
+  <h4 class="mb-3">My Collections</h4>
+  <hr>
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each ownCollections}}
+    <div class="col">
+      <div class="card h-100">
+        <a href="/collections/{{this.id}}">
+          <div class="card-img-top">
+            <img src="{{this.JoinedArtworks.[0].[ArtworkImages].[0].url}}" class=""
+              style="width: 100%; height: 150px; object-fit: cover" alt="{{this.name}}">
+          </div>
+        </a>
+
+        <div class="card-body">
+          <a href="/collections/{{this.id}}">
+            <h6 class="card-title" style="height: 2em"><strong>{{this.name}}</strong></h6>
+          </a>
+          <p class="card-text" style="height: 2em">
+            <small class="text-muted">{{this.description}}</small>
+          </p>
+        </div>
+
+        <div class="card-footer d-flex justify-content-end mt-4">
+          <small class="text-muted" align="right">
+            <i class="fa-regular fa-image me-2"></i>{{this.workCount}}
+          </small>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+
+  </div>
+  {{/if}}
+
+  {{#if user}}
+  <h4 class="mb-3">More Collections</h4>
+  {{else}}
+  <h4 class="mb-3">Collections</h4>
+  {{/if}}
+  <hr>
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
+    {{#each collections}}
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-img-top">
+          <a href="/collections/{{this.id}}">
+            <img src="{{this.JoinedArtworks.[0].[ArtworkImages].[0].url}}" class=""
+              style="width: 100%; height: 150px; object-fit: cover" alt="{{this.name}}">
+          </a>
+        </div>
+
+        <div class="card-body">
+          <a href="/collections/{{this.id}}">
+            <h6 class="card-title" style="height: 2em"><strong>{{this.name}}</strong></h6>
+          </a>
+          <p class="card-text" style="height: 2em">
+            <small class="text-muted">{{this.description}}</small>
+          </p>
+        </div>
+
+        <div class="card-footer d-flex justify-content-between mt-4">
+          <small class="text-muted" align="left">By {{this.User.name}}</small>
+          <small class="text-muted" align="right"><i class="fa-regular fa-image me-2"></i>{{this.workCount}}</small>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+
+  </div>
+</div>
