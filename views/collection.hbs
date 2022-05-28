@@ -1,0 +1,60 @@
+<div class="exhibition-banner mb-5">
+  <div class="ms-5">
+    <h2 class="banner-title">{{collection.name}}</h2>
+    <small class="banner-details ms-2">{{collection.description}}</small>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between">
+    <p>共{{collection.workCount}}件藝術品</p>
+    <p><span> Created by </span>{{collection.User.name}}</p>
+  </div>
+
+  {{#noResult collection.workCount}}
+  <p align="center">尚無作品加入</p>
+  {{/noResult}}
+
+  <div class="grid mb-5">
+    {{#each collection.JoinedArtworks}}
+    <div class="card grid-item grid-item-artwork-big">
+      <a href="/artworks/{{this.id}}">
+        <img src="{{this.image}}" class="card-img-top" alt="{{this.name}}"
+          style="height: auto; max-height: 600px; object-fit: cover">
+      </a>
+
+      <div style="position: absolute; bottom: 110px; right: 5%" align="right" class="d-flex justify-content-end">
+        <button type="button" style="color:peru; max-width: 10px" class="btn btn-sm btn-link mx-2 d-block modal_btn" data-bs-toggle="modal" data-bs-target="#editCollection_{{this.id}}"><i class="fa-solid fa-circle-plus modal_btn"></i></button>
+
+        <form id="favorite" action="/collections/favorite/{{this.id}}" method="post">
+          <button type="submit" form="favorite" style="color:peru" class="btn btn-sm btn-link mx-2"><i class="fa-regular fa-heart"></i></button>
+        </form>
+      </div>
+
+      <div class="card-body">
+        <h6 class="card-title">{{this.name}}</h6>
+        <small class="card-text d-inline-block">{{this.artistName}}　{{this.Medium.name}}　{{this.creationTime}}　{{this.size}}</small>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+
+<script>
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 10,  // 欄與欄之間的距離
+    // horizontalOrder: true
+  });
+
+  $grid.imagesLoaded().progress(function () {  // trigger layout after loaded then initialize Masonry
+    $grid.masonry();
+  });
+
+
+</script>
