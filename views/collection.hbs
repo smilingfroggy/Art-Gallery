@@ -80,13 +80,28 @@
       </a>
 
       <div style="position: absolute; bottom: 110px; right: 5%;" align="right" class="d-flex justify-content-end button-area">
-        <button type="button" class="btn btn-sm btn-link addCollection_btn"
-          data-bs-target="#editCollection_{{this.id}}"><i class="fa-solid fa-circle-plus addCollection_btn"></i></button>
+        <button type="button" class="btn btn-sm btn-link modal_btn addCollection_btn"
+          data-bs-target="#editCollection_{{this.id}}">
+        {{#if this.isAdded}}
+          <i class="fa-solid fa-circle-plus modal_btn addCollection_btn "></i>
+        {{else}}
+          <i class="fa-solid fa-plus modal_btn addCollection_btn"></i>
+        {{/if}}
+        </button>
+
+        {{#if this.isFavorite}}
+        <form id="favorite" action="/collections/favorite/{{this.id}}?_method=DELETE" method="post">
+          <button type="submit" form="favorite" class="btn btn-sm btn-link favorite_btn">
+            <i class="fa-solid fa-heart favorite_btn"></i>
+          </button>
+        </form>
+        {{else}}
         <form id="favorite" action="/collections/favorite/{{this.id}}" method="post">
           <button type="submit" form="favorite" class="btn btn-sm btn-link favorite_btn">
             <i class="fa-regular fa-heart favorite_btn"></i>
           </button>
         </form>
+        {{/if}}
       </div>
 
       <div class="card-body">

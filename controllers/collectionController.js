@@ -81,6 +81,8 @@ const collectionController = {
       let ownCollections = getUser(req)?.Collections
       let ownership = false
       let notFavorite = false
+      let addedArtworks = getUser(req)?.addedArtworks || new Set()
+      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
 
       if (ownCollections) {
         ownership = !!ownCollections.find(collection => collection.id === Number(collectionId))
@@ -118,6 +120,8 @@ const collectionController = {
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : "",
           work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : IMAGE_NOT_AVAILABLE  // if no image in DB, use "no image"
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
+        work.isAdded = addedArtworks.size ? addedArtworks.has(work.id) : false
+        work.isFavorite = favoriteArtworks.includes(work.id)
       })
       collection.workCount = collection.JoinedArtworks.length
       collection.editable = ownership && notFavorite
