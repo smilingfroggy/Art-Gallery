@@ -6,6 +6,7 @@ const Medium = db.Medium
 const ArtworkImage = db.ArtworkImage
 const Collection = db.Collection
 const User = db.User
+const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 
 const collectionController = {
   getCollections: async (req, res, next) => {
@@ -30,9 +31,18 @@ const collectionController = {
         order: ['updatedAt'],
       })
 
+      function checkImage(source) {
+        if (!source.JoinedArtworks.length) {  // if no works were added yet
+          source.JoinedArtworks.push({ ArtworkImages: [{ url: IMAGE_NOT_AVAILABLE }] })
+        } else if (!source.JoinedArtworks[0].ArtworkImages.length) {   // if work has no image
+          source.JoinedArtworks.push({ ArtworkImages: [{ url: IMAGE_NOT_AVAILABLE }] })
+        }
+      }
+
       const collections = JSON.parse(JSON.stringify(collections_rawData))
       collections.forEach(list => {
         list.description = list.description.slice(0, 45) + "..."
+        checkImage(list)
       })
 
       // user own collections
@@ -56,6 +66,7 @@ const collectionController = {
         ownCollections = JSON.parse(JSON.stringify(ownCollections_rawData))
         ownCollections.forEach(list => {
           list.description = list.description.slice(0, 45) + "..."
+          checkImage(list)
         })
       }
       // return res.json({ collections, ownCollections })
@@ -106,7 +117,7 @@ const collectionController = {
       const collection = JSON.parse(JSON.stringify(collection_rawData))
       collection.JoinedArtworks.forEach(work => {
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : "",
-        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
+        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : IMAGE_NOT_AVAILABLE  // if no image in DB, use "no image"
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
       })
       collection.workCount = collection.JoinedArtworks.length
