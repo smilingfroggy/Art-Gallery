@@ -248,6 +248,27 @@ const collectionController = {
       console.log(error)
       next(error)
     }
+  },
+  addFavorite: async (req, res, next) => {
+    try {    
+      const userId = getUser(req)?.id || null
+      const { artworkId } = req.params
+      const Collection_fav = await Collection.findOne({
+        where: { UserId: userId, name: 'Favorite List' },
+        attributes: ['id'], raw: true
+      })
+      if (!Collection_fav) throw new Error('Favorite List unavailable')
+
+      await CollectionArtwork.create({
+        CollectionId: Collection_fav.id,
+        ArtworkId: artworkId
+      })
+      req.flash('success_messages', 'Added to Favorite List')
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
   }
 }
 
