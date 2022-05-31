@@ -26,6 +26,7 @@ router.post('/collections', authenticated, collectionController.postCollection)
 router.get('/collections/:collectionId', collectionController.getCollection)
 router.put('/collections/:collectionId', authenticated, collectionController.putCollection)
 router.delete('/collections/:collectionId', authenticated, collectionController.deleteCollection)
+router.put('/collections/artworks/:artworkId', authenticated, collectionController.putCollectionArtworks)
 router.use('/', generalErrorHandler)
 
 module.exports = router;

@@ -198,6 +198,53 @@ const collectionController = {
       next(error)
     }
   },
+  putCollectionArtworks: async (req, res, next) => {
+    try {
+      const userId = getUser(req)?.id || null
+      const { artworkId } = req.params
+      let { collectionId_select } = req.body//[ '42', '50' ] or 50
+
+      if (typeof collectionId_select === "string") collectionId_select = [collectionId_select]
+      if (!collectionId_select) collectionId_select = []
+      console.log('[collectionId_select]:', collectionId_select)
+
+      // 找出使用者 所有包含此作品的收藏清單
+      const artwork_rawData = await Artwork.findByPk(artworkId, {
+        attributes: ['id'],
+        include: { model: Collection, as: 'JoinedCollections', through: { attributes: [] }, 
+          attributes: ['id', 'UserId'], where: { UserId: userId} 
+        }, 
+      })
+      if (!artwork_rawData) throw new Error('Artwork unavailable')
+      const joinedCollection = artwork_rawData?.toJSON().JoinedCollections || null
+      const joinedCollectionId = joinedCollection ? joinedCollection.map(col => col.id) : []  // [ 43, 45 ]
+      console.log('joinedCollectionId', joinedCollectionId)
+
+      // 多的要加入，少的要刪除
+      const toAddCollections = collectionId_select.filter(id => !joinedCollectionId.includes(Number(id)))
+      const toRemoveCollections = joinedCollectionId.filter(id => !collectionId_select.includes(String(id)))
+      console.log('toAddCollections:', toAddCollections, 'toRemoveCollections:', toRemoveCollections)
+
+      Promise.all([
+        CollectionArtwork.bulkCreate(toAddCollections.map(id => {
+          return {
+            CollectionId: id,
+            ArtworkId: artworkId
+          }
+        })),
+        ...toRemoveCollections.map(id => CollectionArtwork.destroy({
+          where: {
+            CollectionId: id,
+            ArtworkId: artworkId
+          }
+        }))
+      ]).then(() => {
+        return res.redirect('back')
+      }).catch(error => console.log(error))
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
   }
 }
 
