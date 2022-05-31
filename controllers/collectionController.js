@@ -222,7 +222,6 @@ const collectionController = {
           attributes: ['id', 'UserId'], where: { UserId: userId} 
         }, 
       })
-      if (!artwork_rawData) throw new Error('Artwork unavailable')
       const joinedCollection = artwork_rawData?.toJSON().JoinedCollections || null
       const joinedCollectionId = joinedCollection ? joinedCollection.map(col => col.id) : []  // [ 43, 45 ]
       console.log('joinedCollectionId', joinedCollectionId)
