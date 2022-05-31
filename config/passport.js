@@ -2,7 +2,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const User = db.User
+const { User, Collection, Artwork } = db
 
 passport.use(new LocalStrategy(
   {
@@ -27,8 +27,19 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser( async (id, done) => {
-  const user_rawData = await User.findByPk(id)
+  const user_rawData = await User.findByPk(id, {
+    include: { model: Collection, attributes: ['id'],
+      include: { model: Artwork, as: 'JoinedArtworks', attributes: ['id'], through: { attributes: [] } } 
+    }
+  })
+  
   const user = user_rawData.toJSON()
+  user.addedArtworks = new Set()
+  user.Collections.forEach(col => {
+    col.JoinedArtworks.forEach( work => {
+      user.addedArtworks.add(work.id)
+    })
+  })
   return done(null, user)
 })
 

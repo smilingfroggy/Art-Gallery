@@ -1,5 +1,5 @@
 const db = require('../models');
-const { Artwork, ArtworkImage, Collection, Medium, User } = db
+const { Artwork, ArtworkImage, Collection, CollectionArtwork, Medium, User } = db
 const { getUser } = require('../helpers/auth-helpers')
 const { Op, Sequelize } = require('sequelize')
 const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
@@ -78,18 +78,16 @@ const collectionController = {
       const userId = getUser(req)?.id || null
 
       // find user's own collections
-      let ownCollections
-      if (userId) {
-        ownCollections_rawData = await Collection.findAll({
-          where: { UserId: userId },
-          attributes: ['id']
-        })
-        ownCollections = JSON.parse(JSON.stringify(ownCollections_rawData))
+      let ownCollections = getUser(req)?.Collections
+      let ownership = false
+
+      if (ownCollections) {
+        ownership = !!ownCollections.find(collection => collection.id === Number(collectionId))
       }
 
       // if user owns collection, find anyway; if not, check find public collection only
       let whereQuery = { id: collectionId }
-      if (!ownCollections || !ownCollections.find(collection => collection.id === Number(collectionId))) {
+      if (!ownCollections || !ownership) {
         whereQuery.privacy = { [Op.eq]: 2 }
       }
 
@@ -108,7 +106,10 @@ const collectionController = {
           }
         ]
       })
-      if (!collection_rawData) throw new Error('Collection unavailable')
+      if (!collection_rawData) {
+        req.flash('error_messages', 'Collection unavailable')
+        return res.redirect('/collections')
+      }
 
       const collection = JSON.parse(JSON.stringify(collection_rawData))
       collection.JoinedArtworks.forEach(work => {
@@ -117,6 +118,7 @@ const collectionController = {
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
       })
       collection.workCount = collection.JoinedArtworks.length
+      collection.isOwner = ownership
 
       return res.render('collection', { collection })
     } catch (error) {
@@ -137,6 +139,60 @@ const collectionController = {
       })
       req.flash('success_messages', `Created collection ${name}`)
       return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  putCollection: async (req, res, next) => {
+    try {
+      const { name, description, privacy } = req.body
+      const { collectionId } = req.params
+      const userId = getUser(req)?.id
+      if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
+
+      const collection_rawData = await Collection.findByPk(collectionId, {
+        include: {
+          model: User, attributes: ['id']
+        }
+      })
+      if (!collection_rawData) throw new Error('Please provide valid collection Id')
+      if (collection_rawData.User.id !== userId) throw new Error('Permission denied')
+
+      await collection_rawData.update({
+        name, description,
+        privacy: privacy === 'on' ? 2 : 0
+      })
+
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  deleteCollection: async (req, res, next) => {
+    try {
+      const { collectionId } = req.params
+      const userId = getUser(req)?.id
+
+      const collection_rawData = await Collection.findByPk(collectionId, {
+        include: [
+          { model: User, attributes: ['id'] },
+          { model: Artwork, as: 'JoinedArtworks', through: { attributes: [] }, attributes: ['id'] }
+        ]
+      })
+      if (!collection_rawData) throw new Error('Please provide valid collection Id')
+      if (collection_rawData.User.id !== userId) throw new Error('Permission denied')
+
+      const collection = JSON.parse(JSON.stringify(collection_rawData))
+      const workCount = collection.JoinedArtworks.length
+      Promise.all([
+        CollectionArtwork.destroy({ where: { CollectionId: collectionId } }),
+        collection_rawData.destroy(),
+      ]).then(() => {
+        req.flash('success_messages', `Deleted 1 collectiwon and ${workCount} works`)
+        return res.redirect('/collections')
+      }).catch(error => console.log(error))
     } catch (error) {
       console.log(error)
       next(error)
