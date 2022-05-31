@@ -33,6 +33,52 @@
     </div>
     {{/each}}
 
+    <div class="col">
+      <div class="card h-100">
+        <button type="button" class="btn btn-link h-100" data-bs-toggle="modal" data-bs-target="#new-collection-modal">
+          <div class="d-flex align-items-center justify-content-center" style="height: 150px">
+            <h1 class="text-muted"><i class="fa-solid fa-circle-plus"></i></h1>
+          </div>
+          <div class="card-body">
+            <h6 class="card-title text-muted" style="height: 2em" align="center">Create new</h6>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="new-collection-modal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create new collection</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="newCollection" action="/collections" method="post">
+              <div class="mb-3 row">
+                <label for="name" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-9">
+                  <input class="form-control" type="text" name="name" id="name" placeholder="Max: 25 characters"
+                    maxlength="25" required>
+                </div>
+              </div>
+              <div class="mb-3 row">
+                <label for="description" class="col-sm-3 col-form-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea class="form-control" name="description" id="description" rows="5" maxlength="100"
+                    placeholder="Max: 100 characters"></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="newCollection" class="btn btn-primary">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
   {{/if}}
 

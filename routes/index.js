@@ -22,6 +22,7 @@ router.get('/artworks/:artworkId', artworkController.getArtwork)
 router.get('/artists/:artistId', artistController.getArtist)
 
 router.get('/collections', collectionController.getCollections)
+router.post('/collections', authenticated, collectionController.postCollection)
 router.get('/collections/:collectionId', collectionController.getCollection)
 router.use('/', generalErrorHandler)
 

@@ -1,11 +1,7 @@
+const db = require('../models');
+const { Artwork, ArtworkImage, Collection, Medium, User } = db
 const { getUser } = require('../helpers/auth-helpers')
 const { Op, Sequelize } = require('sequelize')
-const db = require('../models');
-const Artwork = db.Artwork
-const Medium = db.Medium
-const ArtworkImage = db.ArtworkImage
-const Collection = db.Collection
-const User = db.User
 const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 
 const collectionController = {
@@ -127,6 +123,25 @@ const collectionController = {
       console.log(error)
       next(error)
     }
+  },
+  postCollection: async (req, res, next) => {
+    try {
+      const { name, description } = req.body
+      const userId = getUser(req)?.id
+      if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
+
+      await Collection.create({
+        UserId: userId,
+        name, description,
+        privacy: 0  // default to private
+      })
+      req.flash('success_messages', `Created collection ${name}`)
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
   }
 }
 
