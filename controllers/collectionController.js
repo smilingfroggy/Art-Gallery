@@ -80,9 +80,11 @@ const collectionController = {
       // find user's own collections
       let ownCollections = getUser(req)?.Collections
       let ownership = false
+      let notFavorite = false
 
       if (ownCollections) {
         ownership = !!ownCollections.find(collection => collection.id === Number(collectionId))
+        notFavorite = ownCollections.find(collection => collection.name === 'Favorite List').id !== Number(collectionId)
       }
 
       // if user owns collection, find anyway; if not, check find public collection only
@@ -114,11 +116,11 @@ const collectionController = {
       const collection = JSON.parse(JSON.stringify(collection_rawData))
       collection.JoinedArtworks.forEach(work => {
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : "",
-        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : IMAGE_NOT_AVAILABLE  // if no image in DB, use "no image"
+          work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : IMAGE_NOT_AVAILABLE  // if no image in DB, use "no image"
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
       })
       collection.workCount = collection.JoinedArtworks.length
-      collection.isOwner = ownership
+      collection.editable = ownership && notFavorite
 
       return res.render('collection', { collection })
     } catch (error) {
@@ -158,6 +160,7 @@ const collectionController = {
       })
       if (!collection_rawData) throw new Error('Please provide valid collection Id')
       if (collection_rawData.User.id !== userId) throw new Error('Permission denied')
+      if (collection_rawData.name === 'Favorite') throw new Error('Favorite cannot be edited')
 
       await collection_rawData.update({
         name, description,

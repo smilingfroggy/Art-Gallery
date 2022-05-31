@@ -6,7 +6,7 @@
 </div>
 
 {{!-- Show edit & delete btn if owned by user --}}
-{{#if collection.isOwner}}
+{{#if collection.editable}}
 <div class="mb-3 d-flex justify-content-end" >
   <div class="btn-group btn-group-sm banner-buttons" role="group" style="position: relative; top: -90px">
     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"

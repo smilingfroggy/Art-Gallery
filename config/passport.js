@@ -28,7 +28,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser( async (id, done) => {
   const user_rawData = await User.findByPk(id, {
-    include: { model: Collection, attributes: ['id'],
+    include: { model: Collection, attributes: ['id', 'name'],
       include: { model: Artwork, as: 'JoinedArtworks', attributes: ['id'], through: { attributes: [] } } 
     }
   })
@@ -36,6 +36,9 @@ passport.deserializeUser( async (id, done) => {
   const user = user_rawData.toJSON()
   user.addedArtworks = new Set()
   user.Collections.forEach(col => {
+    if (col.name === 'Favorite List') {
+      user.favoriteArtworks = col.JoinedArtworks.map(work => work.id)
+    }
     col.JoinedArtworks.forEach( work => {
       user.addedArtworks.add(work.id)
     })
