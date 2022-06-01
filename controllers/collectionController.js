@@ -117,10 +117,11 @@ const collectionController = {
 
       const collection = JSON.parse(JSON.stringify(collection_rawData))
       collection.JoinedArtworks.forEach(work => {
+        work.name = work.name.slice(0, 22)
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : "",
-          work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : IMAGE_NOT_AVAILABLE  // if no image in DB, use "no image"
-        work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
-        work.isAdded = addedArtworks.size ? addedArtworks.has(work.id) : false
+        work.image = work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE
+        work.size = work.depth ? (work.height + "x" + work.width + "x" + work.depth) : (work.height + "x" + work.width)
+        work.isAdded = addedArtworks.has(work.id)
         work.isFavorite = favoriteArtworks.includes(work.id)
       })
       collection.workCount = collection.JoinedArtworks.length
@@ -158,9 +159,7 @@ const collectionController = {
       if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
 
       const collection_rawData = await Collection.findByPk(collectionId, {
-        include: {
-          model: User, attributes: ['id']
-        }
+        include: { model: User, attributes: ['id'] }
       })
       if (!collection_rawData) throw new Error('Please provide valid collection Id')
       if (collection_rawData.User.id !== userId) throw new Error('Permission denied')
@@ -170,7 +169,6 @@ const collectionController = {
         name, description,
         privacy: privacy === 'on' ? 2 : 0
       })
-
       return res.redirect('back')
     } catch (error) {
       console.log(error)
@@ -197,7 +195,7 @@ const collectionController = {
         CollectionArtwork.destroy({ where: { CollectionId: collectionId } }),
         collection_rawData.destroy(),
       ]).then(() => {
-        req.flash('success_messages', `Deleted 1 collectiwon and ${workCount} works`)
+        req.flash('success_messages', `Deleted 1 collection and ${workCount} works`)
         return res.redirect('/collections')
       }).catch(error => console.log(error))
     } catch (error) {

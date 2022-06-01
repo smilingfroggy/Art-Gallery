@@ -1,11 +1,4 @@
 <div class="artworks-banner mb-5">
-  {{!-- <h2 class="exhibition-name">{{exhibition.name}}</h2> --}}
-  <div class="container">
-    {{!-- <form class="d-flex">
-      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success" type="submit">Search</button>
-    </form> --}}
-  </div>
 </div>
 
 <div class="container-fluid">
@@ -269,10 +262,10 @@
       </span>
 
       <div class="card-body">
-        <h6 class="card-title">{{this.name}}</h6>
-        <small class="card-text d-inline-block">{{#each
-          this.Creators}}{{this.name}}{{/each}}　{{this.medium}}　{{this.creationTime}}</small>
-        <small class="card-text d-inline-block">{{this.size}}</small>
+        <h6 class="card-title" style="height: 2em;">{{this.name}}</h6>
+        <small class="card-text" style="height: 2em;">{{#each
+          this.Creators}}{{this.name}}{{/each}}　{{this.medium}}　{{this.creationTime}}　{{this.size}}&nbsp;cm
+        </small>
       </div>
     </div>
     {{/each}}

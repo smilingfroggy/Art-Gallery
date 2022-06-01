@@ -1,12 +1,10 @@
-const { Op } = require("sequelize");
-const sequelize = require("sequelize");
 const db = require('../models')
-const Artwork = db.Artwork
-const Subject = db.Subject
-const Medium = db.Medium
-const Artist = db.Artist
-const ArtistImage = db.ArtistImage
-const ArtworkImage = db.ArtworkImage
+const { Artwork, Artist, ArtistImage, ArtworkImage, Medium, Subject, } = db
+const { Op } = require("sequelize")
+const sequelize = require("sequelize")
+const { getUser } = require('../helpers/auth-helpers')
+const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
+const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
 
 const artworkController = {
   getSelections: async (req, res, next) => {
@@ -73,7 +71,6 @@ const artworkController = {
       }
 
       if (!Object.keys(req.query).length) {   // if req.query is empty
-        // return res.json(selections)
         return res.render('artworks', { selections })
       }
 
@@ -100,7 +97,7 @@ const artworkController = {
         artistId_search = selections_artist.find(selection => selection.id === Number(artistId))
         if (!artistId_search) warning_messages.push({ message: `Cannot find artist Id: ${artistId}` })
       }
-      
+
       let searching = {
         medium: medium || (mediumId ? (mediumId_search?.name || undefined) : undefined),
         subject: subject || (subjectId ? (subjectId_search?.name || undefined) : undefined),
@@ -132,10 +129,7 @@ const artworkController = {
       if (createYear_lower || createYear_upper) {
         if (createYear_includeNone) {
           whereQuery['creationTime'] = {
-            [Op.or]: [
-              { [Op.between]: [createYear_lower || '1600', createYear_upper || '2100'] },
-              null
-            ]
+            [Op.or]: [{ [Op.between]: [createYear_lower || '1600', createYear_upper || '2100'] }, null]
           }
         } else {  // exclude null
           whereQuery['creationTime'] = {
@@ -143,8 +137,6 @@ const artworkController = {
           }
         }
       }
-
-      // console.log(' whereQuery: ', whereQuery)
 
       const artwork_rawData = await Artwork.findAndCountAll({
         nest: true,
@@ -156,23 +148,22 @@ const artworkController = {
           { model: ArtworkImage, attributes: ['url', 'type'] },
           {
             model: Artist, as: 'Creators', through: { attributes: [] },
-            attributes: ['id', 'name'],
-            required: true
+            attributes: ['id', 'name'], required: true
           }
         ],
         distinct: true   // count distinct pk 
       })
 
       let artwork_result = JSON.parse(JSON.stringify(artwork_rawData))
-
       // 整理藝術品資料: medium, size
       artwork_result.rows.forEach(work => {
+        work.name = work.name.slice(0, 22)
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
         work.medium = work.Medium.name
-        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
+        work.image = work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE
         delete work.Medium
         delete work.ArtworkImages
-        work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
+        work.size = work.depth ? (work.height + "x" + work.width + "x" + work.depth) : (work.height + "x" + work.width)
       })
 
       // return res.json({ selections, searching, artwork_result })
@@ -202,14 +193,14 @@ const artworkController = {
       // console.log(artwork)
 
       // 整理藝術品資料：medium, subject, size, creationTime
-      artwork.image = artwork.ArtworkImages[0] ? artwork.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
+      artwork.image = artwork.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE
       artwork.size = (artwork.depth) ? (artwork.height + "x" + artwork.width + "x" + artwork.depth + " cm") : (artwork.height + "x" + artwork.width + " cm")
       artwork.creationTime = artwork.creationTime ? artwork.creationTime.getFullYear() : ""
 
       // 整理藝術家資料介紹
       artwork.Creators.map(creator => {
         if (creator.ArtistImages.length === 0) {
-          creator.ArtistImages = 'https://i.imgur.com/QJrNwMz.jpg'  //預設空白大頭照
+          creator.ArtistImages = ARTIST_AVATAR_NOT_AVAILABLE
         } else {
           const headImg = creator.ArtistImages.find(image => image.type === 'head')
           if (headImg) {  // imgur url + b => big thumbnail 

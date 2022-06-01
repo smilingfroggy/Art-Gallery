@@ -1,11 +1,8 @@
-const db = require('../models');
-const Artwork = db.Artwork
-const Exhibition = db.Exhibition
-const ExhibitionImage = db.ExhibitionImage
-const Medium = db.Medium
-const Artist = db.Artist
-const ArtistImage = db.ArtistImage
-const ArtworkImage = db.ArtworkImage
+const db = require('../models')
+const { Artwork, Artist, ArtistImage, ArtworkImage, Exhibition, ExhibitionImage, Medium } = db
+const { getUser } = require('../helpers/auth-helpers')
+const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
+const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
 
 const exhibitionController = {
   getExhibitions: async (req, res, next) => {
@@ -23,7 +20,7 @@ const exhibitionController = {
       let exhibitionsData = exhibitions_rawData.map(exhibition => {
         let count = exhibition.ContainedArtworks.length
         delete exhibition.dataValues.ContainedArtworks
-        let useImage = exhibition.dataValues.ExhibitionImages.find(images => images.type === 'poster')?.url || 'https://i.imgur.com/nVNO3Kj.png'   // if no poster, use "no image"
+        let useImage = exhibition.dataValues.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE
         return {
           ...exhibition.dataValues,
           date_start: exhibition.dataValues.date_start.toISOString().slice(0, 10),
@@ -60,11 +57,10 @@ const exhibitionController = {
       if (!exhibition_rawData) throw new Error('Exhibition unavailable')
 
       let result = exhibition_rawData.toJSON()
-      const count_work = result.ContainedArtworks.length
-      result.artwork_sum = count_work
+      result.artwork_sum = result.ContainedArtworks.length
 
       // console.log(result.ContainedArtworks) 
-      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || 'https://i.imgur.com/nVNO3Kj.png'   // if no poster, use "no image"
+      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE
       result.poster = usePoster
 
       // return res.json(result)
@@ -101,16 +97,16 @@ const exhibitionController = {
       if (!exhibitionArtworks_rawData) throw new Error('Exhibition artwork unavailable')
 
       let result = exhibitionArtworks_rawData.toJSON()
-      // 整理藝術品資料: medium, size
-      const count_work = result.ContainedArtworks.length
-      result.artwork_sum = count_work
-
+      result.artwork_sum = result.ContainedArtworks.length
+      // 整理藝術品資料: name, medium, time, image, size...
       result.ContainedArtworks.forEach(work => {
+        work.name = work.name.slice(0,20)
         work.medium = work.Medium.name
-        work.image = work.ArtworkImages[0]?.url || 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
+        work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
+        work.image = work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE 
         delete work.Medium
         delete work.ArtworkImages
-        work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
+        work.size = work.depth ? (work.height + "x" + work.width + "x" + work.depth) : (work.height + "x" + work.width)
       })
 
       // 找出不重複的創作者；每件作品創作者可能不同、每件作品可有多個創作者
@@ -127,7 +123,7 @@ const exhibitionController = {
       // 藝術家照片：優先顯示創作者大頭照(type: head)
       creators.forEach(creator => {
         if (creator.ArtistImages.length === 0) {
-          creator.ArtistImages = 'https://i.imgur.com/QJrNwMz.jpg'  //預設空白大頭照
+          creator.ArtistImages = ARTIST_AVATAR_NOT_AVAILABLE  //預設空白大頭照
         } else {
           const headImg = creator.ArtistImages.find(image => image.type === 'head')
           if (headImg) {  // imgur url + b => big thumbnail 
@@ -141,7 +137,6 @@ const exhibitionController = {
 
       result.Creators = creators
 
-      // return res.json(result)
       return res.render('exhibition_artworks', { exhibition: result })
     } catch (error) {
       console.log(error)
@@ -163,8 +158,7 @@ const exhibitionController = {
       if (!exhibitionImages_rawData) throw new Error('Exhibition images unavailable')
       const exhibitionImages = exhibitionImages_rawData.toJSON()
 
-      // return res.json(exhibitionImages)
-      res.render('exhibition_images', { exhibition: exhibitionImages })
+      return res.render('exhibition_images', { exhibition: exhibitionImages })
     } catch (error) {
       console.log(error)
       next(error)
