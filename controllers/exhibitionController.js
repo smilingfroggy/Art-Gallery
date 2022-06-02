@@ -58,6 +58,8 @@ const exhibitionController = {
 
       let result = exhibition_rawData.toJSON()
       result.artwork_sum = result.ContainedArtworks.length
+      result.date_start = result.date_start.toISOString().slice(0, 10)
+      result.date_end = result.date_end.toISOString().slice(0, 10)
 
       // console.log(result.ContainedArtworks) 
       let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE
