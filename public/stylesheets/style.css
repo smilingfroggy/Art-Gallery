@@ -9,6 +9,10 @@ nav.trans {
   opacity: 0.8
 }
 
+nav:hover {
+  opacity: 1;
+}
+
 a {
   color: #00B7FF;
 }
@@ -58,7 +62,7 @@ img {
 
 .grid-item-exhWork {
   float: left;
-  width: 240px;
+  width: 230px;
   margin: 10px;
 }
 
@@ -227,15 +231,4 @@ img {
   .modal-content {
     width: 100%;
   }
-}
-
-/* horizontal scroll */
-.scrolling-wrapper {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-}
-
-.scrolling-wrapper .card {
-  flex: 0 0 auto;
 }

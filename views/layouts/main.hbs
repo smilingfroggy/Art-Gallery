@@ -25,13 +25,13 @@
             <li class="nav-item mx-2 d-flex">
               <a class="nav-link" href="/exhibitions">Exhibitions</a>
               {{#if user.isAdmin}}
-              <a class="nav-link" href="/admin/exhibitions"><i class="fa-solid fa-square-pen"></i></a>
+              <a class="nav-link ms-1" href="/admin/exhibitions"><i class="fa-solid fa-square-pen"></i></a>
               {{/if}}
             </li>
             <li class="nav-item mx-2 d-flex">
               <a class="nav-link" href="/artworks">Artworks</a>
               {{#if user.isAdmin}}
-              <a class="nav-link" href="/admin/artworks"><i class="fa-solid fa-square-pen"></i></a>
+              <a class="nav-link ms-1" href="/admin/artworks"><i class="fa-solid fa-square-pen"></i></a>
               {{/if}}
             </li>
             {{#unless user.isAdmin}}

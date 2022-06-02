@@ -1,9 +1,9 @@
 <div class="artworks-banner mb-5">
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid mx-auto" style="max-width: 1400px">
   {{!-- searched keywords --}}
-  <h4 class="d-inline-block mb-3 me-3">Search</h4>
+  <h4 class="d-inline-block mb-3 me-3"><strong>Search</strong></h4>
   <p class="d-inline-block mb-3">
     <small>{{searching.medium}}　{{searching.artist}}　{{searching.artworkName}}　{{searching.subject}}　{{searching.height}}　{{searching.width}}　{{searching.depth}}　{{searching.shape}}
     </small>
@@ -169,7 +169,7 @@
   {{!-- 查詢前顯示各項代表作品 --}}
   {{#unless artwork_result}}
   {{!-- media --}}
-  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>媒材</h4>
+  <h4 class="mb-3"><strong>媒材</strong></h4>
   <hr class="mb-4">
   <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
     {{#each selections.media}}
@@ -192,7 +192,7 @@
   </div>
 
   {{!-- artists --}}
-  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>藝術家</h4>
+  <h4 class="mb-3"><strong>藝術家</strong></h4>
   <hr class="mb-4">
   <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
     {{#each selections.artists}}
@@ -215,7 +215,7 @@
   </div>
 
   {{!-- subjects --}}
-  <h4 class="mb-3"><i class="fa-solid fa-diamond fa-2xs me-3"></i>主題</h4>
+  <h4 class="mb-3"><strong>主題</strong></h4>
   <hr class="mb-4">
   <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-4 mb-5">
     {{#each selections.subjects}}

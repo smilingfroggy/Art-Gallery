@@ -19,9 +19,14 @@
 
   {{!-- poster and introduction --}}
   <div class="card border-white mb-5">
-    <img src="{{exhibition.poster}}" class="card-img-top mx-auto" style="max-width: 540px;" alt="{{exhibition.name}}">
-    <div class="card-body">
-      <h5 style="line-height: 200%">{{exhibition.introduction}}</h5>
+    <div class="row">
+      <div class="col-12 col-lg-4 mb-5 me-5 d-flex justify-content-center">
+        <img src="{{exhibition.poster}}" class=" card-img-top mx-auto"
+          style="max-width: 500px; max-height: 600px; object-fit: contain" alt="{{exhibition.name}}">
+      </div>
+      <div class="card-body col-12 col-lg-7">
+        <p style="line-height: 200%; max-width: 800px">{{exhibition.introduction}}</p>
+      </div>
     </div>
   </div>
 

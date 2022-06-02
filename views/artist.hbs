@@ -12,8 +12,6 @@
 </div>
 
 <div class="container-fluid">
-
-
   {{!-- artist info: image, intro, year --}}
   <p class="mx-auto" style="max-width: 720px; line-height: 2">{{artist.introduction}}</p>
 
@@ -132,27 +130,4 @@
     $grid.masonry();
   });
 
-</script>
-
-<script>
-  // Get the modal
-  const modal = document.getElementById("myModal");
-
-  // Get the image and insert it inside the modal
-  const img = document.getElementById("myImg");
-  const modalImg = document.getElementById("img01");
-  const captionText = document.getElementById("caption");
-  img.onclick = function () {
-    modal.style.display = "block";
-    modalImg.src = this.src;
-    captionText.innerHTML = this.alt;
-  }
-
-  // Get the <span> element that closes the modal
-  const span = document.getElementsByClassName("close")[0];
-
-  // close the modal
-  span.onclick = function () {
-    modal.style.display = "none";
-  }
 </script>

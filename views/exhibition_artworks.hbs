@@ -19,8 +19,8 @@
 
   <div class="row">
     {{!-- artworks --}}
-    <div class="col-md-8">
-      <h4 class="mb-3"><i class="fa-solid fa-diamond fa-xs"></i> 參展作品</h4>
+    <div class="col-12 col-lg-8 col-xl-9">
+      <h4 class="mb-3"><strong> 參展作品</strong></h4>
       <hr class="mb-4">
       {{#unless exhibition.ContainedArtworks}}
       <h5 class="mt-5" align="center">No artwork available.</h5>
@@ -96,27 +96,31 @@
     </div>
 
     {{!-- artists --}}
-    <div class="col-md-3 mx-auto">
-      <h4 class="mb-3"><i class="fa-solid fa-diamond fa-xs"></i> 藝術家</h4>
+    <div class="col-12 col-lg-3 col-xl-3 mx-auto">
+      <h4 class="mb-3"><strong> 藝術家</strong></h4>
       <hr class="mb-4">
       {{#unless exhibition.Creators}}
       <h5 class="mt-5" align="center">No artist available.</h5>
       {{/unless}}
+
       {{#each exhibition.Creators}}
-        <div class="card mb-3" >
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img src="{{this.ArtistImages}}" class="img-fluid artist-thumbnail" alt="{{this.name}}">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
+      <div class="card border-white mb-3">
+        <div class="row">
+          <div class="col-sm-3 col-lg-12 d-flex justify-content-center">
+            <a href="/artists/{{this.id}}">
+              <img src="{{this.ArtistImages}}" class="img-fluid artist-thumbnail mx-auto" alt="{{this.name}}" style="max-width: 150px">
+            </a>
+          </div>
+          <div class="col-sm-9 col-lg-12 align-self-center">
+            <div class="card-body">
+              <a href="/artists/{{this.id}}">
                 <h5 class="card-title">{{this.name}}</h5>
-                <p class="card-text">{{this.introduction}}</p> 
-                <p class="mx-3" align="right"><a href="exhibitions/{{exhibition.id}}/artworks"><i class="fa-solid fa-angles-right"></i> More </a></p>
-              </div>
+              </a>
+              <p class="card-text">{{this.introduction}}</p> 
             </div>
           </div>
         </div>
+      </div>
       {{/each}}
     </div>
 
