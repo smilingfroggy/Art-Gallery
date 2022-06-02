@@ -1,5 +1,6 @@
 'use strict';
 const { faker } = require('@faker-js/faker')
+const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 
 //read excel file
 const xlsx = require('xlsx')
@@ -18,7 +19,7 @@ module.exports = {
         ArtworkId: artworks.find(artwork_db => { return artwork_db.serialNumber == work.serialNumber }).id,
         type: 'original',
         description: faker.lorem.sentence(),
-        url: work.url,
+        url: work.url || IMAGE_NOT_AVAILABLE,
         createdAt: new Date(),
         updatedAt: new Date()
       }

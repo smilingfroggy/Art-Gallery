@@ -8,7 +8,6 @@ module.exports = {
     const names = [['Connoisseur', 'The Persistence of Memory'], ['Pulse of the Earth', 'Inspirations'], ['Free spirited', 'Delicate touches']]
 
     await queryInterface.bulkInsert('Collections', users.map((user, index) => { 
-      console.log('user index', index)
       return [{
       UserId: user.id,
       name: 'Favorite List',

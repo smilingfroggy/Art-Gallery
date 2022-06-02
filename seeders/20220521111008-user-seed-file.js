@@ -1,5 +1,6 @@
 'use strict';
 const bcrypt = require('bcryptjs')
+const { faker } = require('@faker-js/faker')
 
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -13,7 +14,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        name: 'user1',
+        name: faker.name.findName(),
         email: 'user1@example.com',
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
         isAdmin: false,
@@ -21,7 +22,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        name: 'user2',
+        name: faker.name.findName(),
         email: 'user2@example.com',
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
         isAdmin: false,
@@ -29,7 +30,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        name: 'user3',
+        name: faker.name.findName(),
         email: 'user3@example.com',
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
         isAdmin: false,

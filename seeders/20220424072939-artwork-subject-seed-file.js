@@ -5,7 +5,7 @@ const xlsx = require('xlsx')
 const wb = xlsx.readFile('./seeders/seedsRawData.xlsx')
 const artwork = wb.Sheets['artwork']
 const rawData = xlsx.utils.sheet_to_json(artwork)
-console.log(rawData.slice(0, 3))
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     // query existed id from artworks and subjects table

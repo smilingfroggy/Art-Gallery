@@ -7,7 +7,6 @@ const exhibitionImage = wb.Sheets['exhibitionImage']
 const rawData_exhibitionImage = xlsx.utils.sheet_to_json(exhibitionImage)
 const artistImage = wb.Sheets['artistImage']
 const rawData_artistImage = xlsx.utils.sheet_to_json(artistImage)
-console.log(rawData_artistImage.slice(0,3))
 
 module.exports = {
   async up (queryInterface, Sequelize) {
