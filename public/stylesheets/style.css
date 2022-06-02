@@ -56,6 +56,12 @@ img {
   margin: 10px;
 }
 
+.grid-item-exhWork {
+  float: left;
+  width: 240px;
+  margin: 10px;
+}
+
 .grid-item-artwork, .grid-item-exhImage-sm {
   float: left;
   width: 150px;

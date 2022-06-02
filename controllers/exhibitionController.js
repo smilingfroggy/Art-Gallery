@@ -72,6 +72,10 @@ const exhibitionController = {
   },
   getExhibitionArtworks: async (req, res, next) => {
     try {
+      const userId = getUser(req)?.id || null
+      let addedArtworks = getUser(req)?.addedArtworks || new Set()
+      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+
       const exhibitionArtworks_rawData = await Exhibition.findOne({
         where: {
           privacy: 2,
@@ -107,6 +111,8 @@ const exhibitionController = {
         delete work.Medium
         delete work.ArtworkImages
         work.size = work.depth ? (work.height + "x" + work.width + "x" + work.depth) : (work.height + "x" + work.width)
+        work.isAdded = addedArtworks.has(work.id)
+        work.isFavorite = favoriteArtworks.includes(work.id)
       })
 
       // 找出不重複的創作者；每件作品創作者可能不同、每件作品可有多個創作者

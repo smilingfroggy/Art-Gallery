@@ -60,6 +60,9 @@ const artworkController = {
   },
   getArtworks: async (req, res, next) => {
     try {
+      let addedArtworks = getUser(req)?.addedArtworks || new Set()
+      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+
       // get selections
       const selections_artist = await Artist.findAll({ attributes: ['id', 'name'], raw: true, order: ['name'] })
       const selections_medium = await Medium.findAll({ attributes: ['id', 'name'], raw: true, order: ['name'] })
@@ -164,6 +167,8 @@ const artworkController = {
         delete work.Medium
         delete work.ArtworkImages
         work.size = work.depth ? (work.height + "x" + work.width + "x" + work.depth) : (work.height + "x" + work.width)
+        work.isAdded = addedArtworks.has(work.id)
+        work.isFavorite = favoriteArtworks.includes(work.id)
       })
 
       // return res.json({ selections, searching, artwork_result })
@@ -175,6 +180,9 @@ const artworkController = {
   },
   getArtwork: async (req, res, next) => {
     try {
+      let addedArtworks = getUser(req)?.addedArtworks || new Set()
+      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+
       const artwork_rawData = await Artwork.findByPk(req.params.artworkId, {
         attributes: { exclude: ['MediumId', 'viewCount', 'createdAt', 'updatedAt', 'piecesNum'] },
         include: [
@@ -196,6 +204,8 @@ const artworkController = {
       artwork.image = artwork.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE
       artwork.size = (artwork.depth) ? (artwork.height + "x" + artwork.width + "x" + artwork.depth + " cm") : (artwork.height + "x" + artwork.width + " cm")
       artwork.creationTime = artwork.creationTime ? artwork.creationTime.getFullYear() : ""
+      artwork.isAdded = addedArtworks.has(artwork.id)
+      artwork.isFavorite = favoriteArtworks.includes(artwork.id)
 
       // 整理藝術家資料介紹
       artwork.Creators.map(creator => {

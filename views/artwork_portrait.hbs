@@ -30,6 +30,32 @@
               href="/artworks/?subject={{this.id}}">{{this.name}}</a>
             {{/each}}
           </p>
+
+          <div class="d-flex justify-content-center align-items-center mx-auto mt-3 button-area d-inline-block">
+            <button type="button" class="btn btn-sm btn-link modal_btn addCollection_btn me-3"
+              data-bs-target="#editCollection_{{artwork.id}}">
+              {{#if artwork.isAdded}}
+              <i class="fa-solid fa-circle-plus modal_btn addCollection_btn me-3"></i>編輯清單
+              {{else}}
+              <i class="fa-solid fa-plus modal_btn addCollection_btn me-3"></i>加入清單
+              {{/if}}
+            </button>
+          
+            {{#if artwork.isFavorite}}
+            <form id="favorite" action="/collections/favorite/{{artwork.id}}?_method=DELETE" method="post">
+              <button type="submit" form="favorite" class="btn btn-sm btn-link favorite_btn">
+                <i class="fa-solid fa-heart favorite_btn me-3"></i>移除收藏
+              </button>
+            </form>
+            {{else}}
+            <form id="favorite" action="/collections/favorite/{{artwork.id}}" method="post">
+              <button type="submit" form="favorite" class="btn btn-sm btn-link favorite_btn">
+                <i class="fa-regular fa-heart favorite_btn me-3"></i>加入收藏
+              </button>
+            </form>
+            {{/if}}
+          </div>
+
         </div>
       </div>
     </div>
@@ -58,7 +84,29 @@
     </div>
   </div>
 
-  <!-- The Modal -->
+  <div class="modal fade" id="editCollection_{{artwork.id}}" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add to Collections</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="min-height: 200px" align="center">
+          <form id="edit_collection" action="/collections/artworks/{{artwork.id}}?_method=PUT" method="post">
+            <select class="form-select mb-3" name="collectionId_select" id="selectWork" size="8" multiple>
+            </select>
+            <p class="text-muted">Press ctrl to add or remove multiple collections.</p>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" form="edit_collection" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Image Modal -->
   <div id="myModal" class="modal">
     <span class="close">&times;</span>
     <!-- Modal Content (The Image) -->
@@ -66,7 +114,6 @@
     <div id="caption"></div>
   </div>
 
-</div>
 
 
 <script>
@@ -90,4 +137,61 @@
   span.onclick = function () {
     modal.style.display = "none";
   }
+
+  // ajax get collections
+  const button_area = document.querySelector('.button-area')
+
+  function removeAllChild(node) {
+    while (node.firstElementChild) {
+      node.removeChild(node.firstElementChild)
+    }
+  }
+  button_area.addEventListener('click', async (event) => {
+    // check logout before submit add collection / favorite
+    const ifLogout = document.querySelector('.fa-circle-user')
+    const login_alert = new bootstrap.Modal(document.getElementById('login_alert'))
+    if (ifLogout) login_alert.show()
+    let target = event.target
+
+    // add favorites button
+    if (target.classList.contains('favorite_btn')) {
+      event.stopPropagation()
+      event.preventDefault()
+      if (!ifLogout) {
+        let form = document.getElementById('favorite')
+        form.submit()
+      }
+    }
+
+    // add collection button: 
+    if (target.classList.contains('modal_btn') && !ifLogout) {
+      let workId
+      if (target.tagName === 'I') {
+        workId = target.parentElement.getAttribute('data-bs-target').split('_')[1]
+      } else {
+        workId = target.getAttribute('data-bs-target').split('_')[1]
+      }
+
+      const modalCalled = new bootstrap.Modal(document.getElementById(`editCollection_${workId}`))
+      modalCalled.show()
+      try {
+        let response = await axios.get('/api/collections')
+        let ownCollections = response.data
+        let modal_select = document.getElementById(`selectWork`)
+        removeAllChild(modal_select)
+
+        ownCollections.forEach(col => {
+          let option = document.createElement('option')
+          option.setAttribute('value', col.id)
+          if (col.JoinedArtworks.find(work => work.id === Number(workId))) {
+            option.setAttribute('selected', "")
+          }
+          option.innerText = `${col.name} (${col.workCount} pieces)`
+          modal_select.appendChild(option)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  })
 </script>
