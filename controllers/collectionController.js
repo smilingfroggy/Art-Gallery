@@ -37,7 +37,7 @@ const collectionController = {
 
       const collections = JSON.parse(JSON.stringify(collections_rawData))
       collections.forEach(list => {
-        list.description = list.description.slice(0, 45) + "..."
+        list.description = list.description ? list.description.slice(0, 45) + "..." : ""
         checkImage(list)
       })
 
@@ -61,7 +61,7 @@ const collectionController = {
 
         ownCollections = JSON.parse(JSON.stringify(ownCollections_rawData))
         ownCollections.forEach(list => {
-          list.description = list.description.slice(0, 45) + "..."
+          list.description = list.description ? list.description.slice(0, 45) + "..." : ""
           checkImage(list)
         })
       }
