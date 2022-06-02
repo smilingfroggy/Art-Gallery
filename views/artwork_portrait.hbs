@@ -15,7 +15,7 @@
             <h5 class="card-title">創作年代：{{artwork.creationTime}} {{artwork.creationTimeNote}}</h5>
             <h5 class="card-title">作品尺寸：{{artwork.size}}</h5>
             <h5 class="card-title">作品媒材：{{artwork.Medium.name}}
-              <a href="/artworks/?medium={{artwork.Medium.name}}">
+              <a href="/artworks/search?medium={{artwork.Medium.name}}">
                 <span style="font-size: 12px; color: rgba(238, 153, 104, 0.952);"><i
                     class="fa-solid fa-square-arrow-up-right"></i>
                 </span>
@@ -27,7 +27,7 @@
           <p class="card-text">標籤：
             {{#each artwork.SubjectTags}}
             <a class="btn btn-outline-secondary btn-sm" id="artwork-tag"
-              href="/artworks/?subject={{this.id}}">{{this.name}}</a>
+              href="/artworks/search?subjectId={{this.id}}">{{this.name}}</a>
             {{/each}}
           </p>
 
