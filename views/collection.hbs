@@ -210,17 +210,16 @@
     }
   }
   grid.addEventListener('click', async (event) => {
+    const ifLogout = document.querySelector('.fa-circle-user')
+    const login_alert = new bootstrap.Modal(document.getElementById('login_alert'))
     let target = event.target
 
     // add favorites button: check logout before submit
     if (target.classList.contains('favorite_btn')) {
       event.stopPropagation()
       event.preventDefault()
-      let ifLogout = document.querySelector('.fa-circle-user')
-      if (ifLogout) {
-        const login_alert = new bootstrap.Modal(document.getElementById('login_alert'))
-        login_alert.show()
-      } else {
+      if (ifLogout) login_alert.show()
+      else {
         let form
         if (target.tagName === 'I') {
           form = target.parentElement.parentElement
@@ -241,11 +240,8 @@
         workId = target.getAttribute('data-bs-target').split('_')[1]
       }
 
-      let ifLogout = document.querySelector('.fa-circle-user')
-      if (ifLogout) {
-        const login_alert = new bootstrap.Modal(document.getElementById('login_alert'))
-        login_alert.show()
-      } else {
+      if (ifLogout) login_alert.show()
+      else {
         let modalCalled = new bootstrap.Modal(document.getElementById(`editCollection_${workId}`))
         modalCalled.show()
         try {
