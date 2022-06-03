@@ -2,6 +2,7 @@ const { imgurFileHandler } = require('../helpers/file-helpers')
 const db = require('../models');
 const { Artwork, Exhibition, ExhibitionImage, Medium, Artist, ArtworkImage, ArtworkArtist, ArtworkSubject, ExhibitionArtwork, Subject } = db
 const { Op } = require('sequelize')
+const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 
 const adminController = {
   getExhibitions: async (req, res, next) => {
@@ -75,13 +76,13 @@ const adminController = {
       result.date_end = result.date_end.toISOString().slice(0, 10)
 
       // console.log(result.ContainedArtworks) 
-      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || 'https://i.imgur.com/nVNO3Kj.png'   // if no poster, use "no image"
+      let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE
       result.poster = usePoster
 
       // ContainedArtworks
       result.ContainedArtworks.forEach(work => {
         work.creationTime = work.creationTime ? work.creationTime.toISOString().slice(0, 4) : null
-        if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })
+        if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: IMAGE_NOT_AVAILABLE })
       })
 
       // return res.json(result)
@@ -116,6 +117,7 @@ const adminController = {
           }
           res.redirect('back')
         })
+        .catch(error => next(error))
     } catch (error) {
       console.log(error)
       next(error)
@@ -189,6 +191,7 @@ const adminController = {
               return res.redirect('back')
             })
         })
+        .catch(error => next(error))
     } catch (error) {
       console.log(error)
       next(error)
@@ -228,7 +231,7 @@ const adminController = {
       let result = exhibitionArtworks_rawData.toJSON()
       result.ContainedArtworks.forEach(work => {
         work.creationTime = work.creationTime ? work.creationTime.toISOString().slice(0, 4) : null
-        if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: 'https://i.imgur.com/nVNO3Kj.png' })  // if no image in DB, use "no image"
+        if (!work.ArtworkImages.length) work.ArtworkImages.push({ url: IMAGE_NOT_AVAILABLE })  // if no image in DB, use "no image"
       })
       result.artwork_sum = result.ContainedArtworks.length
 
@@ -426,7 +429,7 @@ const adminController = {
       }).then((newWork) => {
         // create artworkArtist, artworkTags
         // 若數量只有一個也轉換成陣列
-        artist_select = artist_select.length === 1 ? [artist_select] : artist_select
+        artist_select = typeof artist_select === 'string' ? [artist_select] : artist_select
         switch (typeof SubjectTags_select) {
           case 'undefined':
             SubjectTags_select = []
@@ -506,7 +509,7 @@ const adminController = {
           const artistId_array = artworkArtist.map(data => data.ArtistId)
           const subjectId_array = artworkSubject.map(data => data.SubjectId)
           // 若數量只有一個也轉換成陣列
-          artist_select = artist_select.length === 1 ? [artist_select] : artist_select
+          artist_select = typeof artist_select === 'string' ? [artist_select] : artist_select
           switch (typeof SubjectTags_select) {
             case 'undefined':
               SubjectTags_select = []
@@ -584,7 +587,7 @@ const adminController = {
         return artwork_data.destroy()
       }).then(() => {
         return res.redirect('back')
-      })
+      }).catch(error => next(error))
     } catch (error) {
       console.log(error)
       next(error)
