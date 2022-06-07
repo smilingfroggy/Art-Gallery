@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const User = db.User
-const Collection = db.Collection
+const { User, Collection } = db
+const { getUser } = require('../helpers/auth-helpers')
 
 const userController = {
   signUp: async (req, res, next) => {
@@ -44,6 +44,36 @@ const userController = {
     try {
       req.flash('success_messages', 'Log out successfully')
       req.logOut(() => res.redirect('/user/login'));
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  getProfile: async (req, res, next) => {
+    try {
+      const user = getUser(req)
+      return res.render('profile', user )
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  putProfile: async (req, res, next) => {
+    try {
+      const userId = getUser(req).id
+      const { name, password, passwordCheck } = req.body
+      if (!name || !password || !passwordCheck) throw new Error('Please provide complete messages')
+      if (password !== passwordCheck) throw new Error('Passwords do not match')
+
+      await User.update({
+        name,
+        password: bcrypt.hashSync(password, 10)
+      },{
+        where: { id: userId }
+      })
+
+      req.flash('success_messages', 'Updated Successfully')
+      return res.redirect('back')
     } catch (error) {
       console.log(error)
       next(error)
