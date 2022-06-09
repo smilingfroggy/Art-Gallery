@@ -1,0 +1,94 @@
+<div class="container-fluid mt-5">
+  <div class="d-flex mb-3 justify-content-between">
+    <h4 class="mb-3">Artist List</h4>
+    <a href="/admin/artists/create"><button class="btn btn-success">Create</button></a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover ">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col" style="min-width: 70px;">姓名</th>
+          <th scope="col">別名</th>
+          <th scope="col" style="min-width: 70px;">生年</th>
+          <th scope="col">卒年</th>
+          <th scope="col">介紹</th>
+          <th scope="col" style="min-width: 70px;">作品數</th>
+          <th scope="col" style="min-width: 70px;">照片數</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each artists}}
+        <tr>
+          <th scope="row">{{this.id}}</th>
+          <td>{{this.name}}</td>
+          <td>{{this.otherName}}</td>
+          <td>{{this.birthYear}}</td>
+          <td>{{this.deathYear}}</td>
+          <td>{{this.introduction}}</td>
+          <td>{{this.workCount}}</td>
+          <td>{{this.imageCount}}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary btn-sm">
+                <a href="/admin/artists/{{this.id}}" style="color: inherit; font-weight: 400">Info</a>
+              </button>
+              <button type="button" class="btn btn-outline-primary btn-sm">
+                <a href="/admin/artists/{{this.id}}/edit" style="color: inherit; font-weight: 400">Edit</a>
+              </button>
+              <form action="/admin/artists/{{this.id}}?_method=DELETE" method="post">
+              </form>
+              <button type="submit" class="btn btn-outline-danger btn-sm" form="delete_form">Delete</button>
+            </div>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const table = document.querySelector('tbody')
+  table.addEventListener('click', (event) => {
+    let target = event.target
+    if (target.classList.contains('btn-outline-danger')) {
+      event.preventDefault()
+      let form = target.parentElement.children[2]
+      let name = target.parentElement.parentElement.parentElement.children[1].innerText
+      let workCount = target.parentElement.parentElement.parentElement.children[6].innerText
+      let imageCount = target.parentElement.parentElement.parentElement.children[7].innerText
+
+      if (workCount > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Unable to delete this artist. ${workCount} works were created by this artist.`
+        })
+      } else {
+        Swal.fire({
+          title: 'Are you sure?',
+          html: `確定要刪除<strong>${name}</strong>個人資料及${imageCount}張照片？`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: '刪除！'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire(
+              '已刪除!',
+              `${name}及${imageCount}張照片`,
+              'success'
+            ).then(result => {
+              form.submit()
+            })
+          }
+        })
+      }
+    }
+  })
+</script>

@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const adminExhController = require('../controllers/adminExhController')
 const adminArtworkController = require('../controllers/adminArtworkController')
+const adminArtistController = require('../controllers/adminArtistController')
 const { authenticatedAdmin } = require('../middleware/auth')
 const upload = require('../middleware/multer')
 const { generalErrorHandler } = require('../middleware/error-handler')
@@ -32,6 +33,8 @@ router.get('/artworks/:artworkId/edit', authenticatedAdmin, adminArtworkControll
 router.put('/artworks/:artworkId', authenticatedAdmin, upload.array('image', 10), adminArtworkController.putArtworks)
 router.delete('/artworks/:artworkId', authenticatedAdmin, adminArtworkController.deleteArtwork)
 router.delete('/artworks/:artworkId/images', authenticatedAdmin, adminArtworkController.deleteArtworkImages)
+
+router.get('/artists', authenticatedAdmin, adminArtistController.getArtists)
 router.use('/', generalErrorHandler)
 
 module.exports = router

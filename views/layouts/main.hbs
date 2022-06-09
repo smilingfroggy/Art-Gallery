@@ -39,6 +39,13 @@
               <a class="nav-link" href="/collections">Collection</a>
             </li>
             {{/unless}}
+            {{#if user.isAdmin}}
+            <li class="nav-item mx-2">
+              <a class="nav-link" href="/admin/artists">Artists
+                <i class="fa-solid fa-square-pen ms-lg-3"></i>
+              </a>
+            </li>
+            {{/if}}
             {{#if user}}
             <li class="nav-item ms-2 me-5 dropdown">
 
