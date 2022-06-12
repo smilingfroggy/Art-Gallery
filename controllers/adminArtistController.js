@@ -120,6 +120,25 @@ const adminArtistController = {
       next(error)
     }
   },
+  deleteArtist: async (req, res, next) => {
+    try {
+      const { artistId } = req.params
+      const artist_rawData = await Artist.findByPk(artistId, {
+        include: { model: Artwork, as: 'Creations', through: { attributes: [] } }
+      })
+      if (!artist_rawData) throw new Error('Please provide valid artist Id')
+      if (artist_rawData.Creations.length) throw new Error('Unable to delete this artist, due to remaining works.')
+      const images_deleted = await ArtistImage.destroy({
+        where: { ArtistId: artistId }
+      })
+      await artist_rawData.destroy()
+      req.flash('success_messages', `Successfully deleted 1 artist profile and ${images_deleted} images.`)
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
   deleteArtistImages: async (req, res, next) => {
     try {
       const { imageId } = req.body

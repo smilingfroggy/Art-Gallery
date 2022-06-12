@@ -38,6 +38,7 @@ router.get('/artists', authenticatedAdmin, adminArtistController.getArtists)
 router.get('/artists/:artistId', authenticatedAdmin, adminArtistController.getArtist)
 router.post('/artists', authenticatedAdmin, upload.array('image', 10), adminArtistController.postArtist)
 router.put('/artists/:artistId', authenticatedAdmin, upload.array('image', 10), adminArtistController.putArtist)
+router.delete('/artists/:artistId', authenticatedAdmin, adminArtistController.deleteArtist)
 router.delete('/artists/:artistId/images', authenticatedAdmin, adminArtistController.deleteArtistImages)
 
 router.use('/', generalErrorHandler)
