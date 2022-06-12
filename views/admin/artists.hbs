@@ -35,9 +35,6 @@
               <button type="button" class="btn btn-outline-primary btn-sm">
                 <a href="/admin/artists/{{this.id}}" style="color: inherit; font-weight: 400">Info</a>
               </button>
-              <button type="button" class="btn btn-outline-primary btn-sm">
-                <a href="/admin/artists/{{this.id}}/edit" style="color: inherit; font-weight: 400">Edit</a>
-              </button>
               <form action="/admin/artists/{{this.id}}?_method=DELETE" method="post">
               </form>
               <button type="submit" class="btn btn-outline-danger btn-sm" form="delete_form">Delete</button>
@@ -57,7 +54,7 @@
     let target = event.target
     if (target.classList.contains('btn-outline-danger')) {
       event.preventDefault()
-      let form = target.parentElement.children[2]
+      let form = target.parentElement.children[1]
       let name = target.parentElement.parentElement.parentElement.children[1].innerText
       let workCount = target.parentElement.parentElement.parentElement.children[6].innerText
       let imageCount = target.parentElement.parentElement.parentElement.children[7].innerText
