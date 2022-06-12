@@ -120,6 +120,20 @@ const adminArtistController = {
       next(error)
     }
   },
+  deleteArtistImages: async (req, res, next) => {
+    try {
+      const { imageId } = req.body
+      const { artistId } = req.params
+      const images_deleted = await ArtistImage.destroy({
+        where: { id: imageId, ArtistId: artistId }
+      })
+      req.flash('success_messages', `Successfully deleted ${images_deleted} image.`)
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  }
 }
 
 module.exports = adminArtistController
