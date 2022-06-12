@@ -1,0 +1,245 @@
+<div class="container-fluid mt-5">
+
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">藝術家資料</h5>     
+      <button class="btn btn-success" type="submit" form="artist-form">Submit</button>
+    </div>
+    <div class="card-body row d-flex justify-content-between">
+      {{#if artist}}
+      <form class="needs-validation" id="artist-form" action="/admin/artists/{{artist.id}}?_method=PUT" method="post" enctype="multipart/form-data" novalidate>
+        {{else}}
+        <form class="needs-validation" id="artist-form" action="/admin/artists" method="post" enctype="multipart/form-data" novalidate>
+        {{/if}}
+          <fieldset {{#if artist}}disabled{{/if}}>
+            <div class="row">
+              <label for="artist-name" class="col-sm-2 col-form-label" align="center">姓名
+                <span class="requiredInput">*</span>
+                <small class="text-muted d-block">30字以內</small>
+              </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="artist-name" name="name" value="{{artist.name}}"
+                  maxlength="30" required autofocus>
+                <div class="invalid-feedback">
+                  請輸入藝術家姓名
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="otherName" class="col-sm-2 col-form-label" align="center">別名
+                <small class="text-muted d-block">50字以內</small>
+              </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="otherName" name="otherName" maxlength="50" value="{{artist.otherName}}">
+                <div class="invalid-feedback">
+                  請輸入有效年份
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="birthYear" class="col-sm-2 col-form-label" align="center">生年</label>
+              <div class="col-sm-10">
+                <input type="number" class="form-control" id="birthYear" name="birthYear" min="1600" max="2050" value="{{artist.birthYear}}">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="deathYear" class="col-sm-2 col-form-label" align="center">卒年</label>
+              <div class="col-sm-10">
+                <input type="number" class="form-control" id="deathYear" name="deathYear" min="1600" max="2050" value="{{artist.deathYear}}">
+                <div class="invalid-feedback">
+                  請輸入有效年份
+                </div>
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="introduction" class="col-sm-2 col-form-label" align="center">介紹<small
+                  class="text-muted d-block">1000字以內</small></label>
+              <div class="col-sm-10">
+                <textarea class="form-control" id="introduction" name="introduction" maxlength="1000"
+                  rows="5">{{artist.introduction}}</textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <label class="col-sm-2 col-form-label" for="image_upload" align="center">作品圖示
+                <small class="text-muted d-block">一次最多10張</small></label>
+              </label>
+              <div class="col-sm-10">
+                <div class="input-group">
+                  <input class="form-control" type="file" name="image" id="image_upload" multiple>
+                  <span class="input-group-text" id="image-type">Type</span>
+                  <input type="text" class="form-control" id="type" name="type" value="Original">
+            
+                  <div class="invalid-feedback">請勿超過10張</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3 row">
+              <label class="col-sm-2 col-form-label" for="description" align="center">圖片說明
+                <small class="text-muted d-block">請隨圖片上傳</small></label>
+              </label>
+              <div class="col-sm-10">
+                <textarea class="form-control" id="description" name="description" maxlength="1000" rows="2"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+    </div>
+  </div>
+
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-between">
+      <h5 class="mt-2">作品圖片</h5>
+    </div>
+    {{#if artist.ArtistImages}}
+    <div class="card-body grid" id="ArtworkImages">
+      {{#each artist.ArtistImages}}
+      <div class="grid-item grid-item-exhImage-sm">
+  
+        <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
+  
+        {{!-- delete button --}}
+        <form action="/admin/artists/{{this.ArtistId}}/images?_method=DELETE" method="post"
+          style="position: absolute; top: 5px; right: 10px; width: 20px">
+          <input class="d-none" type="text" name="imageId" id="images" value="{{this.id}}">
+          <button type="submit" class="btn btn-sm delete">
+            <span class="delete" style="color: #CC0000;">
+              <i class="fa-solid fa-xmark delete"></i>
+            </span>
+          </button>
+        </form>
+      </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <div align="center">
+      <label for="image_upload">
+        <h5 style="line-height: 80px;">Please upload artwork images</h5>
+      </label>
+    </div>
+    {{/if}}
+  </div>
+</div>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <span class="close">&times;</span>
+  <!-- Modal Content (The Image) -->
+  <img class="modal-content" id="modalImg">
+  <div id="caption"></div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // form validation
+  let artist_form =document.getElementById('artist-form')
+  artist_form.addEventListener('submit', function (event) {
+    if (birthYear.value && deathYear.value) checkYear()
+    if (!artist_form.checkValidity()) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
+    artist_form.classList.add('was-validated')
+  })
+
+  // check images input validity
+  let image_upload = document.getElementById('image_upload')
+  function checkFilesNum() {
+    console.log('waiting for upload')
+    if (image_upload.files.length > 10) {
+      image_upload.setCustomValidity('超過數量限制')
+      event.preventDefault()
+      return;
+    }
+    image_upload.setCustomValidity('')
+  }
+  image_upload.addEventListener('change', (event) => {
+    checkFilesNum()
+  })
+
+  // check death year after birth
+  let birthYear = document.getElementById('birthYear')
+  let deathYear = document.getElementById('deathYear')
+    console.log('birthYear, deathYear: ', birthYear.value, deathYear.value)
+    
+  function checkYear() {
+    if (deathYear.value < birthYear.value) {
+      deathYear.setCustomValidity('卒年不可小於生年')
+      event.preventDefault()
+      return;
+    }
+    deathYear.setCustomValidity('')
+  }
+      
+  // trigger the modal or delete confirm
+  const modal = document.getElementById("myModal");
+  const ArtworkImages = document.getElementById("ArtworkImages")
+  const modalImg = document.getElementById("modalImg");
+  const captionText = document.getElementById("caption");
+  if (ArtworkImages) {
+    ArtworkImages.addEventListener('click', (event) => {
+      console.log('clicked!', event.target)
+      let target = event.target
+      if (target.tagName === "IMG") {
+        modal.style.display = "block";
+        modalImg.src = target.src;
+        captionText.innerHTML = target.alt;
+      }
+
+      if (target.classList.contains("delete")) {
+        event.preventDefault()
+
+        function findForm(target) {
+          if (target.parentElement.tagName === "FORM") return target.parentElement
+          return findForm(target.parentElement)
+        }
+        let form = findForm(target)
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: `確定要刪除？`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: '刪除！'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire(
+              '已刪除!',
+              ``,
+              'success'
+            ).then(result => {
+              form.submit()
+            })
+          }
+        })
+      }
+    })
+  }
+
+  // close the modal
+  modal.addEventListener('click', (event) => {
+    if (event.target.id === "myModal" || event.target.tagName === 'SPAN') {
+      modal.style.display = "none";
+    }
+  })
+
+  // masonry images
+  const $grid = $('.grid').masonry({
+    itemSelector: '.grid-item',
+    columnWidth: 30,
+  })
+
+  $grid.imagesLoaded().progress(function () {
+    $grid.masonry();
+  })
+
+  
+</script>

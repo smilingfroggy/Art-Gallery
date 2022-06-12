@@ -29,7 +29,80 @@ const adminArtistController = {
       next(error)
     }
   },
-}
+  putArtist: async (req, res, next) => {
+    try {
+      const { artistId } = req.params
+      const { files } = req
+      const { name, otherName, birthYear, deathYear, introduction, type, description } = req.body
+      if (!name) throw new Error('Please provide artist name.')
+      const artist_rawData = await Artist.findByPk(artistId)
+      if (!artist_rawData) throw new Error('Invalid artist id')
+      await artist_rawData.update({
+        name, otherName, birthYear, deathYear, introduction
+      })
+      if (files.length) {
+        Promise.all(files.map(file => imgurFileHandler(file)))
+          .then(async filesPath => {
+            await ArtistImage.bulkCreate(filesPath.map(path => {
+              return {
+                ArtistId: artistId,
+                url: path,
+                type,
+                description
+              }
+            }))
+          })
+          .then(() => {
+            req.flash('success_messages', `Updated ${name} profile`)
+            return res.redirect(`/admin/artists/${artistId}`)
+          })
+          .catch(error => next(error))
+      } else {
+        req.flash('success_messages', `Updated ${name} profile`)
+        return res.redirect(`/admin/artists/${artistId}`)
+      }
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  postArtist: async (req, res, next) => {
+    try {
+      const { name, otherName, birthYear, deathYear, introduction, type, description } = req.body
+      const { files } = req
+      if (!name) throw new Error('Please provide artist name.')
+      const artist_repeat = await Artist.findOne({
+        where: { name }
+      })
+      if (artist_repeat) throw new Error('Artist with same name exists')
 
+      const filesUpload = files ? Promise.all(files.map(file => imgurFileHandler(file))) : Promise.resolve()
+
+      Promise.all([
+        filesUpload,
+        Artist.create({
+          name, otherName, birthYear, deathYear, introduction
+        })
+      ]).then(async ([filesPath, newArtist]) => {
+        const bulkCreateImg = await ArtistImage.bulkCreate(filesPath.map(path => {
+          return {
+            ArtistId: newArtist.id,
+            url: path,
+            type,
+            description,
+          }
+        }))
+        console.log('created: ', bulkCreateImg.length)
+        return newArtist
+      }).then((newArtist) => {
+        req.flash('success_messages', `Created ${name} profile`)
+        return res.redirect(`/admin/artists/${newArtist.id}`)
+      }).catch(error => console.log(error))
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+}
 
 module.exports = adminArtistController
