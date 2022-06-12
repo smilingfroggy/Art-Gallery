@@ -29,6 +29,23 @@ const adminArtistController = {
       next(error)
     }
   },
+  getArtist: async (req, res, next) => {
+    try {
+      const { artistId } = req.params
+      const artist_rawData = await Artist.findByPk(artistId, {
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+        include: [
+          { model: ArtistImage, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+          // { model: Artwork, as: 'Creations', through: { attributes: [] }, attributes: { exclude: ['createdAt', 'updatedAt'] }}
+        ]
+      })
+      const artist = JSON.parse(JSON.stringify(artist_rawData))
+      return res.render('admin/edit_artist', { artist })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
   putArtist: async (req, res, next) => {
     try {
       const { artistId } = req.params

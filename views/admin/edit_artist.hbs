@@ -3,7 +3,15 @@
   <div class="card mb-5">
     <div class="card-header d-flex justify-content-between">
       <h5 class="mt-2">藝術家資料</h5>     
-      <button class="btn btn-success" type="submit" form="artist-form">Submit</button>
+      <div id="edit_div">
+        {{#if artist}}
+        <button id="edit_btn" class="btn btn-success" type="button">Edit</button>
+        <button id="cancel_btn" class="d-none btn btn-secondary" type="button">Cancel</button>
+        <button class="d-none btn btn-success" type="submit" form="artist-form">Submit</button>
+        {{else}}
+        <button class="btn btn-success" type="submit" form="artist-form">Submit</button>
+        {{/if}}
+      </div>
     </div>
     <div class="card-body row d-flex justify-content-between">
       {{#if artist}}
@@ -136,6 +144,30 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+  // toggle fieldset and edit buttons
+  let fieldset = document.querySelector('fieldset')
+  let edit_div = document.getElementById('edit_div')
+  let submit_btn = edit_div.children[2]
+  let cancel_btn = edit_div.children[1]
+  let edit_btn = edit_div.children[0]
+
+  if (edit_div) {  // if editing not creating artist profile
+    edit_div.addEventListener('click', (event) => {
+      if (event.target.id === "edit_btn") {
+        fieldset.removeAttribute('disabled', null)
+        submit_btn.classList.remove('d-none')
+        cancel_btn.classList.remove('d-none')
+        edit_btn.classList.add('d-none')
+      }
+      if (event.target.id === "cancel_btn") {
+        fieldset.setAttribute('disabled', null)
+        submit_btn.classList.add('d-none')
+        cancel_btn.classList.add('d-none')
+        edit_btn.classList.remove('d-none')
+      }
+    })
+  }
+
   // form validation
   let artist_form =document.getElementById('artist-form')
   artist_form.addEventListener('submit', function (event) {
