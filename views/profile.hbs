@@ -8,22 +8,24 @@
         <div class="form-row mb-3">
           <label class="form-label" for="email">Email</label>
           <input class="form-control" id="email" type="text" name="email" class="form-control" placeholder="Email"
-            value="{{user.email}}" required disabled>
+            value="{{user.email}}" maxlength="254" required disabled>
         </div>
         <div class="form-row mb-3">
           <label class="form-label" for="name">Name</label>
           <input class="form-control" id="name" type="text" name="name" class="form-control" placeholder="Name"
-            value="{{user.name}}" required autofocus>
+            value="{{user.name}}" maxlength="20" required autofocus>
         </div>
         <div class="form-row mb-3">
           <label class="form-label" for="password">New Password</label>
+          <small class="text-muted ms-3">6-16 characters</small>
           <input class="form-control" id="password" type="password" name="password" class="form-control"
-            placeholder="Password" required>
+            placeholder="Password" minlength="6" maxlength="16" required>
         </div>
         <div class="form-row mb-5">
           <label class="form-label" for="passwordCheck">Please enter the password again</label>
+          <small class="text-muted ms-3">6-16 characters</small>
           <input type="password" id="passwordCheck" name="passwordCheck" class="form-control"
-            placeholder="Password Check" required>
+            placeholder="Password Check" minlength="6" maxlength="16" required>
         </div>
         <div id="submit_btn" class="d-grid mb-3 d-none">
           <button class="btn btn-primary" type="submit">Submit</button>
@@ -33,22 +35,29 @@
   </div>
   <div id="edit_div" class="mb-4 text-center">
     <button id="edit_btn" class="btn btn-success" type="button">Edit</button>
-    <button id="cancel_btn" class="btn btn-secondary" type="button">Cancel</button>
+    <button id="cancel_btn" class="btn btn-secondary d-none" type="button">Cancel</button>
   </div>
 </div>
 
 <script>
+  // click edit or cancel button 
   let fieldset = document.querySelector('fieldset')
   let edit_div = document.getElementById('edit_div')
   let submit_btn = document.getElementById('submit_btn')
+  let edit_btn = document.getElementById('edit_btn')
+  let cancel_btn = document.getElementById('cancel_btn')
   edit_div.addEventListener('click', (event) => {
     if (event.target.id === "edit_btn") {
       fieldset.removeAttribute('disabled', null)
       submit_btn.classList.remove('d-none')
+      cancel_btn.classList.remove('d-none')
+      edit_btn.classList.add('d-none')
     }
     if (event.target.id === "cancel_btn") {
       fieldset.setAttribute('disabled', null)
       submit_btn.classList.add('d-none')
+      cancel_btn.classList.add('d-none')
+      edit_btn.classList.remove('d-none')
     }
   })
 </script>
