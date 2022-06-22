@@ -158,7 +158,7 @@
           <button type="submit" class="btn btn-success btn-sm">Submit</button>
         </div>
         <div class="col-12 ms-auto mb-3">
-          <input type="reset" class="btn btn-secondary btn-sm" value="Reset">
+          <button type="button" class="btn btn-secondary btn-sm" id="clear_button" >Clear</button>
         </div>
       </div>
     </div>
@@ -397,4 +397,12 @@
     }
   })
 
+  // clear selections
+  let clear_button = document.getElementById('clear_button')
+  let inputs = document.querySelectorAll('input')
+  clear_button.addEventListener('click', (event) => {
+    inputs.forEach(input => {
+      input.value = ""
+    })
+  })
 </script>
