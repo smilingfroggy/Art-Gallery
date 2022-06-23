@@ -9,11 +9,12 @@
     </div>
     <div class="card-body row d-flex justify-content-between">
       {{#if artwork}}
-      <form class="needs-validation" id="artwork_form" action="/admin/artworks/{{artwork.id}}?_method=PUT"
-        method="post" enctype="multipart/form-data" novalidate>
-      {{else}}
-      <form class="needs-validation" id="artwork_form" action="/admin/artworks" method="post" enctype="multipart/form-data" novalidate>
-      {{/if}}
+      <form class="needs-validation" id="artwork_form" action="/admin/artworks/{{artwork.id}}?_method=PUT" method="post"
+        enctype="multipart/form-data" novalidate>
+        {{else}}
+        <form class="needs-validation" id="artwork_form" action="/admin/artworks" method="post"
+          enctype="multipart/form-data" novalidate>
+          {{/if}}
           <div class="row">
             <label for="serialNumber" class="col-sm-2 col-form-label" align="center">品號
               <span class="requiredInput">*</span>
@@ -46,9 +47,11 @@
             </label>
             <div class="col-sm-10">
               <div class="input-group">
-                <select class="selectpicker show-tick border rounded-start" name="artist_select" id="artist_select" data-size="5" data-live-search="true" data-width="50%" multiple required>
+                <select class="selectpicker show-tick border rounded-start" name="artist_select" id="artist_select"
+                  data-size="5" data-live-search="true" data-width="50%" multiple required>
                   {{#each artist_selections}}
-                  <option value="{{this.id}}" {{#if ../artwork}}{{#ifInclude this.name ../artwork.Creators}}selected{{/ifInclude}}{{/if}}>{{this.id}}_{{this.name}}</option>
+                  <option value="{{this.id}}" {{#if ../artwork}}{{#ifInclude this.name
+                    ../artwork.Creators}}selected{{/ifInclude}}{{/if}}>{{this.id}}_{{this.name}}</option>
                   {{/each}}
                 </select>
 
@@ -65,13 +68,15 @@
           <div class="mb-3 row">
             <label for="creationTime" class="col-sm-2 col-form-label" align="center">創作年份</label>
             <div class="col-sm-10">
-              <input type="number" class="form-control" id="creationTime" name="creationTime" value="{{artwork.creationTime}}" max="2099" min="1200" step="1">
+              <input type="number" class="form-control" id="creationTime" name="creationTime"
+                value="{{artwork.creationTime}}" max="2099" min="1200" step="1">
             </div>
           </div>
           <div class="mb-3 row">
             <label for="creationTimeNote" class="col-sm-2 col-form-label" align="center">年份說明</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="creationTimeNote" name="creationTimeNote" value="{{artwork.creationTimeNote}}" placeholder="例：壬寅">
+              <input type="text" class="form-control" id="creationTimeNote" name="creationTimeNote"
+                value="{{artwork.creationTimeNote}}" placeholder="例：壬寅">
             </div>
           </div>
 
@@ -81,10 +86,11 @@
               <small class="text-muted d-block">請輸入或擇一媒材</small>
             </label>
             <div class="col-sm-10">
-              <select class="selectpicker show-tick border rounded-start" name="MediumId" id="medium"
-                data-size="5" data-live-search="true" data-width="100%" required>
+              <select class="selectpicker show-tick border rounded-start" name="MediumId" id="medium" data-size="5"
+                data-live-search="true" data-width="100%" required>
                 {{#each medium_selections}}
-                <option value="{{this.id}}" {{#if ../artwork}}{{#ifEqual this.name ../artwork.Medium.name}}selected{{/ifEqual}}{{/if}}>{{this.name}}</option>
+                <option value="{{this.id}}" {{#if ../artwork}}{{#ifEqual this.name
+                  ../artwork.Medium.name}}selected{{/ifEqual}}{{/if}}>{{this.name}}</option>
                 {{/each}}
               </select>
             </div>
@@ -98,27 +104,30 @@
             <div class="col-sm-10">
               <div class="input-group">
                 <span class="input-group-text" id="height-text">長*</span>
-                <input type="number" class="form-control" id="height" name="height" value="{{artwork.height}}" min="1" step="0.01" aria-describedby="height-text" required>
+                <input type="number" class="form-control" id="height" name="height" value="{{artwork.height}}" min="1"
+                  step="0.01" aria-describedby="height-text" required>
                 <div class="invalid-feedback">
                   請輸入尺寸
                 </div>
                 <span class="input-group-text" id="width-text">寬*</span>
-                <input type="number" class="form-control" id="width" name="width" value="{{artwork.width}}" min="1" step="0.01" aria-describedby="width-text" required>
+                <input type="number" class="form-control" id="width" name="width" value="{{artwork.width}}" min="1"
+                  step="0.01" aria-describedby="width-text" required>
                 <span class="input-group-text" id="depth-text">深</span>
-                <input type="number" class="form-control" id="width" name="depth" value="{{artwork.depth}}" step="0.01" aria-describedby="depth-text">
+                <input type="number" class="form-control" id="width" name="depth" value="{{artwork.depth}}" step="0.01"
+                  aria-describedby="depth-text">
                 <div class="invalid-feedback">
                   請輸入尺寸
                 </div>
               </div>
             </div>
           </div>
-          
           <div class="mb-3 row">
             <label for="piecesNum" class="col-sm-2 col-form-label" align="center">數量
               <span class="requiredInput">*</span>
             </label>
             <div class="col-sm-10">
-              <input type="number" class="form-control" id="piecesNum" name="piecesNum" value="{{#if artwork.piecesNum}}{{artwork.piecesNum}}{{else}}1{{/if}}" min="1" step="1" placeholder="1" required>
+              <input type="number" class="form-control" id="piecesNum" name="piecesNum"
+                value="{{#if artwork.piecesNum}}{{artwork.piecesNum}}{{else}}1{{/if}}" min="1" step="1" placeholder="1" required>
               <div class="invalid-feedback">
                 請輸入組合數量
               </div>
@@ -140,13 +149,12 @@
             </label>
             <div class="col-sm-10">
               <div class="input-group">
-              <input class="form-control" type="file" name="image" id="image_upload" multiple>
-              <span class="input-group-text" id="image-type">Type</span>
-              <input type="text" class="form-control" id="type" name="type" value="Original">
-              
-              <div class="invalid-feedback">請勿超過10張</div>
+                <input class="form-control" type="file" name="image" id="image_upload" multiple>
+                <span class="input-group-text" id="image-type">Type</span>
+                <input type="text" class="form-control" id="type" name="type" value="Original">
+                <div class="invalid-feedback">請勿超過10張</div>
               </div>
-            </div> 
+            </div>
           </div>
 
           <div class="mb-3 row">
@@ -154,8 +162,7 @@
               <small class="text-muted d-block">請隨圖片上傳</small></label>
             </label>
             <div class="col-sm-10">
-              <textarea class="form-control" id="description" name="description" maxlength="1000"
-                rows="2"></textarea>
+              <textarea class="form-control" id="description" name="description" maxlength="1000" rows="2"></textarea>
             </div>
           </div>
 
@@ -163,21 +170,23 @@
             <label class="col-sm-2 col-form-label" for="SubjectTags_select" align="center">主題標籤</label>
             <div class="col-sm-10">
               <div class="input-group">
-                <select class="selectpicker show-tick border rounded-start" name="SubjectTags_select" id="SubjectTags_select" data-size="5"
-                  data-live-search="true" data-width="50%" multiple>
+                <select class="selectpicker show-tick border rounded-start" name="SubjectTags_select"
+                  id="SubjectTags_select" data-size="5" data-live-search="true" data-width="50%" multiple>
                   {{#each subject_selections}}
-                  <option value="{{this.id}}" {{#if ../artwork}}{{#ifInclude this.name ../artwork.SubjectTags}}selected{{/ifInclude}}{{/if}}>{{this.name}}</option>
+                  <option value="{{this.id}}" {{#if ../artwork}}{{#ifInclude this.name
+                    ../artwork.SubjectTags}}selected{{/ifInclude}}{{/if}}>{{this.name}}</option>
                   {{/each}}
                 </select>
-                
+                <button class="btn btn-outline-secondary border" id="addNewTag" type="button" title="Create subject"
+                  data-bs-toggle="modal" data-bs-target="#createTagModal"><i
+                    class="fa-solid fa-circle-plus"></i></button>
                 <span class="input-group-text" id="SubjectTags_text">已選</span>
-                <input type="text" class="form-control" id="SubjectTags" name="SubjectTags" value="{{artwork.SubjectTags_text}}"
-                  aria-describedby="SubjectTags_text" disabled>
+                <input type="text" class="form-control" id="SubjectTags" name="SubjectTags"
+                  value="{{artwork.SubjectTags_text}}" aria-describedby="SubjectTags_text" disabled>
               </div>
             </div>
           </div>
-      </form>
-  
+        </form>
     </div>
   </div>
 
@@ -193,32 +202,78 @@
         <img class="modal-original-img" src="{{this.url}}" alt="{{this.type}}">
 
         {{!-- delete button --}}
-        <form action="/admin/artworks/{{this.ArtworkId}}/images?_method=DELETE" method="post" style="position: absolute; top: 5px; right: 10px; width: 20px">
+        <form action="/admin/artworks/{{this.ArtworkId}}/images?_method=DELETE" method="post"
+          style="position: absolute; top: 5px; right: 10px; width: 20px">
           <input class="d-none" type="text" name="imageId" id="images" value="{{this.id}}">
           <button type="submit" class="btn btn-sm delete">
             <span class="delete" style="color: #CC0000;">
               <i class="fa-solid fa-xmark delete"></i>
             </span>
-          </button> 
+          </button>
         </form>
       </div>
       {{/each}}
     </div>
     {{else}}
-      <div align="center">
-        <label for="image_upload" >
-        <h5 style="line-height: 80px;" >Please upload artwork images</h5>
-        </label>
-      </div>
+    <div align="center">
+      <label for="image_upload">
+        <h5 style="line-height: 80px;">Please upload artwork images</h5>
+      </label>
+    </div>
     {{/if}}
   </div>
 
-  <!-- The Modal -->
+  <!-- Image Modal -->
   <div id="myModal" class="modal">
     <span class="close">&times;</span>
     <!-- Modal Content (The Image) -->
     <img class="modal-content" id="modalImg">
     <div id="caption"></div>
+  </div>
+
+  <!-- Create Tag Modal -->
+  <div class="modal fade" id="createTagModal" tabindex="-1" aria-labelledby="createTagTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createTagTitle">Create Artwork Subject</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <label for="name" class="col-sm-4 col-form-label">Subject name</label>
+            <div class="col-sm-8">
+              <input id="input_tag" type="text" class="form-control" name="name" maxlength="20" required>
+              <small class="text-muted">Max: 20 characters</small>
+              <div class="invalid-feedback">
+                Please enter subject name.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+          <button id="submit_tag" type="button" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message after subject created -->
+  <div class="modal fade" id="tagMessage" tabindex="-1" aria-labelledby="tagMessageTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tagMessageTitle">Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -228,6 +283,52 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+  // add new tag
+  const input_tag = document.getElementById('input_tag')
+  const submit_tag = document.getElementById('submit_tag')
+  input_tag.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      submit_tag.click()
+    }
+  })
+  submit_tag.addEventListener('click', async (event) => {
+    try {
+      let name = document.getElementById('input_tag').value
+      if (!name) return
+      let response = await axios({
+        method: "POST",
+        url: '/api/subjects',
+        data: { "name": name },
+        headers: { "Content-Type": "application/json" },
+      })
+
+      let newSubject = response.data.subject
+      if (response.data.message === 'Created successfully') {
+        // create new options and add to subject selections
+        let newOption = document.createElement('option')
+        newOption.value = newSubject.id
+        newOption.innerText = newSubject.name
+        newOption.selected = true
+
+        $('#SubjectTags_select').append(newOption)
+        $('#SubjectTags_select').selectpicker('destroy')
+        $('#SubjectTags_select').selectpicker('render')
+      } else {
+        if (response.data.message === "Subject already existed") {
+          let selectedTags = $('#SubjectTags_select').val();  // ['1', '2']
+          selectedTags.push(newSubject.id.toString())
+          $('#SubjectTags_select').selectpicker('val', selectedTags)
+        }
+        let message = new bootstrap.Modal(document.getElementById('tagMessage'))
+        let message_body = document.querySelector('#tagMessage .modal-body')
+        message_body.innerText = response.data.message
+        message.show()
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
   // form validation
   const artwork_form = document.getElementById('artwork_form')
 
@@ -242,7 +343,6 @@
   // check images input validity
   const image_upload = document.getElementById('image_upload')
   function checkFilesNum() {
-    console.log('waiting for upload')
     if (image_upload.files.length > 10) {
       image_upload.setCustomValidity('超過數量限制')
       event.preventDefault()
@@ -261,7 +361,6 @@
   const captionText = document.getElementById("caption");
   if (ArtworkImages) {
     ArtworkImages.addEventListener('click', (event) => {
-      console.log('clicked!', event.target)
       let target = event.target
       if (target.tagName === "IMG") {
         modal.style.display = "block";
@@ -307,7 +406,7 @@
       modal.style.display = "none";
     }
   })
-  
+
   // masonry images
   const $grid = $('.grid').masonry({
     itemSelector: '.grid-item',
