@@ -49,14 +49,14 @@
         </div>
 
         <div class="col-auto  mb-3">
-          <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse"
-            data-bs-target="#moreOptions" aria-expanded="false" aria-controls="moreOptions">
+          <button class="btn btn-outline-primary  btn-sm"  type="button" data-bs-toggle="collapse"
+            data-bs-target="#moreOptions"   aria-expanded="{{#toggleOptions searching}} true {{else}} false {{/toggleOptions}}" aria-controls="moreOptions">
             More options
           </button>
         </div>
 
         {{!-- Collapse Selections --}}
-        <div class="col-12 col-md-12 collapse card-group mb-3" id="moreOptions">
+        <div class="col-12 col-md-12 collapse card-group mb-3 {{#toggleOptions searching}} show {{/toggleOptions}}"  id="moreOptions">
           <div class="card card-body" style="min-width: 15rem;">
             <label for="height_lower" class="form-label">作品尺寸 (cm) <small class="ms-2 text-muted">包含輸入尺寸　e.g.
                 80</small></label>

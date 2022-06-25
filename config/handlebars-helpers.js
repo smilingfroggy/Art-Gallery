@@ -19,5 +19,11 @@ module.exports = {
   ifEqual: function (data1, data2, options) {
     if (data1 === data2) return options.fn(this)
     return options.inverse(this)
+  },
+  toggleOptions: function (searchings, options) {
+    if (searchings.height || searchings.width || searchings.depth || searchings.shape || searchings.year) {
+      return options.fn(this)
+    }
+    return options.inverse(this)
   }
 }
