@@ -5,7 +5,7 @@
   {{!-- searched keywords --}}
   <h4 class="d-inline-block mb-3 me-3"><strong>Search</strong></h4>
   <p class="d-inline-block mb-3">
-    <small>{{searching.medium}}　{{searching.artist}}　{{searching.artworkName}}　{{searching.subject}}　{{searching.height}}　{{searching.width}}　{{searching.depth}}　{{searching.shape}}
+    <small>{{searching.medium}}　{{searching.artist}}　{{searching.artworkName}}　{{searching.subject}}　{{searching.height}}　{{searching.width}}　{{searching.depth}}　{{searching.shape}}　{{searching.year}}
     </small>
   </p>
 
@@ -142,7 +142,7 @@
             </div>
             <div class="form-check form-switch ms-auto">
               <input name="createYear_includeNone" class="form-check-input" type="checkbox" role="switch"
-                id="createYear_includeNone" {{#unless searching.createYear_includeNone}}checked{{/unless}}>
+                id="createYear_includeNone" {{#if searching.createYear_includeNone}}checked{{/if}}>
               <label class="form-check-label" for="createYear_includeNone">包含無年份的作品</label>
             </div>
           </div>

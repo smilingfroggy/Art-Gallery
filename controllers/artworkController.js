@@ -101,7 +101,8 @@ const artworkController = {
         if (!artistId_search) warning_messages.push({ message: `Cannot find artist Id: ${artistId}` })
       }
 
-      let searching = {
+      let searching = {  // show search records
+        // medium: query text or medium_search with mediumId or undefined
         medium: medium || (mediumId ? (mediumId_search?.name || undefined) : undefined),
         subject: subject || (subjectId ? (subjectId_search?.name || undefined) : undefined),
         artist: artist || (artistId ? (artistId_search?.name || undefined) : undefined),
