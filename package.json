@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "rebuildDB": "npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all"
+    "rebuildDB": "npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all",
+    "rebuildDB_test": "SET \"NODE_ENV=test\" && npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all",
+    "test": "SET \"NODE_ENV=test\" && mocha test --exit"
   },
   "dependencies": {
     "@faker-js/faker": "^6.2.0",
@@ -30,5 +32,12 @@
     "sequelize-cli": "^6.4.1",
     "tslib": "^2.4.0",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "sequelize-test-helpers": "^1.4.3",
+    "sinon": "^14.0.0",
+    "supertest": "^6.2.4"
   }
 }
