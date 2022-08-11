@@ -21,7 +21,7 @@ module.exports = {
     return options.inverse(this)
   },
   toggleOptions: function (searchings, options) {
-    if (searchings.height || searchings.width || searchings.depth || searchings.shape || searchings.year) {
+    if (searchings?.height || searchings?.width || searchings?.depth || searchings?.shape || searchings?.year) {
       return options.fn(this)
     }
     return options.inverse(this)
