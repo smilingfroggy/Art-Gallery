@@ -23,9 +23,9 @@ const exhibitionController = {
         let useImage = exhibition.dataValues.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE
         return {
           ...exhibition.dataValues,
-          date_start: exhibition.dataValues.date_start.toISOString().slice(0, 10),
-          date_end: exhibition.dataValues.date_end.toISOString().slice(0, 10),
-          introduction: exhibition.dataValues.introduction.slice(0, 55) + "...",
+          date_start: exhibition.dataValues.date_start?.toISOString().slice(0, 10),
+          date_end: exhibition.dataValues.date_end?.toISOString().slice(0, 10),
+          introduction: exhibition.dataValues.introduction?.slice(0, 55) + "...",
           ExhibitionImages: useImage,
           artwork_sum: count
         }
@@ -58,8 +58,8 @@ const exhibitionController = {
 
       let result = exhibition_rawData.toJSON()
       result.artwork_sum = result.ContainedArtworks.length
-      result.date_start = result.date_start.toISOString().slice(0, 10)
-      result.date_end = result.date_end.toISOString().slice(0, 10)
+      result.date_start = result.date_start?.toISOString().slice(0, 10)
+      result.date_end = result.date_end?.toISOString().slice(0, 10)
 
       // console.log(result.ContainedArtworks) 
       let usePoster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE
@@ -106,10 +106,10 @@ const exhibitionController = {
       result.artwork_sum = result.ContainedArtworks.length
       // 整理藝術品資料: name, medium, time, image, size...
       result.ContainedArtworks.forEach(work => {
-        work.name = work.name.slice(0,20)
+        work.name = work.name?.slice(0, 20)
         work.medium = work.Medium.name
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
-        work.image = work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE 
+        work.image = work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE
         delete work.Medium
         delete work.ArtworkImages
         work.size = work.depth ? (work.height + "x" + work.width + "x" + work.depth) : (work.height + "x" + work.width)
@@ -140,7 +140,7 @@ const exhibitionController = {
             creator.ArtistImages = creator.ArtistImages[0].url.split('.jpg')[0] + 'b.jpg'
           }
         }
-        creator.introduction = creator.introduction.split("。")[0] + "。"
+        creator.introduction = creator.introduction?.split("。")[0] + "。"
       })
 
       result.Creators = creators
