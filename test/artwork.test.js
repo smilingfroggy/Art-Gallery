@@ -70,3 +70,94 @@ describe('GET /artworks', () => {
       })
   })
 })
+
+describe('GET /artworks/search', () => {
+  it('shows correct results of medium', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ medium: 'medium_ink' })
+      .end((err, res) => {
+        expect(res.text).to.include('The First Work')   // work name
+        expect(res.text).to.not.include('The Second Work')
+        expect(res.text).to.not.include('The Third Work')
+        expect(res.text).to.not.include('collapse show')  // closed options
+        return done()
+      })
+  })
+
+  it('shows correct results of artist', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ artist: 'artist_A' })
+      .end((err, res) => {
+        expect(res.text).to.include('The First Work')
+        expect(res.text).to.not.include('The Second Work')
+        expect(res.text).to.include('The Third Work')
+        expect(res.text).to.not.include('collapse show')  // closed options
+        return done()
+      })
+  })
+
+  it('shows correct results of work name', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ artworkName: 'First' })
+      .end((err, res) => {
+        expect(res.text).to.include('The First Work')   // work name
+        expect(res.text).to.not.include('The Second Work')
+        expect(res.text).to.not.include('The Third Work')
+        expect(res.text).to.not.include('collapse show')  // closed options
+        return done()
+      })
+  })
+
+  it('shows correct results of size query', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ height_lower: 90 })
+      .end((err, res) => {
+        expect(res.text).to.include('The First Work')
+        expect(res.text).to.include('The Second Work')
+        expect(res.text).to.not.include('The Third Work')
+        expect(res.text).to.include('collapse show')  // opened options
+        return done()
+      })
+  })
+
+  it('shows correct results of size query', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ width_upper: 75 })
+      .end((err, res) => {
+        expect(res.text).to.not.include('The First Work')
+        expect(res.text).to.include('The Second Work')
+        expect(res.text).to.not.include('The Third Work')
+        expect(res.text).to.include('collapse show')  // opened options
+        return done()
+      })
+  })
+
+  it('shows correct results of shape query', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ shape_portrait: true })
+      .end((err, res) => {
+        expect(res.text).to.include('The First Work')
+        expect(res.text).to.include('The Second Work')
+        expect(res.text).to.not.include('The Third Work')
+        expect(res.text).to.include('collapse show')  // opened options
+        return done()
+      })
+  })
+
+  it('shows no result', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ width_lower: 100, medium: 'ink' })
+      .end((err, res) => {
+        expect(res.text).to.include('查無藝術品，請重新搜尋')
+        expect(res.text).to.include('collapse show')  // opened options
+        return done()
+      })
+  })
+})
