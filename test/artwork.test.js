@@ -85,6 +85,19 @@ describe('GET /artworks/search', () => {
       })
   })
 
+  it('shows correct results of medium ID', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ mediumId: 2 })
+      .end((err, res) => {
+        expect(res.text).to.not.include('The First Work')   // work name
+        expect(res.text).to.include('The Second Work')
+        expect(res.text).to.include('The Third Work')
+        expect(res.text).to.not.include('collapse show')  // closed options
+        return done()
+      })
+  })
+
   it('shows correct results of artist', (done) => {
     request(app)
       .get('/artworks/search')
@@ -93,6 +106,19 @@ describe('GET /artworks/search', () => {
         expect(res.text).to.include('The First Work')
         expect(res.text).to.not.include('The Second Work')
         expect(res.text).to.include('The Third Work')
+        expect(res.text).to.not.include('collapse show')  // closed options
+        return done()
+      })
+  })
+
+  it('shows correct results of artist ID', (done) => {
+    request(app)
+      .get('/artworks/search')
+      .query({ artistId: 2 })
+      .end((err, res) => {
+        expect(res.text).to.not.include('The First Work')
+        expect(res.text).to.include('The Second Work')
+        expect(res.text).to.not.include('The Third Work')
         expect(res.text).to.not.include('collapse show')  // closed options
         return done()
       })
@@ -157,6 +183,22 @@ describe('GET /artworks/search', () => {
       .end((err, res) => {
         expect(res.text).to.include('查無藝術品，請重新搜尋')
         expect(res.text).to.include('collapse show')  // opened options
+        return done()
+      })
+  })
+})
+
+describe('GET /artworks/id', () => {
+  it('shows artwork info', (done) => {
+    request(app)
+      .get('/artworks/1')
+      .end((err, res) => {
+        expect(res.status).to.equal(200)
+        expect(res.text).to.include('test_artist_A')  // artist name
+        expect(res.text).to.include('The First Work')  // work name
+        expect(res.text).to.include('animal')    // subject
+        expect(res.text).to.include('test_medium_ink')  // medium
+        expect(res.text).to.include('2001')   // creationTime
         return done()
       })
   })
