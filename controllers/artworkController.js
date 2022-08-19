@@ -2,7 +2,7 @@ const db = require('../models')
 const { Artwork, Artist, ArtistImage, ArtworkImage, Medium, Subject, } = db
 const { Op } = require("sequelize")
 const sequelize = require("sequelize")
-const { getUser } = require('../helpers/auth-helpers')
+const helpers = require('../helpers/auth-helpers')
 const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
 
@@ -60,8 +60,8 @@ const artworkController = {
   },
   getArtworks: async (req, res, next) => {
     try {
-      let addedArtworks = getUser(req)?.addedArtworks || new Set()
-      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+      let addedArtworks = helpers.getUser(req)?.addedArtworks || new Set()
+      let favoriteArtworks = helpers.getUser(req)?.favoriteArtworks || []
 
       // get selections
       const selections_artist = await Artist.findAll({ attributes: ['id', 'name'], raw: true, order: ['name'] })
@@ -181,8 +181,8 @@ const artworkController = {
   },
   getArtwork: async (req, res, next) => {
     try {
-      let addedArtworks = getUser(req)?.addedArtworks || new Set()
-      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+      let addedArtworks = helpers.getUser(req)?.addedArtworks || new Set()
+      let favoriteArtworks = helpers.getUser(req)?.favoriteArtworks || []
 
       const artwork_rawData = await Artwork.findByPk(req.params.artworkId, {
         attributes: { exclude: ['MediumId', 'viewCount', 'createdAt', 'updatedAt', 'piecesNum'] },

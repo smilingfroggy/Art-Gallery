@@ -1,4 +1,4 @@
-const { getUser } = require('../../helpers/auth-helpers')
+const helpers = require('../../helpers/auth-helpers')
 const { Sequelize } = require('sequelize')
 const db = require('../../models');
 const Artwork = db.Artwork
@@ -7,7 +7,7 @@ const Collection = db.Collection
 const collectionController = {
   getOwnCollections: async (req, res, next) => {
     try {
-      const userId = getUser(req)?.id || null
+      const userId = helpers.getUser(req)?.id || null
       const ownCollections_rawData = await Collection.findAll({
         where: { UserId: userId },
         attributes: ['id', 'name', 
