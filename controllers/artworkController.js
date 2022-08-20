@@ -220,7 +220,7 @@ const artworkController = {
             creator.ArtistImages = creator.ArtistImages[0].url.split('.jpg')[0] + 'b.jpg'
           }
         }
-        creator.introduction = creator.introduction.slice(0, 50) + "..."
+        creator.introduction = creator.introduction?.slice(0, 50) + "..."
       })
 
       // return res.json(artwork)

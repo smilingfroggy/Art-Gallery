@@ -86,7 +86,7 @@ const collectionController = {
 
       if (ownCollections) {
         ownership = !!ownCollections.find(collection => collection.id === Number(collectionId))
-        notFavorite = ownCollections.find(collection => collection.name === 'Favorite List').id !== Number(collectionId)
+        notFavorite = ownCollections.find(collection => collection.name === 'Favorite List')?.id !== Number(collectionId)
       }
 
       // if user owns collection, find anyway; if not, check find public collection only
