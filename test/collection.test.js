@@ -106,3 +106,56 @@ describe('GET /collections', () => {
   })
 })
 
+
+describe('GET /collections/:id', () => {
+  describe('before login', () => {
+    it('shows artworks', (done) => {
+      request(app)
+        .get('/collections/1')
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(res.text).to.include('collection1-1')
+          expect(res.text).to.include('The First Work')
+          expect(res.text).to.not.include('The Second Work')
+          expect(res.text).to.include('The Third Work')
+          return done()
+        })
+    })
+
+    it('does not show artworks of other users private collection', (done) => {
+      request(app)
+        .get('/collections/2')
+        .expect(302)
+        .end((err, res) => {
+          expect(res.status).to.equal(302)
+          return done()
+        })
+    })
+  })
+
+  describe('after login', () => {
+    before(() => {
+      sinon.stub(helpers, 'getUser')
+        .returns({ id: 1, name: 'test_user1', isAdmin: false, Collections: [
+          { id: 1, name: 'collection1-1' },
+          { id: 2, name: 'collection1-2' }
+        ] })
+    })
+    it("shows artworks of users' own collection", (done) => {
+      request(app)
+        .get('/collections/2')
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(res.text).to.include('collection1-2')
+          expect(res.text).to.include('The First Work')
+          expect(res.text).to.include('The Second Work')
+          expect(res.text).to.not.include('The Third Work')
+          return done()
+        })
+    })
+
+    after(() => {
+      helpers.getUser.restore()
+    })
+  })
+})
