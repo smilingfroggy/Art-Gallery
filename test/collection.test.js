@@ -136,10 +136,12 @@ describe('GET /collections/:id', () => {
   describe('after login', () => {
     before(() => {
       sinon.stub(helpers, 'getUser')
-        .returns({ id: 1, name: 'test_user1', isAdmin: false, Collections: [
-          { id: 1, name: 'collection1-1' },
-          { id: 2, name: 'collection1-2' }
-        ] })
+        .returns({
+          id: 1, name: 'test_user1', isAdmin: false, Collections: [
+            { id: 1, name: 'collection1-1' },
+            { id: 2, name: 'collection1-2' }
+          ]
+        })
     })
     it("shows artworks of users' own collection", (done) => {
       request(app)
@@ -158,4 +160,47 @@ describe('GET /collections/:id', () => {
       helpers.getUser.restore()
     })
   })
+})
+
+
+describe('POST /collections', () => {
+  before(() => {
+    sinon.stub(helpers, 'getUser')
+      .returns({
+        id: 1, name: 'test_user1', isAdmin: false, Collections: [
+          { id: 1, name: 'collection1-1' },
+          { id: 2, name: 'collection1-2' },
+          { id: 4, name: 'new_collection' }
+        ]
+      })
+    sinon.stub(helpers, 'ensureAuthenticated')
+      .returns(true)
+  })
+
+  it('create collections successfully', (done) => {
+    let collection = {
+      name: 'new_collection',
+      description: 'Special Room for Testing',
+    }
+    request(app)
+      .post('/collections')
+      .send(collection)
+      .end((err, res) => {
+        expect(res.status).to.equal(302)
+        request(app)
+          .get('/collections/4')
+          .end((err, res) => {
+            expect(res.status).to.equal(200)
+            expect(res.text).to.include(collection.description)
+            expect(res.text).to.include('尚無作品加入')
+            return done()
+          })
+      })
+  })
+
+  after(() => {
+    helpers.getUser.restore()
+    helpers.ensureAuthenticated.restore()
+  })
+
 })

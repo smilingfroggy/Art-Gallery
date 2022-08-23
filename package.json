@@ -7,7 +7,7 @@
     "dev": "nodemon ./bin/www",
     "rebuildDB": "npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all",
     "rebuildDB_test": "SET \"NODE_ENV=test\" && npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all",
-    "test": "SET \"NODE_ENV=test\" && mocha test --exit"
+    "test": "SET \"NODE_ENV=test\" && mocha test --exit --timeout 5000"
   },
   "dependencies": {
     "@faker-js/faker": "^6.2.0",
