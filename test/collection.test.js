@@ -202,5 +202,50 @@ describe('POST /collections', () => {
     helpers.getUser.restore()
     helpers.ensureAuthenticated.restore()
   })
+})
+
+
+describe('PUT /collections/:id', () => {
+  before(() => {
+    sinon.stub(helpers, 'getUser')
+      .returns({
+        id: 1, name: 'test_user1', isAdmin: false, Collections: [
+          { id: 1, name: 'collection1-1' },
+          { id: 2, name: 'collection1-2' },
+          { id: 4, name: 'new_collection' }
+        ]
+      })
+    sinon.stub(helpers, 'ensureAuthenticated')
+      .returns(true)
+  })
+
+  it('edit collection\'s name and privacy successfully', (done) => {
+    let collection = {
+      name: 'edited_collection',
+      description: 'Special Room for Testing',
+      privacy: 'on'
+    }
+    request(app)
+      .put('/collections/4')
+      .send(collection)
+      .end((err, res) => {
+        expect(res.status).to.equal(302)
+        request(app)
+          .get('/collections/4')
+          .end((err, res) => {
+            expect(res.status).to.equal(200)
+            expect(res.text).to.include(collection.name)
+            expect(res.text).to.include('尚無作品加入')
+            return done()
+          })
+      })
+  })
+
+  after(() => {
+    helpers.getUser.restore()
+    helpers.ensureAuthenticated.restore()
+  })
+})
+
 
 })
