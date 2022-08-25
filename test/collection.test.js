@@ -5,6 +5,7 @@ const expect = chai.expect
 const helpers = require('../helpers/auth-helpers')
 const request = require('supertest')
 const sinon = require('sinon')
+let getUser1, getUser2  // for sinon.stub(helpers, 'getUser')
 
 
 describe('GET /collections', () => {
@@ -67,6 +68,17 @@ describe('GET /collections', () => {
       await db.CollectionArtwork.create({ CollectionId: collection2.id, ArtworkId: test_artwork2.id })
       await db.CollectionArtwork.create({ CollectionId: collection2.id, ArtworkId: test_artwork3.id })
 
+      getUser1 = {  //  for sinon.stub(helpers, 'getUser')
+        id: 1, name: 'test_user1', isAdmin: false, Collections: [
+          { id: 1, name: 'collection1-1' },
+          { id: 2, name: 'collection1-2' }
+        ]
+      }
+      getUser2 = {  //  for sinon.stub(helpers, 'getUser')
+        id: 2, name: 'test_user2', isAdmin: false, Collections: [
+          { id: 3, name: 'collection2' }
+        ]
+      }
     })
 
     it('shows all public collections when user is not logged in', (done) => {
@@ -81,11 +93,10 @@ describe('GET /collections', () => {
         })
     })
   })
-  
+
   describe('after login', () => {
     before(async () => {
-      sinon.stub(helpers, 'getUser')
-        .returns({ id: 1, name: 'test_user1', isAdmin: false, Collections: [] })
+      sinon.stub(helpers, 'getUser').returns(getUser1)
     })
 
     it("shows user's private collections when user is logged in", (done) => {
@@ -165,14 +176,7 @@ describe('GET /collections/:id', () => {
 
 describe('POST /collections', () => {
   before(() => {
-    sinon.stub(helpers, 'getUser')
-      .returns({
-        id: 1, name: 'test_user1', isAdmin: false, Collections: [
-          { id: 1, name: 'collection1-1' },
-          { id: 2, name: 'collection1-2' },
-          { id: 4, name: 'new_collection' }
-        ]
-      })
+    sinon.stub(helpers, 'getUser').returns(getUser1)
     sinon.stub(helpers, 'ensureAuthenticated')
       .returns(true)
   })
@@ -187,6 +191,7 @@ describe('POST /collections', () => {
       .send(collection)
       .end((err, res) => {
         expect(res.status).to.equal(302)
+        getUser1.Collections.push({ id: 4, name: 'new_collection' })
         request(app)
           .get('/collections/4')
           .end((err, res) => {
@@ -207,16 +212,8 @@ describe('POST /collections', () => {
 
 describe('PUT /collections/:id', () => {
   before(() => {
-    sinon.stub(helpers, 'getUser')
-      .returns({
-        id: 1, name: 'test_user1', isAdmin: false, Collections: [
-          { id: 1, name: 'collection1-1' },
-          { id: 2, name: 'collection1-2' },
-          { id: 4, name: 'new_collection' }
-        ]
-      })
-    sinon.stub(helpers, 'ensureAuthenticated')
-      .returns(true)
+    sinon.stub(helpers, 'getUser').returns(getUser1)
+    sinon.stub(helpers, 'ensureAuthenticated').returns(true)
   })
 
   it('edit collection\'s name and privacy successfully', (done) => {
@@ -248,4 +245,3 @@ describe('PUT /collections/:id', () => {
 })
 
 
-})
