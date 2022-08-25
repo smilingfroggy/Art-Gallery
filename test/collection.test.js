@@ -275,42 +275,43 @@ describe('PUT /collections/artworks/:id', () => {
 
     it('add to two collections successfully', (done) => {
       request(app)
-        .put('/collections/artworks/3')  // artwork { id:3, name: The Third Work }
+        .put('/collections/artworks/2')  // artwork { id:2, name: The Second Work }
         .send({
-          collectionId_select: ['2', '4']  // add to collectionId 2 & 4, remove from collectionId 1
+          collectionId_select: ['1', '2', '4']  // add to collectionId 1 & 4
         })
         .end((err, res) => {
           expect(res.status).to.equal(302)
+          return Promise.all([
             request(app)
               .get('/collections/4')
-              .end((err, res) => {
+              .then(res => {
                 expect(res.status).to.equal(200)
                 expect(res.text).to.include('共2件藝術品')
                 expect(res.text).to.include('The First Work')
-                expect(res.text).to.not.include('The Second Work')
+                expect(res.text).to.include('The Second Work')
+                expect(res.text).to.not.include('The Third Work')
+              }),
+            request(app)
+              .get('/collections/2')
+              .then(res => {
+                expect(res.status).to.equal(200)
+                expect(res.text).to.include('共1件藝術品')
+                expect(res.text).to.not.include('The First Work')
+                expect(res.text).to.include('The Second Work')
+                expect(res.text).to.not.include('The Third Work')
+              }),
+            request(app)
+              .get('/collections/1')
+              .then(res => {
+                expect(res.status).to.equal(200)
+                expect(res.text).to.include('共2件藝術品')
+                expect(res.text).to.not.include('The First Work')
+                expect(res.text).to.include('The Second Work')
                 expect(res.text).to.include('The Third Work')
-
-                // request(app)
-                //   .get('/collections/2')
-                //   .then((err, res) => {
-                //     expect(res.status).to.equal(200)
-                //     expect(res.text).to.include('共3件藝術品')
-                //     expect(res.text).to.include('The First Work')
-                //     expect(res.text).to.include('The Second Work')
-                //     expect(res.text).to.include('The Third Work')
-                // })
-                request(app)
-                  .get('/collections/1')
-                  .end((err, res) => {
-                    console.log(res.text)
-                    expect(res.status).to.equal(200)
-                    expect(res.text).to.include('共0件藝術品')
-                    expect(res.text).to.not.include('The First Work')
-                    expect(res.text).to.not.include('The Second Work')
-                    expect(res.text).to.not.include('The Third Work')
-                    return done()
-                  })
               })
+          ])
+            .then(() => done())
+            .catch((err) => done(err))
         })
     })
   })
@@ -333,8 +334,8 @@ describe('PUT /collections/artworks/:id', () => {
               expect(res.status).to.equal(200)
               expect(res.text).to.include('共2件藝術品')  // does not edit CollectionArtwork
               expect(res.text).to.include('The First Work')
-              expect(res.text).to.not.include('The Second Work')
-              expect(res.text).to.include('The Third Work')
+              expect(res.text).to.include('The Second Work')
+              expect(res.text).to.not.include('The Third Work')
               return done()
             })
         })
@@ -345,4 +346,3 @@ describe('PUT /collections/artworks/:id', () => {
     helpers.getUser.restore()
     helpers.ensureAuthenticated.restore()
   })
-})
