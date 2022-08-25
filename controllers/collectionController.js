@@ -137,12 +137,13 @@ const collectionController = {
     try {
       const { name, description } = req.body
       const userId = getUser(req)?.id
-      if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
+      if (!name) throw new Error("Please provide collection name")
+      if (description?.length > 100 || name?.length > 25) throw new Error("Collection's name or description is over limit")
 
       await Collection.create({
         UserId: userId,
         name, description,
-        privacy: 0  // default to private
+        privacy: 0  // default to be private
       })
       req.flash('success_messages', `Created collection ${name}`)
       return res.redirect('back')
@@ -156,7 +157,8 @@ const collectionController = {
       const { name, description, privacy } = req.body
       const { collectionId } = req.params
       const userId = getUser(req)?.id
-      if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
+      if (!name) throw new Error("Please provide collection name")
+      if (description?.length > 100 || name?.length > 25) throw new Error("Collection's name or description is over limit")
 
       const collection_rawData = await Collection.findByPk(collectionId, {
         include: { model: User, attributes: ['id'] }
@@ -212,6 +214,18 @@ const collectionController = {
       if (typeof collectionId_select === "string") collectionId_select = [collectionId_select]
       if (!collectionId_select) collectionId_select = []
       console.log('[collectionId_select]:', collectionId_select)
+
+      // 檢查收藏清單擁有者
+      const collections_rawData = await Collection.findAll({
+        where: { id: { [Op.in]: collectionId_select } },
+        attributes: ['UserId'],
+        raw: true
+      })
+      collections_rawData.forEach(collection => {
+        if (collection.UserId != userId) {
+          throw new Error('Permission Denied')
+        }
+      })
 
       // 找出使用者 所有包含此作品的收藏清單
       const artwork_rawData = await Artwork.findByPk(artworkId, {
