@@ -245,3 +245,104 @@ describe('PUT /collections/:id', () => {
 })
 
 
+describe('PUT /collections/artworks/:id', () => {
+  describe('by owner logged in', () => {
+    beforeEach(() => {
+      sinon.stub(helpers, 'getUser').returns(getUser1)
+      sinon.stub(helpers, 'ensureAuthenticated').returns(true)
+    })
+
+    it('add and remove artworks from collections successfully', (done) => {
+      request(app)
+        .put('/collections/artworks/1')  // add artwork { id:1, name: The First Work }
+        .send({
+          collectionId_select: '4'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(302)
+          request(app)
+            .get('/collections/4')
+            .end((err, res) => {
+              expect(res.status).to.equal(200)
+              expect(res.text).to.include('共1件藝術品')
+              expect(res.text).to.include('The First Work')
+              expect(res.text).to.not.include('The Second Work')
+              expect(res.text).to.not.include('The Third Work')
+              return done()
+            })
+        })
+    })
+
+    it('add to two collections successfully', (done) => {
+      request(app)
+        .put('/collections/artworks/3')  // artwork { id:3, name: The Third Work }
+        .send({
+          collectionId_select: ['2', '4']  // add to collectionId 2 & 4, remove from collectionId 1
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(302)
+            request(app)
+              .get('/collections/4')
+              .end((err, res) => {
+                expect(res.status).to.equal(200)
+                expect(res.text).to.include('共2件藝術品')
+                expect(res.text).to.include('The First Work')
+                expect(res.text).to.not.include('The Second Work')
+                expect(res.text).to.include('The Third Work')
+
+                // request(app)
+                //   .get('/collections/2')
+                //   .then((err, res) => {
+                //     expect(res.status).to.equal(200)
+                //     expect(res.text).to.include('共3件藝術品')
+                //     expect(res.text).to.include('The First Work')
+                //     expect(res.text).to.include('The Second Work')
+                //     expect(res.text).to.include('The Third Work')
+                // })
+                request(app)
+                  .get('/collections/1')
+                  .end((err, res) => {
+                    console.log(res.text)
+                    expect(res.status).to.equal(200)
+                    expect(res.text).to.include('共0件藝術品')
+                    expect(res.text).to.not.include('The First Work')
+                    expect(res.text).to.not.include('The Second Work')
+                    expect(res.text).to.not.include('The Third Work')
+                    return done()
+                  })
+              })
+        })
+    })
+  })
+
+  describe('by other user who does not own the collection', () => {
+    before(() => {
+      sinon.stub(helpers, 'getUser').returns(getUser2)
+      sinon.stub(helpers, 'ensureAuthenticated').returns(true)
+    })
+
+    it('fail to add artworks to collections', (done) => {
+      request(app)
+        .put('/collections/artworks/2')  // add artwork { id: 2, name: The Second Work }
+        .send({ collectionId_select: '4' })
+        .end((err, res) => {
+          expect(res.status).to.equal(302)
+          request(app)
+            .get('/collections/4')
+            .end((err, res) => {
+              expect(res.status).to.equal(200)
+              expect(res.text).to.include('共2件藝術品')  // does not edit CollectionArtwork
+              expect(res.text).to.include('The First Work')
+              expect(res.text).to.not.include('The Second Work')
+              expect(res.text).to.include('The Third Work')
+              return done()
+            })
+        })
+    })
+  })
+
+  afterEach(() => {
+    helpers.getUser.restore()
+    helpers.ensureAuthenticated.restore()
+  })
+})
