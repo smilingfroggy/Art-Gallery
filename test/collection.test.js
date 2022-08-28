@@ -346,3 +346,50 @@ describe('PUT /collections/artworks/:id', () => {
     helpers.getUser.restore()
     helpers.ensureAuthenticated.restore()
   })
+})
+
+
+describe('DELETE /collections/:id', () => {
+  describe('by other user who does not own the collection', () => {
+    before(() => {
+      sinon.stub(helpers, 'getUser').returns(getUser2)
+      sinon.stub(helpers, 'ensureAuthenticated').returns(true)
+    })
+
+    it('fail to delete', (done) => {
+      request(app)
+        .delete('/collections/4')
+        .expect(302)
+        .end((err, res) => {
+          request(app)
+            .get('/collections/4')
+            .expect(200)
+            .end(() => done())
+        })
+    })
+  })
+
+  describe('by owner of collection', () => {
+    before(() => {
+      sinon.stub(helpers, 'getUser').returns(getUser1)
+      sinon.stub(helpers, 'ensureAuthenticated').returns(true)
+    })
+
+    it('successfully', (done) => {
+      request(app)
+        .delete('/collections/4')
+        .expect(302)
+        .end((err, res) => {
+          request(app)
+            .get('/collections/4')
+            .expect(302)
+            .end(() => done())
+        })
+    })
+  })
+
+  afterEach(() => {
+    helpers.getUser.restore()
+    helpers.ensureAuthenticated.restore()
+  })
+})
