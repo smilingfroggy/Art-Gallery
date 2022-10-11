@@ -393,3 +393,45 @@ describe('DELETE /collections/:id', () => {
     helpers.ensureAuthenticated.restore()
   })
 })
+
+
+describe('POST & DELETE /collections/favorite/:artworkId', () => {
+  let collection_favorite
+  before(async () => {
+    sinon.stub(helpers, 'getUser').returns(getUser1)
+    sinon.stub(helpers, 'ensureAuthenticated').returns(true)
+    collection_favorite = await db.Collection.create({ UserId: 1, name: 'Favorite List' })
+    getUser1.Collections.push({ id: collection_favorite.id, name: collection_favorite.name })
+  })
+
+  it('add artwork id 2 into favorite list successfully', (done) => {
+    request(app)
+      .post('/collections/favorite/2')  // add artworkId: 2
+      .end((err, res) => {
+        request(app)
+          .get(`/collections/${collection_favorite.id}`)   // ID: 5
+          .end((err, res) => {
+            expect(res.text).to.include('test_artist_B')
+            expect(res.text).to.include('The Second Work')
+            expect(res.text).to.not.include('The First Work')
+            expect(res.text).to.not.include('The Third Work')
+            return done()
+          })
+      })
+  })
+
+  it('delete artwork id 2 from favorite list successfully', (done) => {
+    request(app)
+      .delete('/collections/favorite/2')  // delete artworkId: 2
+      .end((err, res) => {
+        expect(res.text).to.not.include('test_artist_B')
+        expect(res.text).to.not.include('The Second Work')
+        return done()
+      })
+  })
+
+  after(() => {
+    helpers.getUser.restore()
+    helpers.ensureAuthenticated.restore()
+  })
+})
