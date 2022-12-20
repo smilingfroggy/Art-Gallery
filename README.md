@@ -41,7 +41,7 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 
     ```$ touch .env```
 
-    Login and create applications at https://imgur.com to get ClientID for `.env` file
+    To upload image with admin account, login and create applications at https://imgur.com to get ClientID for `.env` file
 
 5. Run it 
 
@@ -50,12 +50,15 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 6. View the website at: http://localhost:3000
 
 7. Register an account or use seed accounts to login
-    - User account：
-      user1@example.com, 
-      user2@example.com, 
-      user3@example.com
-    - Admin account： admin@example.com
-    - PW: 12345678
+    - User 
+        - Account：
+        user1@example.com, 
+        user2@example.com, 
+        user3@example.com
+        - PW: 12345678
+    - Admin 
+        - Account： admin@example.com
+        - PW: root
 
 
 ## ERD
