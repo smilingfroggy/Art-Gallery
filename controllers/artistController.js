@@ -1,12 +1,5 @@
 const db = require('../models')
-const Artwork = db.Artwork
-const Subject = db.Subject
-const Medium = db.Medium
-const Artist = db.Artist
-const ArtistImage = db.ArtistImage
-const ArtworkImage = db.ArtworkImage
-const Exhibition = db.Exhibition
-const ExhibitionImage = db.ExhibitionImage
+const { Artwork, Subject, Medium, Artist, ArtistImage, ArtworkImage, Exhibition, ExhibitionImage } = db
 
 const artistController = {
   getArtist: async (req, res, next) => {
@@ -40,14 +33,13 @@ const artistController = {
       let artist = artist_rawData.toJSON()
 
       // 整理藝術家資料介紹
-      let headImage = ""
       if (!artist.ArtistImages.length) {
-        headImage = 'https://i.imgur.com/QJrNwMz.jpg'  //預設空白大頭照
+        artist.headImage = 'https://i.imgur.com/QJrNwMz.jpg'  //預設空白大頭照
       } else {
-        headImage = artist.ArtistImages.find(imageData => imageData.type === 'head') || artist.ArtistImages[0]
-        headImage = headImage.url.split('.jpg')[0] + 'b.jpg'
+        let headImage = artist.ArtistImages.find(imageData => imageData.type === 'head') || artist.ArtistImages[0]
+        artist.headImage = headImage.url.split('.jpg')[0] + 'b.jpg'
       }
-      artist.headImage = headImage
+      delete artist.ArtistImages
 
       // get allMedium, allSubjects, allExhibitions
       const allMedium = new Map()
@@ -85,20 +77,20 @@ const artistController = {
         work.creationTime = work.creationTime ? work.creationTime.getFullYear() : ""
       })
 
+      // map轉換為array，再從大到小排序
       // artist.allMedium = allMedium   // allMedium為map無法直接輸出json (console.log顯示可加入artist{}但是res.json不出來)
       function compareCount(a, b) { b.count - a.count }
       artist.allMedium = [...allMedium.values()].sort(compareCount)
       artist.allSubjects = [...allSubjects.values()].sort(compareCount)
       artist.allExhibitions = [...allExhibitions.values()].sort(compareCount)
 
-      // 找出各medium, subject, exhibition 一/四件作品做為代表圖
+      // 找出medium, subject, exhibition 各一件作品做為代表圖
       for (let i = 0; i < artist.allMedium.length; i++) {
         const id = artist.allMedium[i].id
         const select = await Artwork.findOne({
           raw: true,
           nest: true,
           attributes: ['id', 'name'],
-          // limit: 1,
           include: [
             { model: Artist, as: 'Creators', attributes: [], through: { attributes: [] }, where: { id: req.params.artistId } },
             { model: ArtworkImage, attributes: ['url'] },
@@ -109,7 +101,6 @@ const artistController = {
       }
 
       for (let i = 0; i < artist.allSubjects.length; i++) {
-        // if (artist.allSubjects[i][1].count < 5)  continue  // 主題相關的作品少於5件就不找作品了
         const id = artist.allSubjects[i].id
         const select = await Artwork.findOne({
           raw: true,
@@ -119,10 +110,8 @@ const artistController = {
             { model: Artist, as: 'Creators', attributes: [], through: { attributes: [] }, where: { id: req.params.artistId } },
             { model: ArtworkImage, attributes: ['url'] },
             { model: Subject, as: 'SubjectTags', where: { id: id }, attributes: [], through: { attributes: [] } }
-            // { exclude: ['createdAt', 'updatedAt'] }
           ]
         })
-        // console.log(`subject ${id} selected:`, select)
         artist.allSubjects[i].represent_work = select
       }
 
