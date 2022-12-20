@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User, Collection } = db
-const { getUser } = require('../helpers/auth-helpers')
+const helpers = require('../helpers/auth-helpers')
 
 const userController = {
   signUp: async (req, res, next) => {
@@ -51,7 +51,7 @@ const userController = {
   },
   getProfile: async (req, res, next) => {
     try {
-      const user = getUser(req)
+      const user = helpers.getUser(req)
       return res.render('profile', user )
     } catch (error) {
       console.log(error)
@@ -60,7 +60,7 @@ const userController = {
   },
   putProfile: async (req, res, next) => {
     try {
-      const userId = getUser(req).id
+      const userId = helpers.getUser(req).id
       const { name, password, passwordCheck } = req.body
       if (!name || !password || !passwordCheck) throw new Error('Please provide complete messages')
       if (password !== passwordCheck) throw new Error('Passwords do not match')

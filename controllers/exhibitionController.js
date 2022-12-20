@@ -1,6 +1,6 @@
 const db = require('../models')
 const { Artwork, Artist, ArtistImage, ArtworkImage, Exhibition, ExhibitionImage, Medium } = db
-const { getUser } = require('../helpers/auth-helpers')
+const helpers = require('../helpers/auth-helpers')
 const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
 
@@ -74,9 +74,9 @@ const exhibitionController = {
   },
   getExhibitionArtworks: async (req, res, next) => {
     try {
-      const userId = getUser(req)?.id || null
-      let addedArtworks = getUser(req)?.addedArtworks || new Set()
-      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+      const user = helpers.getUser(req) || null
+      let addedArtworks = user?.addedArtworks || new Set()
+      let favoriteArtworks = user?.favoriteArtworks || []
 
       const exhibitionArtworks_rawData = await Exhibition.findOne({
         where: {

@@ -1,6 +1,6 @@
 const db = require('../models');
 const { Artwork, ArtworkImage, Collection, CollectionArtwork, Medium, User } = db
-const { getUser } = require('../helpers/auth-helpers')
+const helpers = require('../helpers/auth-helpers')
 const { Op, Sequelize } = require('sequelize')
 const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 
@@ -8,7 +8,7 @@ const collectionController = {
   getCollections: async (req, res, next) => {
     try {
       // exclude collections created by user itself
-      const userId = getUser(req)?.id || null
+      const userId = helpers.getUser(req)?.id || null
       const userQuery = userId ? { UserId: { [Op.ne]: userId } } : null
       const collections_rawData = await Collection.findAll({
         where: { 'privacy': 2, ...userQuery },
@@ -75,18 +75,18 @@ const collectionController = {
   getCollection: async (req, res, next) => {
     try {
       const { collectionId } = req.params
-      const userId = getUser(req)?.id || null
+      const user = helpers.getUser(req) || null
 
       // find user's own collections
-      let ownCollections = getUser(req)?.Collections
+      let ownCollections = user?.Collections
       let ownership = false
       let notFavorite = false
-      let addedArtworks = getUser(req)?.addedArtworks || new Set()
-      let favoriteArtworks = getUser(req)?.favoriteArtworks || []
+      let addedArtworks = user?.addedArtworks || new Set()
+      let favoriteArtworks = user?.favoriteArtworks || []
 
       if (ownCollections) {
         ownership = !!ownCollections.find(collection => collection.id === Number(collectionId))
-        notFavorite = ownCollections.find(collection => collection.name === 'Favorite List').id !== Number(collectionId)
+        notFavorite = ownCollections.find(collection => collection.name === 'Favorite List')?.id !== Number(collectionId)
       }
 
       // if user owns collection, find anyway; if not, check find public collection only
@@ -136,9 +136,8 @@ const collectionController = {
   postCollection: async (req, res, next) => {
     try {
       const { name, description } = req.body
-      const userId = getUser(req)?.id
-      if (!name) throw new Error("Please provide collection name")
-      if (description?.length > 100 || name?.length > 25) throw new Error("Collection's name or description is over limit")
+      const userId = helpers.getUser(req)?.id
+      if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
 
       await Collection.create({
         UserId: userId,
@@ -156,9 +155,8 @@ const collectionController = {
     try {
       const { name, description, privacy } = req.body
       const { collectionId } = req.params
-      const userId = getUser(req)?.id
-      if (!name) throw new Error("Please provide collection name")
-      if (description?.length > 100 || name?.length > 25) throw new Error("Collection's name or description is over limit")
+      const userId = helpers.getUser(req)?.id
+      if (description.length > 100 || name.length > 25) throw new Error("Collection's name or description is over limit")
 
       const collection_rawData = await Collection.findByPk(collectionId, {
         include: { model: User, attributes: ['id'] }
@@ -180,7 +178,7 @@ const collectionController = {
   deleteCollection: async (req, res, next) => {
     try {
       const { collectionId } = req.params
-      const userId = getUser(req)?.id
+      const userId = helpers.getUser(req)?.id
 
       const collection_rawData = await Collection.findByPk(collectionId, {
         include: [
@@ -207,7 +205,7 @@ const collectionController = {
   },
   putCollectionArtworks: async (req, res, next) => {
     try {
-      const userId = getUser(req)?.id || null
+      const userId = helpers.getUser(req)?.id || null
       const { artworkId } = req.params
       let { collectionId_select } = req.body//[ '42', '50' ] or 50
 
@@ -266,7 +264,7 @@ const collectionController = {
   },
   addFavorite: async (req, res, next) => {
     try {    
-      const userId = getUser(req)?.id || null
+      const userId = helpers.getUser(req)?.id || null
       const { artworkId } = req.params
       const Collection_fav = await Collection.findOne({
         where: { UserId: userId, name: 'Favorite List' },
@@ -287,7 +285,7 @@ const collectionController = {
   },
   deleteFavorite: async(req, res, next) => {
     try {
-      const userId = getUser(req)?.id || null
+      const userId = helpers.getUser(req)?.id || null
       const { artworkId } = req.params
       const Collection_fav = await Collection.findOne({
         where: { UserId: userId, name: 'Favorite List' },

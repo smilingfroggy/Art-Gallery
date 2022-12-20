@@ -1,0 +1,7 @@
+{
+  "include": [
+    "controllers/collectionController.js",
+    "controllers/artworkController.js",
+    "controllers/exhibitionController.js"
+  ]
+}
