@@ -4,8 +4,8 @@ const { faker } = require('@faker-js/faker')
 // read excel file
 const xlsx = require('xlsx')
 const wb = xlsx.readFile('./seeders/seedsRawData.xlsx')
-const exhibitions = wb.Sheets['artwork']
-const data = xlsx.utils.sheet_to_json(exhibitions)
+const artworks = wb.Sheets['artwork']
+const data = xlsx.utils.sheet_to_json(artworks)
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -23,6 +23,7 @@ module.exports = {
       delete work.size
       delete work.subjects
       delete work.url
+      delete work.url_origin
       return {
         ...work,
         creationTime: work.creationTime ? new Date(work.creationTime.toString()) : null,

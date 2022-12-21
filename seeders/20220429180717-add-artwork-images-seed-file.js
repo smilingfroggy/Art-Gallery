@@ -20,6 +20,7 @@ module.exports = {
         type: 'original',
         description: faker.lorem.sentence(),
         url: work.url || IMAGE_NOT_AVAILABLE,
+        url_origin: work.url_origin || IMAGE_NOT_AVAILABLE,
         createdAt: new Date(),
         updatedAt: new Date()
       }
