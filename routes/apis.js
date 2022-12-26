@@ -5,15 +5,18 @@ const userController = require('../controllers/api/userController')
 const collectionController = require('../controllers/api/collectionController')
 const exhibitionController = require('../controllers/api/exhibitionController')
 const subjectController = require('../controllers/api/subjectController')
-const { authenticated, authenticatedAdmin } = require('../middleware/auth')
+const { authenticated, authenticatedAdmin } = require('../middleware/api-auth')
+const { authenticated: authenticated_session, authenticatedAdmin: authenticatedAdmin_session } = require('../middleware/auth')  // session authentication
 
 
 router.post('/login', passport.authenticate('local', { session: false }), userController.login)
 
-router.get('/exhibitions/', exhibitionController.getExhibitions)
-router.get('/exhibitions/:exhibitionId', exhibitionController.getExhibitionArtwork)
-router.get('/exhibitions/:exhibitionId/artists', exhibitionController.getExhibitionArtists)
+router.get('/exhibitions/', authenticated, exhibitionController.getExhibitions)
+router.get('/exhibitions/:exhibitionId', authenticated, exhibitionController.getExhibitionArtwork)
+router.get('/exhibitions/:exhibitionId/artists', authenticated, exhibitionController.getExhibitionArtists)
 
-router.get('/collections/', authenticated, collectionController.getOwnCollections)
-router.post('/subjects', authenticatedAdmin, subjectController.postSubject)
+// for inner axios request:  '/api/session/collections'
+router.get('/collections/', authenticated_session, collectionController.getOwnCollections)
+
+router.post('/subjects', authenticatedAdmin_session, subjectController.postSubject)
 module.exports = router;

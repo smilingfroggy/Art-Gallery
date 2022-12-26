@@ -1,8 +1,12 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User, Collection, Artwork } = db
+
+const JWTStrategy = passportJWT.Strategy
+const ExtractJwt = passportJWT.ExtractJwt
 
 passport.use(new LocalStrategy(
   {
@@ -21,6 +25,20 @@ passport.use(new LocalStrategy(
     return done(null, user)
   }
 ))
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET
+}
+passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
+  try {
+    let userData = await User.findByPk(jwtPayload.id)
+    return cb(null, userData)
+  } catch (err) {
+    console.log('JWT strategy error:', err)
+    next(err)
+  }
+}))
 
 passport.serializeUser((user, done) => {
   done(null, user.id)
