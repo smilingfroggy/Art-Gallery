@@ -13,16 +13,14 @@ const authHelpers = require('./helpers/auth-helpers')
 const logger = require('morgan');
 const { engine } = require('express-handlebars')
 const hbsHelpers = require('./config/handlebars-helpers')
-const indexRouter = require('./routes/index');
-const apisRouter = require('./routes/apis');
-const adminRouter = require('./routes/admin')
-const userRouter = require('./routes/user')
+const pages = require('./routes/pages/index');
+const apis = require('./routes/apis');
 
 const app = express();
 const SESSION_SECRET = 'secret'
 
 // view engine setup
-app.engine('hbs', engine({ defaultLayout: 'main', extname: '.hbs', helpers: hbsHelpers}))
+app.engine('hbs', engine({ defaultLayout: 'main', extname: '.hbs', helpers: hbsHelpers }))
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
@@ -30,11 +28,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false} ))
+app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
-app.use( function (req, res, next) {
+app.use(function (req, res, next) {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
   res.locals.warning_messages = req.flash('warning_messages')
@@ -43,18 +41,16 @@ app.use( function (req, res, next) {
 })
 
 app.use(methodOverride('_method'))
-app.use('/', indexRouter);
-app.use('/api', apisRouter);
-app.use('/admin', adminRouter)
-app.use('/user', userRouter)
+app.use('/', pages);
+app.use('/api', apis);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

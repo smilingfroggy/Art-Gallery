@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const artworkController = require('../controllers/artworkController')
-const artistController = require('../controllers/artistController')
-const collectionController = require('../controllers/collectionController')
-const exhibitionController = require('../controllers/exhibitionController')
-const { authenticated } = require('../middleware/auth')
-const { generalErrorHandler } = require('../middleware/error-handler')
+const admin = require('./modules/admin')
+const user = require('./modules/user')
+const artworkController = require('../../controllers/artworkController')
+const artistController = require('../../controllers/artistController')
+const collectionController = require('../../controllers/collectionController')
+const exhibitionController = require('../../controllers/exhibitionController')
+const { authenticated } = require('../../middleware/auth')
+const { generalErrorHandler } = require('../../middleware/error-handler')
 
 /* GET home page. */
 router.get('/', exhibitionController.getExhibitions)
@@ -29,6 +31,10 @@ router.delete('/collections/:collectionId', authenticated, collectionController.
 router.post('/collections/favorite/:artworkId', authenticated, collectionController.addFavorite)
 router.delete('/collections/favorite/:artworkId', authenticated, collectionController.deleteFavorite)
 router.put('/collections/artworks/:artworkId', authenticated, collectionController.putCollectionArtworks)
+
+router.use('/user', user)
+router.use('/admin', admin)
+
 router.use('/', generalErrorHandler)
 
 module.exports = router;
