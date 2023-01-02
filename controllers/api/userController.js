@@ -1,3 +1,4 @@
+const userService = require('../../services/userService')
 const jwt = require('jsonwebtoken')
 
 const userController = {
@@ -15,6 +16,14 @@ const userController = {
       })
     } catch (err) {
       console.log(err)
+      next(err)
+    }
+  },
+  signUp: async (req, res, next) => {
+    try {
+      await userService.signUp(req)
+      return res.json({ status: 'success', message: 'Please login' })
+    } catch (err) {
       next(err)
     }
   }

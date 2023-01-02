@@ -10,7 +10,7 @@ const { authenticated: authenticated_session, authenticatedAdmin: authenticatedA
 
 
 router.post('/login', passport.authenticate('local', { session: false }), userController.login)
-// router.post('/signup', userController.signUp)
+router.post('/signup', userController.signUp)
 
 router.get('/exhibitions/', authenticated, exhibitionController.getExhibitions)
 router.get('/exhibitions/:exhibitionId', authenticated, exhibitionController.getExhibitionArtwork)
