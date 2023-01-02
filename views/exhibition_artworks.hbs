@@ -186,7 +186,7 @@
         const modalCalled = new bootstrap.Modal(document.getElementById(`editCollection_${workId}`))
         modalCalled.show()
         try {
-          let response = await axios.get('/api/collections')
+          let response = await axios.get('/api/session/collections')
           let ownCollections = response.data
           let modal_select = document.getElementById(`selectWork_${workId}`)
           removeAllChild(modal_select)

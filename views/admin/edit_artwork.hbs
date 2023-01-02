@@ -297,7 +297,7 @@
       if (!name) return
       let response = await axios({
         method: "POST",
-        url: '/api/subjects',
+        url: '/api/session/subjects',
         data: { "name": name },
         headers: { "Content-Type": "application/json" },
       })
