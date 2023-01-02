@@ -7,6 +7,7 @@ const exhibitionController = require('../../controllers/api/exhibitionController
 const subjectController = require('../../controllers/api/subjectController')
 const { authenticated, authenticatedAdmin } = require('../../middleware/api-auth')
 const { authenticated: authenticated_session, authenticatedAdmin: authenticatedAdmin_session } = require('../../middleware/auth')  // session authentication
+const { apiErrorHandler } = require('../../middleware/api-error-handler')
 
 
 router.post('/login', passport.authenticate('local', { session: false }), userController.login)
@@ -20,4 +21,7 @@ router.get('/exhibitions/:exhibitionId/artists', authenticated, exhibitionContro
 router.get('/session/collections/', authenticated_session, collectionController.getOwnCollections)
 
 router.post('/session/subjects', authenticatedAdmin_session, subjectController.postSubject)
+
+router.use('/', apiErrorHandler)
+
 module.exports = router;
