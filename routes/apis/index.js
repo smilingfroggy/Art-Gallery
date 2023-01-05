@@ -14,8 +14,10 @@ router.post('/login', passport.authenticate('local', { session: false }), userCo
 router.post('/signup', userController.signUp)
 
 router.get('/exhibitions/', authenticated, exhibitionController.getExhibitions)
-router.get('/exhibitions/:exhibitionId', authenticated, exhibitionController.getExhibitionArtwork)
+router.get('/exhibitions/:exhibitionId', authenticated, exhibitionController.getExhibition)
+router.get('/exhibitions/:exhibitionId/artworks', authenticated, exhibitionController.getExhibitionArtwork)
 router.get('/exhibitions/:exhibitionId/artists', authenticated, exhibitionController.getExhibitionArtists)
+router.get('/exhibitions/:exhibitionId/images', authenticated, exhibitionController.getExhibitionImages)
 
 // for inner axios request:  '/api/session/collections'
 router.get('/session/collections/', authenticated_session, collectionController.getOwnCollections)
