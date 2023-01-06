@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require('../../config/passport')
 const userController = require('../../controllers/api/userController')
 const collectionController = require('../../controllers/api/collectionController')
+const artworkController = require('../../controllers/api/artworkController')
 const exhibitionController = require('../../controllers/api/exhibitionController')
 const subjectController = require('../../controllers/api/subjectController')
 const { authenticated, authenticatedAdmin } = require('../../middleware/api-auth')
@@ -18,6 +19,10 @@ router.get('/exhibitions/:exhibitionId', authenticated, exhibitionController.get
 router.get('/exhibitions/:exhibitionId/artworks', authenticated, exhibitionController.getExhibitionArtwork)
 router.get('/exhibitions/:exhibitionId/artists', authenticated, exhibitionController.getExhibitionArtists)
 router.get('/exhibitions/:exhibitionId/images', authenticated, exhibitionController.getExhibitionImages)
+
+router.get('/artworks', authenticated, artworkController.getSelections)
+router.get('/artworks/search', authenticated, artworkController.getArtworks)
+router.get('/artworks/:artworkId', authenticated, artworkController.getArtwork)
 
 // for inner axios request:  '/api/session/collections'
 router.get('/session/collections/', authenticated_session, collectionController.getOwnCollections)
