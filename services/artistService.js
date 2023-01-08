@@ -1,5 +1,7 @@
 const db = require('../models')
 const { Artwork, Subject, Medium, Artist, ArtistImage, ArtworkImage, Exhibition, ExhibitionImage } = db
+const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
+const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
 
 const artistController = {
   getArtist: async (req, res) => {
@@ -36,7 +38,7 @@ const artistController = {
 
       // 整理藝術家資料介紹
       if (!artist.ArtistImages.length) {
-        artist.headImage = 'https://i.imgur.com/QJrNwMz.jpg'  //預設空白大頭照
+        artist.headImage = ARTIST_AVATAR_NOT_AVAILABLE  //預設空白大頭照
       } else {
         let headImage = artist.ArtistImages.find(imageData => imageData.type === 'head') || artist.ArtistImages[0]
         artist.headImage = headImage.url.split('.jpg')[0] + 'b.jpg'
@@ -52,6 +54,7 @@ const artistController = {
         allMedium.set(work.Medium.id, {
           id: work.Medium.id,
           name: work.Medium.name,
+          represent_work: allMedium.has(work.Medium.id) ? allMedium.get(work.Medium.id).represent_work : (work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE),
           count: allMedium.get(work.Medium.id) ? allMedium.get(work.Medium.id).count + 1 : 1
         })
 
@@ -59,6 +62,7 @@ const artistController = {
           allSubjects.set(tag.id, {
             id: tag.id,
             name: tag.name,
+            represent_work: allSubjects.has(tag.id) ? allSubjects.get(tag.id).represent_work : (work.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE),
             count: allSubjects.get(tag.id) ? allSubjects.get(tag.id).count + 1 : 1
           })
         })
@@ -66,15 +70,15 @@ const artistController = {
 
         work.JoinedExhibitions.forEach(exh => {
           allExhibitions.set(exh.id, {
-            'id': exh.id,
-            'info': exh,
-            'count': allExhibitions.get(exh.id) ? allExhibitions.get(exh.id).count + 1 : 1
+            id: exh.id,
+            info: exh,
+            count: allExhibitions.get(exh.id) ? allExhibitions.get(exh.id).count + 1 : 1
           })
         })
         delete work.JoinedExhibitions
 
         // 整理藝術品資料：add image default; adjust format of size, creationTime
-        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : 'https://i.imgur.com/nVNO3Kj.png'  // if no image in DB, use "no image"
+        work.image = work.ArtworkImages[0] ? work.ArtworkImages[0].url : IMAGE_NOT_AVAILABLE  // if no image in DB, use "no image"
         work.size = (work.depth) ? (work.height + "x" + work.width + "x" + work.depth + " cm") : (work.height + "x" + work.width + " cm")
         work.creationTime = work.creationTime ? work.creationTime.getFullYear() : ""
       })
@@ -85,37 +89,6 @@ const artistController = {
       artist.allMedium = [...allMedium.values()].sort(compareCount)
       artist.allSubjects = [...allSubjects.values()].sort(compareCount)
       artist.allExhibitions = [...allExhibitions.values()].sort(compareCount)
-
-      // 找出medium, subject, exhibition 各一件作品做為代表圖
-      for (let i = 0; i < artist.allMedium.length; i++) {
-        const id = artist.allMedium[i].id
-        const select = await Artwork.findOne({
-          raw: true,
-          nest: true,
-          attributes: ['id', 'name'],
-          include: [
-            { model: Artist, as: 'Creators', attributes: [], through: { attributes: [] }, where: { id: req.params.artistId } },
-            { model: ArtworkImage, attributes: ['url'] },
-            { model: Medium, where: { id: id }, attributes: [] }
-          ]
-        })
-        artist.allMedium[i].represent_work = select
-      }
-
-      for (let i = 0; i < artist.allSubjects.length; i++) {
-        const id = artist.allSubjects[i].id
-        const select = await Artwork.findOne({
-          raw: true,
-          nest: true,
-          attributes: ['id', 'name'],
-          include: [
-            { model: Artist, as: 'Creators', attributes: [], through: { attributes: [] }, where: { id: req.params.artistId } },
-            { model: ArtworkImage, attributes: ['url'] },
-            { model: Subject, as: 'SubjectTags', where: { id: id }, attributes: [], through: { attributes: [] } }
-          ]
-        })
-        artist.allSubjects[i].represent_work = select
-      }
 
       // 整理展覽資料：date格式轉換、introduction
       artist.allExhibitions.forEach(exh => {
