@@ -6,6 +6,5 @@ module.exports = {
       req.flash('error_messages', err )
     }
     res.redirect('back')
-    next(err)
   }
 }

@@ -5,9 +5,6 @@ const helpers = require('../helpers/auth-helpers')
 const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
 
-const createError = require('http-errors');
-
-
 const exhibitionService = {
   getExhibitions: async (req, res) => {  // cb
     const exhibitions_rawData = await Exhibition.findAll({
