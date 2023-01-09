@@ -84,7 +84,6 @@ const artistController = {
       })
 
       // map轉換為array，再從大到小排序
-      // artist.allMedium = allMedium   // allMedium為map無法直接輸出json (console.log顯示可加入artist{}但是res.json不出來)
       function compareCount(a, b) { b.count - a.count }
       artist.allMedium = [...allMedium.values()].sort(compareCount)
       artist.allSubjects = [...allSubjects.values()].sort(compareCount)
@@ -97,6 +96,27 @@ const artistController = {
         exh.info.introduction = exh.info.introduction.slice(0, 55) + "..."
       })
       return artist
+  },
+  getArtistImages: async (req, res) => {
+    const artistImages_raw = await Artist.findByPk(req.params.artistId, {
+      attributes: ['id', 'name'],
+      include: {
+        model: ArtistImage, attributes: { exclude: ['createdAt', 'updatedAt'] }
+      }
+    })
+
+    if (!artistImages_raw) {
+      res.status(404)
+      throw new Error('Artist Unavailable')
+    }
+    const artistImages = artistImages_raw.toJSON()
+
+    if (!artistImages.ArtistImages.length) {
+      res.status(404)
+      throw new Error('Artist Images Unavailable')
+    }
+
+    return artistImages
   }
 }
 

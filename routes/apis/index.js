@@ -26,6 +26,7 @@ router.get('/artworks/search', authenticated, artworkController.getArtworks)
 router.get('/artworks/:artworkId', authenticated, artworkController.getArtwork)
 
 router.get('/artists/:artistId', authenticated, artistController.getArtist)
+router.get('/artists/:artistId/images', authenticated, artistController.getArtistImages)
 
 // for inner axios request:  '/api/session/collections'
 router.get('/session/collections/', authenticated_session, collectionController.getOwnCollections)
