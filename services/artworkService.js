@@ -130,7 +130,7 @@ const artworkService = {
       include: [
         { model: Subject, as: 'SubjectTags', attributes: ['id', 'name'], through: { attributes: [] } },
         { model: Medium, attributes: ['id', 'name'] },
-        { model: ArtworkImage, attributes: ['url', 'type', 'description'] },
+        { model: ArtworkImage, attributes: ['url_origin', 'type', 'description'] },
         {
           model: Artist, as: 'Creators', through: { attributes: [] },
           attributes: { exclude: ['updatedAt', 'createdAt'] },
@@ -145,7 +145,7 @@ const artworkService = {
     let artwork = artwork_rawData.toJSON()
 
     // 整理藝術品資料：medium, subject, size, creationTime
-    artwork.image = artwork.ArtworkImages[0]?.url || IMAGE_NOT_AVAILABLE
+    artwork.image = artwork.ArtworkImages[0]?.url_origin || IMAGE_NOT_AVAILABLE
     artwork.size = (artwork.depth) ? (artwork.height + "x" + artwork.width + "x" + artwork.depth + " cm") : (artwork.height + "x" + artwork.width + " cm")
     artwork.creationTime = artwork.creationTime ? artwork.creationTime.getFullYear() : ""
     artwork.isAdded = addedArtworks.has(artwork.id)
