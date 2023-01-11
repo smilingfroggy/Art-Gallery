@@ -23,6 +23,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'ArtworkImage',
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_unicode_520_ci'
   });
   return ArtworkImage;
 };

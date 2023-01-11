@@ -4,7 +4,11 @@
     "password": "password",
     "database": "art_collection",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_520_ci"
+    }
   },
   "test": {
     "username": "root",
@@ -15,6 +19,10 @@
     "logging": false
   },
   "production": {
-    "use_env_variable": "CLEARDB_DATABASE_URL"
+    "use_env_variable": "CLEARDB_DATABASE_URL",
+    "define": {
+      "charset": "utf8mb4",
+      "collate": "utf8mb4_unicode_520_ci"
+    }
   }
 }
