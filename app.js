@@ -6,6 +6,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
 const flash = require('connect-flash')
 const session = require('express-session')
 const passport = require('./config/passport')
@@ -17,7 +18,7 @@ const pages = require('./routes/pages/index');
 const apis = require('./routes/apis');
 
 const app = express();
-const SESSION_SECRET = 'secret'
+app.use(cors())
 
 // view engine setup
 app.engine('hbs', engine({ defaultLayout: 'main', extname: '.hbs', helpers: hbsHelpers }))
@@ -28,7 +29,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: false }))
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
