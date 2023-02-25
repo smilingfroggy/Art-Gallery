@@ -9,7 +9,7 @@ The aim is to facilitate the exposure of artworks that mostly sit in a warehouse
 - Users can create private or public collections, and add works into collections or favorite list, whenever visiting an exhibition or simply searching for the perfect works that match their taste.
 
 ## Demo
-Online-demo https://art-gallery-01.herokuapp.com/artworks
+ __[Online-demo](https://art-gallery-01.herokuapp.com/artworks?utm_source=github)__ ✨
 
 ![Imgur](https://i.imgur.com/pwk6YsP.jpg)
 ---
@@ -36,7 +36,7 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 
     ```$ npm run rebuildDB```
 
-4. Create `.env` file to set environment parameter
+4. Create `.env` file to set up environment variables
 
 
     ```$ touch .env```
@@ -74,35 +74,45 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 
 ### User
 - Browse public exhibitions's introduction and artworks
-- Search works with name, artist, media, size, create year, subjects.
+- Search works with multiple queries: name, artist, media, size, create year, shape, and subjects.
 - Artwork introduction connects with related subjects, media, and creator.
+- Artist personal page with biography, all works, media, subjects, and exhibitions.
+- Works, exhibitions, artists, subjects, media are all interconnected.
 - Browse other users' public collections. 
-- Logged-in users can add works from websites mentioned above to their favorite list.
-- Logged-in users can create their own collections with descriptions, manage privacy, edit description, and delete it.
-- Add or remove artworks to their own collections wherever they spot the correct one.
 - Guest users can only browse public exhibitions, collections, and search artworks.
+
+### Logged-in User
+- All above features
+- Add works from websites mentioned above to their favorite list, private by default.
+- Create their own collection, manage privacy, edit description, and delete it.
+- Add or remove artworks to their own collections wherever in this website.
+- Edit profile
 
 ### Admin
 - Create, edit, and delete artwork information and images.
 - Create, edit, and delete exhibitions information and image.
 - Search and select artworks from inventory, and add to exhibitions.
  
+### API
+- Sign up and login with JWT
+- Get exhibitions
+- Get and search for artwork
 
 
 ## Future work
 
 ### User
-- Edit own profile
-- Collections can be set to allow only users with exclusive links to view. 
-- Add ordering function to artworks searching page.
-- Add exhibition records to individual artwork page.
+- [x] Edit one's own profile
+- [ ] Collections can be set to allow only users with exclusive links to view. 
+- [ ] Add inquiry function to artworks searching page.
+- [ ] Add exhibition records to individual artwork page.
 
 ### Admin
-- Create, edit, and delete artist data and related images.
-- Create, edit, and delete subject data.
-- Read the summary table with viewCounts and total of joinedCollection and addedFavorite of each work.
-- Create QRcode of artwork page, and export all QRcode of works joined in certain exhibition.
-- Add ordering function to artwork inventory.
+- [x] Create, edit, and delete artist data and related images.
+- [ ] Create, edit, and delete subject data.
+- [ ] Read the summary table with viewCounts and total of joinedCollection and addedFavorite of each work.
+- [ ] Create QRcode of artwork page, and export all QRcode of works joined in certain exhibition.
+- [ ] Response inquiry from users.
 
 <!--
 
@@ -112,7 +122,7 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 
 <!-- ### Precautions? -->
 
-## Packages 
+## Dependencies 
 - Node.js
 - MySQL
 - Sequelize, Sequelize-cli
@@ -121,6 +131,7 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 - Express-session
 - bcryptjs
 - connect-flash
+- cors
 - dotenv
 - faker
 - method-override
@@ -128,4 +139,12 @@ Online-demo https://art-gallery-01.herokuapp.com/artworks
 - imgur
 - passport
 - passport-local
+- passport-jwt
 - xlsx
+
+### Dev Dependencies
+- chai
+- mocha
+- nyc
+- sinon
+- supertest
