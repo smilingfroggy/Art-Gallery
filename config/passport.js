@@ -1,5 +1,6 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const FacebookStrategy = require('passport-facebook').Strategy 
 const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
@@ -48,7 +49,7 @@ passport.serializeUser((user, done) => {
   done(null, user.id)
 })
 
-passport.deserializeUser( async (id, done) => {
+passport.deserializeUser(async (id, done) => {
   const user_rawData = await User.findByPk(id, {
     include: {
       model: Collection, attributes: ['id', 'name'],
@@ -69,5 +70,35 @@ passport.deserializeUser( async (id, done) => {
   return done(null, user)
 })
 
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_ID,
+  clientSecret: process.env.FACEBOOK_SECRET,
+  callbackURL: process.env.FACEBOOK_CALLBACK,
+  profileFields: ['email', 'displayName']
+},
+  async function(accessToken, refreshToken, profile, done) {
+    try {
+      const { email, name } = profile._json
+
+      let user = await User.findOne({ where: { email }})
+      if (user) return done(null, user)
+
+      // create new user and default collection
+      let randomPW = Math.random().toString(36).slice(-8)
+      let password = await bcrypt.hash(randomPW, 10)
+      user = await User.create({
+        name, email, password, isAdmin: 0
+      })
+      await Collection.create({
+        UserId: user.id,
+        name: 'Favorite List',
+        privacy: 0
+      })
+      return done(null, user)
+    } catch (error) {
+      done(error, false)
+    }
+  }
+))
 
 module.exports = passport

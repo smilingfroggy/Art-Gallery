@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const admin = require('./modules/admin')
 const user = require('./modules/user')
+const auth = require('./modules/auth')
 const artworkController = require('../../controllers/artworkController')
 const artistController = require('../../controllers/artistController')
 const collectionController = require('../../controllers/collectionController')
@@ -34,6 +35,7 @@ router.put('/collections/artworks/:artworkId', authenticated, collectionControll
 
 router.use('/user', user)
 router.use('/admin', admin)
+router.use('/auth', auth)
 
 router.use('/', generalErrorHandler)
 
