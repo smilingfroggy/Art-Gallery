@@ -4,9 +4,7 @@ const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User, Collection, Artwork } = db
-
-const JWTStrategy = passportJWT.Strategy
-const ExtractJwt = passportJWT.ExtractJwt
+const { Strategy: JWTStrategy, ExtractJwt } = passportJWT
 
 passport.use(new LocalStrategy(
   {
@@ -30,13 +28,19 @@ const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.JWT_SECRET
 }
-passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
+passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, done) => {
   try {
-    let userData = await User.findByPk(jwtPayload.id)
-    return cb(null, userData)
+    let userData = await User.findByPk(jwtPayload.id, {
+      attributes: ['id', 'email', 'isAdmin'],
+      include: {
+        model: Collection, attributes: ['id', 'name'],
+        where: { privacy: 2 }
+      }
+    })
+    userData = userData.toJSON()
+    return done(null, userData)
   } catch (err) {
-    console.log('JWT strategy error:', err)
-    next(err)
+    return done(err, false)
   }
 }))
 
@@ -46,18 +50,19 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser( async (id, done) => {
   const user_rawData = await User.findByPk(id, {
-    include: { model: Collection, attributes: ['id', 'name'],
-      include: { model: Artwork, as: 'JoinedArtworks', attributes: ['id'], through: { attributes: [] } } 
+    include: {
+      model: Collection, attributes: ['id', 'name'],
+      include: { model: Artwork, as: 'JoinedArtworks', attributes: ['id'], through: { attributes: [] } }
     }
   })
-  
+
   const user = user_rawData.toJSON()
   user.addedArtworks = new Set()
   user.Collections.forEach(col => {
     if (col.name === 'Favorite List') {
       user.favoriteArtworks = col.JoinedArtworks.map(work => work.id)
     }
-    col.JoinedArtworks.forEach( work => {
+    col.JoinedArtworks.forEach(work => {
       user.addedArtworks.add(work.id)
     })
   })
