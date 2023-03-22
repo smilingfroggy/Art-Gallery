@@ -79,7 +79,7 @@ passport.use(new FacebookStrategy({
   async function(accessToken, refreshToken, profile, done) {
     try {
       const { email, name } = profile._json
-
+      if (!email) throw new Error('Invalid email. Please try again to create account.')
       let user = await User.findOne({ where: { email }})
       if (user) return done(null, user)
 
