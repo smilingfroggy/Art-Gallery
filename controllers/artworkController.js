@@ -57,8 +57,11 @@ const artworkController = {
   },
   getArtworks: async (req, res, next) => {
     try {
-      if (!Object.keys(req.query).length) {   // if req.query is empty
-        return res.render('artworks', { selections })
+      // check if req.query is empty
+      let hasQuery = Object.values(req.query).some(val => val != '')
+      if (!hasQuery) {
+        req.flash('warning_messages', { message: 'Please select any option.' })
+        return res.redirect('/artworks')
       }
 
       const results = await artworkService.getArtworks(req, res)

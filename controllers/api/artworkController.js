@@ -11,8 +11,10 @@ const artworkController = {
   },
   getArtworks: async (req, res, next) => {
     try {
-      if (!Object.keys(req.query).length) {   // if req.query is empty
-        return res.json({ status: 'success', message: 'Nothing searched'})
+      // check if req.query is empty
+      let hasQuery = Object.values(req.query).some(val => val != '')
+      if (!hasQuery) {
+        return res.json({ status: 'success', message: 'Nothing searched' })
       }
 
       const searchResult = await artworkService.getArtworks(req, res)
