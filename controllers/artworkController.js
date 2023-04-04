@@ -1,52 +1,9 @@
-const db = require('../models')
-const { Artwork, Artist, ArtworkImage, Medium, Subject, } = db
-const sequelize = require("sequelize")
 const artworkService = require('../services/artworkService')
 
 const artworkController = {
   getSelections: async (req, res, next) => {
     try {
-      const selections_artist = await Artist.findAll({
-        include: {
-          model: Artwork, as: "Creations", through: { attributes: [] }, attributes: ['id', 'artistName'],
-          include: { model: ArtworkImage, attributes: ['id', 'url'] }
-        },
-        attributes: ['id', 'name',
-          [sequelize.fn('COUNT', sequelize.col('Creations.artistName')), 'workCount'],
-        ],
-        raw: true, nest: true, group: ['id'],
-        order: [[sequelize.col('workCount'), 'DESC']]
-      })
-
-      const selections_medium = await Medium.findAll({
-        include: {
-          model: Artwork, attributes: ['id', 'name', 'MediumId'],
-          include: { model: ArtworkImage, attributes: ['id', 'url'] }
-        },
-        attributes: ['id', 'name',
-          [sequelize.fn('COUNT', sequelize.col('Artworks.MediumId')), 'workCount']
-        ],
-        raw: true, nest: true, group: ['id'],
-        order: [[sequelize.col('workCount'), 'DESC']]
-      })
-
-      const selections_subject = await Subject.findAll({
-        include: {
-          model: Artwork, as: 'ContainedArtworks', attributes: ['id', 'name'], through: { attributes: [] },
-          include: { model: ArtworkImage, attributes: ['id', 'url'] }
-        },
-        attributes: ['id', 'name',
-          [sequelize.fn('COUNT', sequelize.col('ContainedArtworks.id')), 'workCount']
-        ],
-        raw: true, nest: true, group: ['id'],
-        order: [[sequelize.col('workCount'), 'DESC']]
-      })
-
-      const selections = {
-        artists: selections_artist,
-        media: selections_medium,
-        subjects: selections_subject
-      }
+      const selections = await artworkService.getSelections()
 
       // return res.json(selections)
       return res.render('artworks', { selections })
