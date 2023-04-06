@@ -44,13 +44,13 @@ const exhibitionService = {
       },
       include: [
         { model: ExhibitionImage, attributes: ['url', 'type', 'description'] },
-        {
-          model: Artwork, as: 'ContainedArtworks',
-          attributes: ['id', 'artistName', 'name'],
-          through: { attributes: [] }
-        },
       ],
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      attributes: { 
+        exclude: ['createdAt', 'updatedAt'],
+        include: [[sequelize.literal(`(
+          SELECT COUNT (*) FROM exhibitionArtworks AS ea WHERE ea.exhibitionId = exhibition.id 
+        )`), 'artwork_sum']]
+      },
     })
 
     if (!exhibition_rawData) {
@@ -59,7 +59,6 @@ const exhibitionService = {
     }
 
     let result = exhibition_rawData.toJSON()
-    result.artwork_sum = result.ContainedArtworks.length
     result.date_start = result.date_start?.toISOString().slice(0, 10)
     result.date_end = result.date_end?.toISOString().slice(0, 10)
     result.poster = result.ExhibitionImages.find(images => images.type === 'poster')?.url || IMAGE_NOT_AVAILABLE

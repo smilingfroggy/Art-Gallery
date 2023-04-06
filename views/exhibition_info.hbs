@@ -30,6 +30,13 @@
           <li class="my-2"><strong>開始日期</strong> {{exhibition.date_start}}</li>
           <li class="mb-2"><strong>結束日期</strong> {{exhibition.date_end}}</li>
           <li class="mb-2"><strong>展覽地點</strong> {{exhibition.location}}</li>
+          <li class="mb-2"><strong>展品數量</strong> 
+            <a href="/exhibitions/{{exhibition.id}}/artworks">
+              共 {{exhibition.artwork_sum}} 件作品
+              <span style="font-size: 12px; color: rgba(238, 153, 104, 0.952);"><i class="fa-solid fa-square-arrow-up-right"></i>
+              </span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
