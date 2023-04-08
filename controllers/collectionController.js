@@ -2,7 +2,7 @@ const db = require('../models');
 const { Artwork, ArtworkImage, Collection, CollectionArtwork, Medium, User } = db
 const helpers = require('../helpers/auth-helpers')
 const { Op, Sequelize } = require('sequelize')
-const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
+const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
 
 const collectionController = {
   getCollections: async (req, res, next) => {

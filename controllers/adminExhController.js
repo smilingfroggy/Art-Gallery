@@ -1,8 +1,8 @@
-const { imgurFileHandler } = require('../helpers/file-helpers')
 const db = require('../models');
 const { Artwork, Exhibition, ExhibitionImage, Medium, ArtworkImage, ExhibitionArtwork, Subject } = db
 const { Op } = require('sequelize')
-const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
+const { imgurFileHandler } = require('../helpers/file-helpers')
+const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
 
 const adminExhController = {
   getExhibitions: async (req, res, next) => {

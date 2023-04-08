@@ -1,7 +1,6 @@
 const db = require('../models')
 const { Artwork, Subject, Medium, Artist, ArtistImage, ArtworkImage, Exhibition, ExhibitionImage } = db
-const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
-const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
+const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
 
 const artistController = {
   getArtist: async (req, res) => {
@@ -37,13 +36,8 @@ const artistController = {
     let artist = artist_rawData.toJSON()
 
     // 整理藝術家資料介紹
-    if (!artist.ArtistImages.length) {
-      artist.headImage = ARTIST_AVATAR_NOT_AVAILABLE  //預設空白大頭照
-    } else {
-      let headImage = artist.ArtistImages.find(imageData => imageData.type === 'head') || artist.ArtistImages[0]
-      artist.headImage = headImage.url.split('.jpg')[0] + 'b.jpg'
-    }
-    delete artist.ArtistImages
+    // put image url in artist.headImage if exists & delete artist.ArtistImages
+    imageHelpers.getHeadImage(artist)
 
     // get allMedium, allSubjects, allExhibitions
     const allMedium = new Map()

@@ -2,8 +2,7 @@ const db = require('../models');
 const { Artwork, ArtworkImage, Exhibition, ExhibitionImage, Medium, Artist, ArtistImage } = db
 const sequelize = require('sequelize')
 const helpers = require('../helpers/auth-helpers')
-const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
-const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
+const { IMAGE_NOT_AVAILABLE, getHeadImage } = require('../helpers/image-helpers')
 
 const exhibitionService = {
   getExhibitions: async (req, res) => {  // cb
@@ -142,16 +141,8 @@ const exhibitionService = {
       work.Creators.forEach(creator => {
         if (!creators.get(creator.id)) {
           // 藝術家照片：優先顯示創作者大頭照(type: head)
-          if (creator.ArtistImages.length === 0) {
-            creator.ArtistImages = ARTIST_AVATAR_NOT_AVAILABLE  //預設空白大頭照
-          } else {
-            const headImg = creator.ArtistImages.find(image => image.type === 'head')
-            if (headImg) {  // imgur url + b => big square 
-              creator.ArtistImages = headImg.url.split('.jpg')[0] + 'b.jpg'
-            } else {
-              creator.ArtistImages = creator.ArtistImages[0].url.split('.jpg')[0] + 'b.jpg'
-            }
-          }
+          getHeadImage(creator)
+
           creator.introduction = creator.introduction?.split("。")[0] + "。"
           creators.set(creator.id, creator)
         }

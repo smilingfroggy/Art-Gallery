@@ -3,7 +3,6 @@ const db = require('../models');
 const { Artwork, Exhibition, ExhibitionImage, Medium, Artist, ArtistImage, ArtworkImage, ArtworkArtist, ArtworkSubject, ExhibitionArtwork, Subject } = db
 const { Op } = require('sequelize')
 const sequelize = require('sequelize')
-const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
 
 const adminArtistController = {
   getArtists: async (req, res, next) => {

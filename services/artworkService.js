@@ -3,8 +3,7 @@ const { Artwork, Artist, ArtistImage, ArtworkImage, Medium, Subject, } = db
 const { Op } = require("sequelize")
 const sequelize = require("sequelize")
 const helpers = require('../helpers/auth-helpers')
-const IMAGE_NOT_AVAILABLE = 'https://i.imgur.com/nVNO3Kj.png'
-const ARTIST_AVATAR_NOT_AVAILABLE = 'https://i.imgur.com/QJrNwMz.jpg'
+const { IMAGE_NOT_AVAILABLE, getHeadImage } = require('../helpers/image-helpers')
 
 const artworkService = {
   getSelections: async () => {
@@ -87,8 +86,8 @@ const artworkService = {
       subject: subject || (subjectId ? (subjectId_search?.name || undefined) : undefined),
       artist: artist || (artistId ? (artistId_search?.name || undefined) : undefined),
       artworkName,
-      height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper,
-      height: sizeQueryText('長', height_lower, height_upper),
+      height_lower, height_upper, width_lower, width_upper, depth_lower, depth_upper,  // shown in form input
+      height: sizeQueryText('長', height_lower, height_upper),  // shown besides Search
       width: sizeQueryText('寬', width_lower, width_upper),
       depth: sizeQueryText('深', depth_lower, depth_upper),
       shape, shape_portrait, shape_landscape,
@@ -186,27 +185,20 @@ const artworkService = {
 
     // 整理藝術家資料介紹
     artwork.Creators.map(creator => {
-      if (creator.ArtistImages.length === 0) {
-        creator.ArtistImages = ARTIST_AVATAR_NOT_AVAILABLE
-      } else {
-        const headImg = creator.ArtistImages.find(image => image.type === 'head')
-        if (headImg) {  // imgur url + b => big thumbnail 
-          creator.ArtistImages = headImg.url.split('.jpg')[0] + 'b.jpg'
-        } else {
-          creator.ArtistImages = creator.ArtistImages[0].url.split('.jpg')[0] + 'b.jpg'
-        }
-      }
+      // put image url in creator.headImage if exists & delete creator.ArtistImages
+      getHeadImage(creator)
       creator.introduction = creator.introduction?.slice(0, 50) + "..."
     })
     return artwork
   }
 }
 
+// create size query record shown in html, e.g. '長 30 - 100', '寬 - 60', '深 30 -'
 function sizeQueryText(dimension, lower, upper) {
   if (!lower && !upper) return undefined
-  return `${dimension} ${lower ? lower : ''} - ${upper ? upper : ''}`
+  return `${dimension} ${lower || ''} - ${upper || ''}`
 }
-
+// edit whereQuery of size for database query
 function sizeQuery(dimension, lower, upper, whereQuery) {
   if (lower && upper) {
     whereQuery[dimension] = { [Op.between]: [lower, upper] }
