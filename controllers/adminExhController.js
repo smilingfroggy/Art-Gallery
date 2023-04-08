@@ -1,6 +1,6 @@
 const db = require('../models');
 const { Artwork, Exhibition, ExhibitionImage, Medium, ArtworkImage, ExhibitionArtwork, Subject } = db
-const { Op } = require('sequelize')
+const { Op, Sequelize } = require('sequelize')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
 
@@ -261,7 +261,13 @@ const adminExhController = {
       const selected_artworkId = selected_artwork_rawData.map(value => value.id)
 
       const artwork_rawData = await Artwork.findAll({
-        attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
+        attributes: { 
+          exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'],
+          include: [[Sequelize.literal(`(
+            SELECT COUNT(*) FROM collectionArtworks AS ca 
+            WHERE ca.artworkId = artwork.id
+          )`), 'collection_count']]
+        },
         where: { id: { [Op.notIn]: selected_artworkId } },  // exclude originally selected artworks
         include: [
           { model: Medium, attributes: { exclude: ['createdAt', 'updatedAt'] } },

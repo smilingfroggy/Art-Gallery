@@ -1,13 +1,18 @@
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const db = require('../models');
-const { Artwork, Exhibition, ExhibitionImage, Medium, Artist, ArtworkImage, ArtworkArtist, ArtworkSubject, Subject } = db
-const { Op } = require('sequelize')
+const { Artwork, Exhibition, Medium, Artist, ArtworkImage, ArtworkArtist, ArtworkSubject, Subject } = db
+const sequelize = require('sequelize')
 
 const adminArtworkController = {
   getArtworks: async (req, res, next) => {
     try {
       const artwork_rawData = await Artwork.findAll({
-        attributes: { exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'] },
+        attributes: { 
+          exclude: ['piecesNum', 'introduction', 'viewCount', 'createdAt', 'updatedAt'],
+          include: [[sequelize.literal(`(
+            SELECT COUNT(*) FROM collectionArtworks AS ca WHERE ca.artworkId = artwork.id
+          )`), 'collection_count']]
+        },
         include: [
           { model: Medium, attributes: { exclude: ['createdAt', 'updatedAt'] } },
           { model: Subject, as: 'SubjectTags', attributes: ['id', 'name'], through: { attributes: [] } },
@@ -156,7 +161,8 @@ const adminArtworkController = {
   putArtworks: async (req, res, next) => {
     try {
       const { artworkId } = req.params
-      let { name, artist_select, serialNumber, creationTime, creationTimeNote, MediumId, height, width, depth, piecesNum, introduction, type, description, SubjectTags_select } = req.body
+      let { name, artist_select, serialNumber, creationTime, creationTimeNote, MediumId, 
+        height, width, depth, piecesNum, introduction, type, description, SubjectTags_select } = req.body
       const { files } = req
       if (!artworkId || !name || !artist_select || !MediumId || !height || !piecesNum) throw new Error('Please provide complete messages')
 
