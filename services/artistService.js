@@ -1,6 +1,6 @@
 const db = require('../models')
 const { Artwork, Subject, Medium, Artist, ArtistImage, ArtworkImage, Exhibition, ExhibitionImage } = db
-const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
+const { IMAGE_NOT_AVAILABLE, getHeadImage } = require('../helpers/image-helpers')
 
 const artistController = {
   getArtist: async (req, res) => {
@@ -37,7 +37,7 @@ const artistController = {
 
     // 整理藝術家資料介紹
     // put image url in artist.headImage if exists & delete artist.ArtistImages
-    imageHelpers.getHeadImage(artist)
+    getHeadImage(artist)
 
     // get allMedium, allSubjects, allExhibitions
     const allMedium = new Map()

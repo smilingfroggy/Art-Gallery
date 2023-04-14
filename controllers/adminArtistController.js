@@ -1,7 +1,6 @@
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const db = require('../models');
-const { Artwork, Exhibition, ExhibitionImage, Medium, Artist, ArtistImage, ArtworkImage, ArtworkArtist, ArtworkSubject, ExhibitionArtwork, Subject } = db
-const { Op } = require('sequelize')
+const { Artwork, Artist, ArtistImage } = db
 const sequelize = require('sequelize')
 
 const adminArtistController = {
@@ -31,6 +30,7 @@ const adminArtistController = {
   getArtist: async (req, res, next) => {
     try {
       const { artistId } = req.params
+      if (artistId === 'create') return res.render('admin/edit_artist')   // provide empty form to create
       const artist_rawData = await Artist.findByPk(artistId, {
         attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [
@@ -38,6 +38,7 @@ const adminArtistController = {
           // { model: Artwork, as: 'Creations', through: { attributes: [] }, attributes: { exclude: ['createdAt', 'updatedAt'] }}
         ]
       })
+      if (!artist_rawData) throw new Error('Artist ID does not exist!')
       const artist = JSON.parse(JSON.stringify(artist_rawData))
       return res.render('admin/edit_artist', { artist })
     } catch (error) {
@@ -85,14 +86,14 @@ const adminArtistController = {
   postArtist: async (req, res, next) => {
     try {
       const { name, otherName, birthYear, deathYear, introduction, type, description } = req.body
-      const { files } = req
+      const { files } = req   // [], [ {fieldName, path, ...}, {...}]
       if (!name) throw new Error('Please provide artist name.')
       const artist_repeat = await Artist.findOne({
         where: { name }
       })
       if (artist_repeat) throw new Error('Artist with same name exists')
 
-      const filesUpload = files ? Promise.all(files.map(file => imgurFileHandler(file))) : Promise.resolve()
+      const filesUpload = files.length ? Promise.all(files.map(file => imgurFileHandler(file))) : Promise.resolve()
 
       Promise.all([
         filesUpload,

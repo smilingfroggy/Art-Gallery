@@ -6,6 +6,7 @@ const client = new ImgurClient({ clientId: IMGUR_CLIENT_ID})
 const imgurFileHandler = file => {
   return new Promise((resolve, reject) => {
     if (!file) return resolve(null)
+    // file.path: temp\148db7d7d051a05cd00e22f240176d55
     return client.upload({
       image: fs.createReadStream(file.path),
       type: 'stream'
