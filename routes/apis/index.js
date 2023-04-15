@@ -9,7 +9,7 @@ const exhibitionController = require('../../controllers/api/exhibitionController
 const subjectController = require('../../controllers/api/subjectController')
 const { authenticated, authenticatedAdmin } = require('../../middleware/api-auth')
 const { authenticated: authenticated_session, authenticatedAdmin: authenticatedAdmin_session } = require('../../middleware/auth')
-const { apiErrorHandler } = require('../../middleware/api-error-handler')
+const { apiErrorHandler } = require('../../middleware/error-handler')
 
 
 router.post('/login', passport.authenticate('local', { session: false }), userController.login)
@@ -33,6 +33,12 @@ router.get('/session/collections/', authenticated_session, collectionController.
 
 router.post('/session/subjects', authenticatedAdmin_session, subjectController.postSubject)
 
-router.use('/', apiErrorHandler)
+
+router.use(function (req, res, next) {
+  res.status(404)
+  next(new Error('Page Not Found'))
+})
+
+router.use(apiErrorHandler)
 
 module.exports = router;

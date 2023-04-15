@@ -5,7 +5,7 @@ const adminArtworkController = require('../../../controllers/adminArtworkControl
 const adminArtistController = require('../../../controllers/adminArtistController')
 const { authenticatedAdmin } = require('../../../middleware/auth')
 const upload = require('../../../middleware/multer')
-const { generalErrorHandler } = require('../../../middleware/error-handler')
+const { adminErrorHandler } = require('../../../middleware/error-handler')
 
 router.get('/exhibitions', authenticatedAdmin, adminExhController.getExhibitions)
 router.post('/exhibitions', authenticatedAdmin, adminExhController.postExhibition)
@@ -41,6 +41,6 @@ router.put('/artists/:artistId', authenticatedAdmin, upload.array('image', 10), 
 router.delete('/artists/:artistId', authenticatedAdmin, adminArtistController.deleteArtist)
 router.delete('/artists/:artistId/images', authenticatedAdmin, adminArtistController.deleteArtistImages)
 
-router.use('/', generalErrorHandler)
+router.use('/', adminErrorHandler)
 
 module.exports = router
