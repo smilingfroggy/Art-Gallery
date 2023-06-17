@@ -14,7 +14,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        name: faker.name.findName(),
+        name: faker.name.fullName(),
         email: 'user1@example.com',
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
         isAdmin: false,
@@ -22,7 +22,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        name: faker.name.findName(),
+        name: faker.name.fullName(),
         email: 'user2@example.com',
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
         isAdmin: false,
@@ -30,7 +30,7 @@ module.exports = {
         updatedAt: new Date()
       },
       {
-        name: faker.name.findName(),
+        name: faker.name.fullName(),
         email: 'user3@example.com',
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10)),
         isAdmin: false,
