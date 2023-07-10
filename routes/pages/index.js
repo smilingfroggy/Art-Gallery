@@ -34,7 +34,8 @@ router.post('/collections/favorite/:artworkId', authenticated, collectionControl
 router.delete('/collections/favorite/:artworkId', authenticated, collectionController.deleteFavorite)
 router.put('/collections/artworks/:artworkId', authenticated, collectionController.putCollectionArtworks)
 
-router.get('/reservations/create', authenticated, reservationController.createReservation)  // edit form page
+router.get('/reservations', authenticated, reservationController.getReservations)
+router.get('/reservations/create', authenticated, reservationController.createReservation)
 router.use('/user', user)
 router.use('/admin', admin)
 router.use('/auth', auth)

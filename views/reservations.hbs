@@ -1,0 +1,95 @@
+<div class="container-fluid mt-3">
+  <div class="d-flex mb-3 justify-content-end">
+    <a href="/reservations/create"><button class="btn btn-success">Create</button></a>
+  </div>
+
+  {{!-- table of reservations --}}
+  <div class="table-responsive">
+    <table class="table table-striped table-hover ">
+      <thead>
+        <tr>
+          {{!-- <th scope="col">#</th> --}}
+          <th scope="col" style="min-width: 70px;">預約日期</th>
+          <th scope="col" style="min-width: 70px;">時間</th>
+          <th scope="col">聯絡人</th>
+          <th scope="col">聯絡方式</th>
+          <th scope="col">作品清單&件數</th>
+          <th scope="col">人數</th>
+          <th scope="col">目的</th>
+          <th scope="col">備註</th>
+          <th scope="col">狀態</th>
+          <th scope="col"></th> <!--操作-->
+        </tr>
+      </thead>
+      <tbody>
+        {{#each reservations}}
+        <tr>
+          {{!-- <th scope="row">{{this.id}}</th> --}}
+          <td>{{this.date}}</td>
+          <td>{{this.timeSlot}}</td>
+          <td>{{this.contact_person}}</td>
+          <td>{{this.phone}}</td>
+          <td>{{this.Collection.name}} ({{this.work_count}}件)
+            <a class="ms-2" href="/collections/{{this.Collection.id}}">
+              <span style="font-size: small;"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+            </a>
+          </td>
+          <td>{{this.visitor_num}}</td>
+          <td>{{this.purpose}}</td>
+          <td>{{this.description}}</td>
+          <td> Status </td>
+
+          <td>
+            <div class="btn-group" role="group">
+              <a href="/reservations/{{this.id}}/edit">
+                <button class="btn btn-outline-primary btn-sm">
+                  修改時間
+                </button>
+              </a>
+              <form action="/reservations/{{this.id}}?_method=DELETE" method="post">
+                <button type="submit" class="btn btn-outline-danger btn-sm">取消</button>
+              </form>
+            </div>
+          </td>
+
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const table = document.querySelector('tbody')
+  table.addEventListener('submit', deleteAlert)
+
+  function deleteAlert(event) {
+    if (event.target.tagName === 'FORM') {
+      event.preventDefault()
+      let form = event.target
+      let tableRow = event.target.parentElement.parentElement.parentElement
+      let time = tableRow.children[0].innerText + " " + tableRow.children[1].innerText
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `確定要取消 ${time} 預約嗎？`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: '確認'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire(
+            '已收到',
+            `取消預約 ${time}`,
+            'success'
+          ).then(result => {
+            form.submit()
+          })
+        }
+      })
+    }
+  }
+</script>

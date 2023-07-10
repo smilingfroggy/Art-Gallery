@@ -1,15 +1,44 @@
-const dayjs = require('dayjs')
 const db = require('../models')
-const { Reservation } = db
+const { Reservation, Collection } = db
 const { Op } = require('sequelize')  
 const helpers = require('../helpers/auth-helpers')
 const purposes = ['Auction', 'Research', 'Inquiry', 'Others']
 
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
+const timezone = require('dayjs/plugin/timezone')
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.tz.setDefault('Asia/Taipei')
+
 const reservationController = {
+  getReservations: async (req, res, next) => {
+    try {
+      const userId = helpers.getUser(req)?.id || null
+
+      const reservations = await Reservation.findAll({
+        where: { UserId: userId },
+        attributes: ['id', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
+        include: { model: Collection, attributes: ['id', 'name'] },
+        raw: true, nest: true
+      })
+
+      reservations.forEach(reserve => {
+        let time = dayjs.tz(reserve.time)
+        reserve.date = time.format('YYYY/MM/DD')
+        reserve.timeSlot = time.format('HH:mm')
+        reserve.description = reserve.description.length ? (reserve.description.slice(0, 20) + '...') : ""
+      })
+
+      return res.render('reservations', { reservations })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
   createReservation: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req)?.id || null
-      if (!userId) return res.redirect('back')
 
       // find user's all collections
       const collections = helpers.getUser(req)?.Collections
@@ -19,8 +48,8 @@ const reservationController = {
       })
 
       // date limit within 1 month
-      const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD')
-      const nextMonth = dayjs().add(1, 'month').format('YYYY-MM-DD')
+      const tomorrow = dayjs.tz().add(1, 'day').format('YYYY-MM-DD')
+      const nextMonth = dayjs.tz().add(1, 'month').format('YYYY-MM-DD')
       const date_limit = { min: tomorrow, max: nextMonth }
 
       // find available date & slot
@@ -32,8 +61,8 @@ const reservationController = {
 
       reservedDates.forEach(date => {
         let time = date.time
-        date.date = dayjs(time).format('YYYY-MM-DD')
-        date.time = dayjs(time).format('HH:mm')
+        date.date = dayjs.tz(time).format('YYYY-MM-DD')
+        date.time = dayjs.tz(time).format('HH:mm')
       })
 
       // return res.json({ 
