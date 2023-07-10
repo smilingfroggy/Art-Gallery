@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'CollectionId',
         as: 'JoinedArtworks'
       })
+      Collection.hasMany(models.Reservation)
     }
   }
   Collection.init({
