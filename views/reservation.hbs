@@ -1,0 +1,194 @@
+<div class="container-fluid mt-5">
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-center">
+      <h5 class="mt-2">預約申請</h5>
+    </div>
+    <div class="card-body row d-flex justify-content-between">
+      {{#if reservation}}
+      <form class="needs-validation mb-5" id="reservation_form" action="/reservations/{{reservations.id}}?_method=PUT" method="post" enctype="multipart/form-data" novalidate>
+      {{else}}
+      <form class="needs-validation mb-5" id="reservation_form" action="/reservations" method="post" novalidate>
+      {{/if}}
+          <div class="mb-3 row">
+            <label for="name" class="col-sm-2 col-form-label" align="center">聯絡人姓名
+              <span class="requiredInput">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="contact_person" name="contact_person" value="{{reservation.name}}" maxlength="20" required>
+              <div class="invalid-feedback">
+                請輸入聯絡人姓名
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <label for="phone" class="col-sm-2 col-form-label" align="center">手機
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">格式: 0912345678</small>
+            </label>
+            <div class="col-sm-10">
+              <input type="tel" class="form-control" id="phone" name="phone" value="{{reservation.phone}}" maxlength="10" pattern="[0-9][1-9][0-9]{8}" required>
+              <div class="invalid-feedback">
+                請輸入電話
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="collection_select_count" class="col-sm-2 col-form-label" align="center">作品清單
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">請擇一收藏清單</small>
+            </label>
+            <div class="col-sm-10">
+              <div class="input-group">
+                <select class="selectpicker show-tick border rounded-start" name="collection_select_count" id="collection_select_count"
+                  data-size="5" data-width="100%" data-live-search="true" required>
+                  {{!-- {{#each artist_selections}} --}}
+                  {{#each collections}}
+                  {{!-- inside options: {{#if ../artwork}}{{#ifInclude this.name
+                  ../artwork.Creators}}selected{{/ifInclude}}{{/if}} --}}
+                    <option value="{{this.id}},{{this.work_count}}">
+                      {{this.name}} ({{this.work_count}}件)
+                    </option>
+                  {{/each}}
+                </select>
+
+                <div class="col-1 invalid-feedback">
+                  請擇一收藏清單
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="mb-3 row">
+            <label for="visitor_num" class="col-sm-2 col-form-label" align="center">來訪人數
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">上限8人</small>
+            </label>
+
+            <div class="col-sm-10">
+              <div class="input-group">
+                <input type="number" class="form-control" id="visitor_num" name="visitor_num"
+                value="{{reservation.visitor_num}}" max="10" min="1" step="1" required>
+                <div class="invalid-feedback">
+                  請填1-8人
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="date" class="col-sm-2 col-form-label" align="center"> 預約日期
+              <span class="requiredInput">*</span>
+              <small class="text-muted d-block">開放1個月內</small>
+            </label>
+
+            <div class="col-sm-10">
+              <div class="input-group">
+                <div class="col-12 col-lg-6 mb-4">
+                  <input type="date" class="form-control" id="date" name="date" value="{{reservation.date}}" min="{{date_limit.min}}" max="{{date_limit.max}}" required>
+                  <div class="invalid-feedback">
+                    請選擇日期
+                  </div>
+                </div>
+
+                <div class="col-12 col-lg-6 form-check mb-4" role="group" aria-label="Basic checkbox toggle button group">
+                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1030" value="10:30" autocomplete="off" required>
+                  {{!-- {{#if }}checked{{/if}} --}}
+                  <label class="btn btn-outline-info form-check-label" for="date_time_1030">10:30-12:30</label>
+
+                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1330" value="13:30" autocomplete="off">
+                  <label class="btn btn-outline-info form-check-label" for="date_time_1330">13:30-15:30</label>
+                
+                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1630" value="16:30" autocomplete="off">
+                  <label class="btn btn-outline-info form-check-label" for="date_time_1630">16:30-18:30</label>
+
+                  <div class="invalid-feedback">
+                    請選擇時段
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="purpose" class="col-sm-2 col-form-label" align="center">預約目的
+              <span class="requiredInput">*</span>
+            </label>
+            <div class="col-sm-10">
+              <select class="selectpicker show-tick border rounded-start" name="purpose" id="purpose" data-size="5"
+                data-live-search="true" data-width="100%" required>
+                {{!-- {{#each medium_selections}}
+                <option value="{{this.id}}" {{#if ../artwork}}{{#ifEqual this.name
+                  ../artwork.Medium.name}}selected{{/ifEqual}}{{/if}}>{{this.name}}</option>
+                {{/each}} --}}
+                {{#each purposes}}
+                <option value="{{this}}">{{this}}</option>
+                {{!-- <option value="{{this}}" {{#if ../reservation}}{{#ifEqual this.purpose this}}selected{{/ifEqual}}{{/if}}>
+                  {{this}}</option> --}}
+                {{/each}}
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="description" class="col-sm-2 col-form-label" align="center">備註
+              <small class="text-muted d-block">300字內</small>
+            </label>
+            <div class="col-sm-10">
+              <textarea class="form-control" id="description" name="description" maxlength="300"
+                rows="5">{{reservation.description}}</textarea>
+            </div>
+          </div>
+
+        </form>
+
+        <div class="row justify-content-center">
+        <button class="btn btn-success col-sm-6" type="submit" form="reservation_form">Submit</button>
+        </div>
+    </div>
+  </div>
+
+  
+</div>
+
+{{!-- for bootstrap-selector --}}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+  // const reserved_dates = {{ reservedDates }} //  SyntaxError: Unexpected identifier 'Object'
+  const reservedDates = {{{ reservedDates }}} // SyntaxError -> JSON.stringify -> success!
+
+  // listen to date selected(clicked) => check date available
+  const date_selector = document.getElementById('date')
+  const date_time_1030 = document.getElementById('date_time_1030')
+  const date_time_1330 = document.getElementById('date_time_1330')
+  const date_time_1630 = document.getElementById('date_time_1630')
+  date_selector.addEventListener('input', (event) => {
+    date_time_1030.removeAttribute('disabled')
+    date_time_1330.removeAttribute('disabled')
+    date_time_1630.removeAttribute('disabled')
+
+    let selectedDate = event.target.value   // '2023-07-14'
+    let reservedTime = reservedDates.filter(reserve => reserve.date === selectedDate)
+    reservedTime.forEach(reserved => {
+      if (reserved.time === '10:30') date_time_1030.setAttribute('disabled', "")
+      if (reserved.time === '13:30') date_time_1330.setAttribute('disabled', "")
+      if (reserved.time === '16:30') date_time_1630.setAttribute('disabled', "")
+    })
+  })
+
+  // form validation
+  const reservation_form = document.getElementById('reservation_form')
+
+  reservation_form.addEventListener('submit', function (event) {
+    if (!reservation_form.checkValidity()) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    reservation_form.classList.add('was-validated')
+  })
+</script>

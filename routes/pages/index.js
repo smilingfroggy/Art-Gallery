@@ -7,6 +7,7 @@ const artworkController = require('../../controllers/artworkController')
 const artistController = require('../../controllers/artistController')
 const collectionController = require('../../controllers/collectionController')
 const exhibitionController = require('../../controllers/exhibitionController')
+const reservationController = require('../../controllers/reservationController')
 const { authenticated } = require('../../middleware/auth')
 const { generalErrorHandler } = require('../../middleware/error-handler')
 
@@ -33,6 +34,7 @@ router.post('/collections/favorite/:artworkId', authenticated, collectionControl
 router.delete('/collections/favorite/:artworkId', authenticated, collectionController.deleteFavorite)
 router.put('/collections/artworks/:artworkId', authenticated, collectionController.putCollectionArtworks)
 
+router.get('/reservations/create', authenticated, reservationController.createReservation)  // edit form page
 router.use('/user', user)
 router.use('/admin', admin)
 router.use('/auth', auth)
