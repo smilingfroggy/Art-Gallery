@@ -39,6 +39,7 @@ const reservationController = {
   createReservation: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req)?.id || null
+      const { reservationId } = req.params    // edit reservation
 
       // find user's all collections
       const collections = helpers.getUser(req)?.Collections
@@ -64,6 +65,27 @@ const reservationController = {
         date.date = dayjs.tz(time).format('YYYY-MM-DD')
         date.time = dayjs.tz(time).format('HH:mm')
       })
+
+      if (reservationId) {    // edit reservation
+        // get reservation info
+        const currentReservation = await Reservation.findByPk(reservationId, {
+          where: { UserId: userId },
+          attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
+          include: { model: Collection, attributes: ['id', 'name'] },
+          raw: true, nest: true
+        })
+        if (!currentReservation) throw new Error('Reservation not exist')
+        if (currentReservation.UserId !== userId) throw new Error('Permission Denied')
+
+        currentReservation.date = dayjs.tz(currentReservation.time).format('YYYY-MM-DD')
+        currentReservation.time = dayjs.tz(currentReservation.time).format('HH:mm')
+        
+        return res.render('reservation', {
+          collections, purposes, date_limit,
+          reservedDates: JSON.stringify(reservedDates), // for <script> {{{reservedDates}}}
+          reservation: currentReservation
+        })
+      }
 
       // return res.json({ 
       //    statue: 'success', collections, purposes, date_limit,

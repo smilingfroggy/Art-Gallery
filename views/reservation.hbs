@@ -14,7 +14,7 @@
               <span class="requiredInput">*</span>
             </label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="contact_person" name="contact_person" value="{{reservation.name}}" maxlength="20" required>
+              <input type="text" class="form-control" id="contact_person" name="contact_person" value="{{reservation.contact_person}}" maxlength="20" required>
               <div class="invalid-feedback">
                 請輸入聯絡人姓名
               </div>
@@ -40,27 +40,21 @@
               <small class="text-muted d-block">請擇一收藏清單</small>
             </label>
             <div class="col-sm-10">
-              <div class="input-group">
-                <select class="selectpicker show-tick border rounded-start" name="collection_select_count" id="collection_select_count"
-                  data-size="5" data-width="100%" data-live-search="true" required>
-                  {{!-- {{#each artist_selections}} --}}
-                  {{#each collections}}
-                  {{!-- inside options: {{#if ../artwork}}{{#ifInclude this.name
-                  ../artwork.Creators}}selected{{/ifInclude}}{{/if}} --}}
-                    <option value="{{this.id}},{{this.work_count}}">
-                      {{this.name}} ({{this.work_count}}件)
-                    </option>
-                  {{/each}}
-                </select>
+              <select class="selectpicker show-tick border rounded" name="collection_select_count" id="collection_select_count"
+                data-size="5" data-width="100%" data-live-search="true" required>
+                {{#each collections}}
+                  <option value="{{this.id}},{{this.work_count}}" 
+                    {{#ifEqual this.id ../reservation.Collection.id}}selected{{/ifEqual}}>
+                    {{this.name}} ({{this.work_count}}件)
+                  </option>
+                {{/each}}
+              </select>
 
-                <div class="col-1 invalid-feedback">
-                  請擇一收藏清單
-                </div>
+              <div class="col-1 invalid-feedback">
+                請擇一收藏清單
               </div>
             </div>
           </div>
-
-
 
           <div class="mb-3 row">
             <label for="visitor_num" class="col-sm-2 col-form-label" align="center">來訪人數
@@ -69,12 +63,10 @@
             </label>
 
             <div class="col-sm-10">
-              <div class="input-group">
-                <input type="number" class="form-control" id="visitor_num" name="visitor_num"
-                value="{{reservation.visitor_num}}" max="10" min="1" step="1" required>
-                <div class="invalid-feedback">
-                  請填1-8人
-                </div>
+              <input type="number" class="form-control round" id="visitor_num" name="visitor_num"
+              value="{{reservation.visitor_num}}" max="10" min="1" step="1" required>
+              <div class="invalid-feedback">
+                請填1-8人
               </div>
             </div>
           </div>
@@ -95,14 +87,16 @@
                 </div>
 
                 <div class="col-12 col-lg-6 form-check mb-4" role="group" aria-label="Basic checkbox toggle button group">
-                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1030" value="10:30" autocomplete="off" required>
-                  {{!-- {{#if }}checked{{/if}} --}}
+                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1030" 
+                  value="10:30" autocomplete="off" required {{#ifEqual reservation.time "10:30"}}checked{{/ifEqual}}>
                   <label class="btn btn-outline-info form-check-label" for="date_time_1030">10:30-12:30</label>
 
-                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1330" value="13:30" autocomplete="off">
+                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1330" 
+                  value="13:30" autocomplete="off" {{#ifEqual reservation.time "13:30"}}checked{{/ifEqual}}>
                   <label class="btn btn-outline-info form-check-label" for="date_time_1330">13:30-15:30</label>
                 
-                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1630" value="16:30" autocomplete="off">
+                  <input type="radio" class="btn-check form-check-input" name="date_time" id="date_time_1630" 
+                  value="16:30" autocomplete="off" {{#ifEqual reservation.time "16:30"}}checked{{/ifEqual}}>
                   <label class="btn btn-outline-info form-check-label" for="date_time_1630">16:30-18:30</label>
 
                   <div class="invalid-feedback">
@@ -119,16 +113,9 @@
               <span class="requiredInput">*</span>
             </label>
             <div class="col-sm-10">
-              <select class="selectpicker show-tick border rounded-start" name="purpose" id="purpose" data-size="5"
-                data-live-search="true" data-width="100%" required>
-                {{!-- {{#each medium_selections}}
-                <option value="{{this.id}}" {{#if ../artwork}}{{#ifEqual this.name
-                  ../artwork.Medium.name}}selected{{/ifEqual}}{{/if}}>{{this.name}}</option>
-                {{/each}} --}}
+              <select class="selectpicker show-tick border rounded" name="purpose" id="purpose" data-size="5" data-width="100%" required>
                 {{#each purposes}}
-                <option value="{{this}}">{{this}}</option>
-                {{!-- <option value="{{this}}" {{#if ../reservation}}{{#ifEqual this.purpose this}}selected{{/ifEqual}}{{/if}}>
-                  {{this}}</option> --}}
+                <option value="{{this}}" {{#ifEqual this ../reservation.purpose}}selected{{/ifEqual}}>{{this}}</option>
                 {{/each}}
               </select>
             </div>
@@ -140,10 +127,9 @@
             </label>
             <div class="col-sm-10">
               <textarea class="form-control" id="description" name="description" maxlength="300"
-                rows="5">{{reservation.description}}</textarea>
+                rows="5" placeholder="如有其他需求請在此註明">{{reservation.description}}</textarea>
             </div>
           </div>
-
         </form>
 
         <div class="row justify-content-center">
@@ -159,8 +145,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <script>
-  // const reserved_dates = {{ reservedDates }} //  SyntaxError: Unexpected identifier 'Object'
-  const reservedDates = {{{ reservedDates }}} // SyntaxError -> JSON.stringify -> success!
+  const reservedDates = {{{ reservedDates }}}
 
   // listen to date selected(clicked) => check date available
   const date_selector = document.getElementById('date')
