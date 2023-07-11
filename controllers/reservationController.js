@@ -2,7 +2,7 @@ const db = require('../models')
 const { Reservation, Collection } = db
 const { Op } = require('sequelize')  
 const helpers = require('../helpers/auth-helpers')
-const purposes = ['Auction', 'Research', 'Inquiry', 'Others']
+const purposes = ['拍賣', '學術研究', '洽購', '其他']
 
 const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
@@ -77,8 +77,40 @@ const reservationController = {
       console.log(error)
       next(error)
     }
-  }
-}
+  },
+  postReservation: async (req, res, next) => {
+    try {
+      const userId = helpers.getUser(req)?.id || null
 
+      const { contact_person, phone, collection_select_count, visitor_num, date, date_time, purpose, description } = req.body
+
+      if (!contact_person || !phone || !collection_select_count || !visitor_num || !date || !date_time || !purpose) throw new Error('Incomplete input')
+
+      if (contact_person.length > 20 || phone.length > 10 || visitor_num > 8) throw new Error('Invalid input')
+      
+      const collectionId = collection_select_count.split(',')[0]
+      const work_count = collection_select_count.split(',')[1]
+      const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
+      
+      const collections = helpers.getUser(req)?.Collections
+      if (!collections.include(col => col.id === collectionId)) throw new Error('Invalid collection')
+
+      const newReservation = await Reservation.create({
+        UserId: userId,
+        CollectionId: Number(collectionId),
+        visitor_num: Number(visitor_num),
+        work_count: Number(work_count), 
+        contact_person, phone, purpose, description, time
+      })
+      if (newReservation) {
+        req.flash('success_messages', `Received reservation on ${date} ${date_time} `)
+      }
+      res.redirect('./reservations')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+}
 
 module.exports = reservationController
