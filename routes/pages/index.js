@@ -39,6 +39,7 @@ router.get('/reservations/create', authenticated, reservationController.createRe
 router.post('/reservations', authenticated, reservationController.postReservation)
 router.get('/reservations/:reservationId/edit', authenticated, reservationController.createReservation)
 router.put('/reservations/:reservationId', authenticated, reservationController.editReservation)
+router.delete('/reservations/:reservationId', authenticated, reservationController.deleteReservation)  // cancel reservation
 
 router.use('/user', user)
 router.use('/admin', admin)

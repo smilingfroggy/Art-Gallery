@@ -193,6 +193,27 @@ const reservationController = {
       next(error)
     }
   },
+  deleteReservation: async (req, res, next) => {
+    try {
+      const userId = helpers.getUser(req)?.id || null
+      const { reservationId } = req.params
+      
+      const reservation = await Reservation.findByPk(reservationId)
+      if (!reservation) throw new Error('Reservation does not exist')
+      if (reservation.UserId !== userId) throw new Error('Permission Denied')
+
+      // only delete reserves 1 week later
+      if (reservation.time < dayjs().add(1,'week')) throw new Error('Cancellation is forbidden')
+      const time = dayjs.tz(reservation.time).format('YYYY-MM-DD HH:mm')
+
+      await reservation.destroy()
+      req.flash('success_messages', `Cancelled reservation on ${time}`)
+      return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  }  
 }
 
 module.exports = reservationController
