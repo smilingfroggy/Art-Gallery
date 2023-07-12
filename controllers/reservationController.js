@@ -79,8 +79,8 @@ const reservationController = {
         if (!currentReservation) throw new Error('Reservation not exist')
         if (currentReservation.UserId !== userId) throw new Error('Permission Denied')
 
-        currentReservation.date = dayjs.tz(currentReservation.time).format('YYYY-MM-DD')
-        currentReservation.time = dayjs.tz(currentReservation.time).format('HH:mm')
+        currentReservation.date = dayjs.tz(currentReservation.time).format('YYYY-MM-DD')  // '2023-07-28'
+        currentReservation.time = dayjs.tz(currentReservation.time).format('HH:mm')       // '16:30'
         
         return res.render('reservation', {
           collections, purposes, date_limit,
@@ -116,8 +116,23 @@ const reservationController = {
       const work_count = collection_select_count.split(',')[1]
       const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
       
+      // check date is within 1 month
+      const tomorrow = dayjs.tz().add(1, 'day') // .format('YYYY-MM-DD')
+      const nextMonth = dayjs.tz().add(1, 'month') //.format('YYYY-MM-DD')
+      if (!time.isBetween(tomorrow, nextMonth)) throw new Error('Invalid date selected')
+
+      // check if date duplicates
+      const date_limit = { min: tomorrow.format('YYYY-MM-DD'), max: nextMonth.format('YYYY-MM-DD') }
+      const reservations = await Reservation.findAll({
+        where: { time: { [Op.between]: [date_limit.min, date_limit.max] }},
+        attributes: ['id', 'time'],
+        raw: true
+      })
+      if (reservations.some(res => res.time.valueOf() === time.valueOf())) throw new Error('Selected time has been reserved')
+
+      // check collection validity
       const collections = helpers.getUser(req)?.Collections
-      if (!collections.include(col => col.id === collectionId)) throw new Error('Invalid collection')
+      if (!collections.some(col => col.id === Number(collectionId))) throw new Error('Invalid collection')
 
       const newReservation = await Reservation.create({
         UserId: userId,
