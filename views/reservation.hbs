@@ -153,19 +153,24 @@
   const date_time_1030 = document.getElementById('date_time_1030')
   const date_time_1330 = document.getElementById('date_time_1330')
   const date_time_1630 = document.getElementById('date_time_1630')
-  date_selector.addEventListener('input', (event) => {
+
+  // check time slot availability when editing reservation or after selecting a date
+  const selectedDates = date_selector.value
+  if (selectedDates) checkTimeAvailability(selectedDates)
+  date_selector.addEventListener('input', event => checkTimeAvailability(event.target.value))
+  
+  function checkTimeAvailability(selectedDate) {  // '2023-07-14'
     date_time_1030.removeAttribute('disabled')
     date_time_1330.removeAttribute('disabled')
     date_time_1630.removeAttribute('disabled')
 
-    let selectedDate = event.target.value   // '2023-07-14'
     let reservedTime = reservedDates.filter(reserve => reserve.date === selectedDate)
     reservedTime.forEach(reserved => {
       if (reserved.time === '10:30') date_time_1030.setAttribute('disabled', "")
       if (reserved.time === '13:30') date_time_1330.setAttribute('disabled', "")
       if (reserved.time === '16:30') date_time_1630.setAttribute('disabled', "")
     })
-  })
+  }
 
   // form validation
   const reservation_form = document.getElementById('reservation_form')
