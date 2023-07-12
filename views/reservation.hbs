@@ -5,7 +5,7 @@
     </div>
     <div class="card-body row d-flex justify-content-between">
       {{#if reservation}}
-      <form class="needs-validation mb-5" id="reservation_form" action="/reservations/{{reservations.id}}?_method=PUT" method="post" enctype="multipart/form-data" novalidate>
+      <form class="needs-validation mb-5" id="reservation_form" action="/reservations/{{reservation.id}}?_method=PUT" method="post" novalidate>
       {{else}}
       <form class="needs-validation mb-5" id="reservation_form" action="/reservations" method="post" novalidate>
       {{/if}}
@@ -14,7 +14,8 @@
               <span class="requiredInput">*</span>
             </label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="contact_person" name="contact_person" value="{{reservation.contact_person}}" maxlength="20" required>
+              <input type="text" class="form-control" id="contact_person" name="contact_person" 
+              value="{{reservation.contact_person}}" maxlength="20" required {{#if reservation}}disabled{{/if}}>
               <div class="invalid-feedback">
                 請輸入聯絡人姓名
               </div>
@@ -27,7 +28,8 @@
               <small class="text-muted d-block">格式: 0912345678</small>
             </label>
             <div class="col-sm-10">
-              <input type="tel" class="form-control" id="phone" name="phone" value="{{reservation.phone}}" maxlength="10" pattern="[0-9][1-9][0-9]{8}" required>
+              <input type="tel" class="form-control" id="phone" name="phone" 
+              value="{{reservation.phone}}" maxlength="10" pattern="[0-9][1-9][0-9]{8}" required {{#if reservation}}disabled{{/if}}>
               <div class="invalid-feedback">
                 請輸入電話
               </div>
@@ -41,7 +43,7 @@
             </label>
             <div class="col-sm-10">
               <select class="selectpicker show-tick border rounded" name="collection_select_count" id="collection_select_count"
-                data-size="5" data-width="100%" data-live-search="true" required>
+                data-size="5" data-width="100%" data-live-search="true" required {{#if reservation}}disabled{{/if}}>
                 {{#each collections}}
                   <option value="{{this.id}},{{this.work_count}}" 
                     {{#ifEqual this.id ../reservation.Collection.id}}selected{{/ifEqual}}>
@@ -113,7 +115,8 @@
               <span class="requiredInput">*</span>
             </label>
             <div class="col-sm-10">
-              <select class="selectpicker show-tick border rounded" name="purpose" id="purpose" data-size="5" data-width="100%" required>
+              <select class="selectpicker show-tick border rounded" name="purpose" id="purpose" data-size="5" data-width="100%" 
+              required {{#if reservation}}disabled{{/if}}>
                 {{#each purposes}}
                 <option value="{{this}}" {{#ifEqual this ../reservation.purpose}}selected{{/ifEqual}}>{{this}}</option>
                 {{/each}}
@@ -137,8 +140,6 @@
         </div>
     </div>
   </div>
-
-  
 </div>
 
 {{!-- for bootstrap-selector --}}

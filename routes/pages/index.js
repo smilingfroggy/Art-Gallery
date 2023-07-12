@@ -37,7 +37,8 @@ router.put('/collections/artworks/:artworkId', authenticated, collectionControll
 router.get('/reservations', authenticated, reservationController.getReservations)
 router.get('/reservations/create', authenticated, reservationController.createReservation)
 router.post('/reservations', authenticated, reservationController.postReservation)
-router.get('/reservations/:reservationId/edit', authenticated, reservationController.createReservation)   // check details and edit
+router.get('/reservations/:reservationId/edit', authenticated, reservationController.createReservation)
+router.put('/reservations/:reservationId', authenticated, reservationController.editReservation)
 
 router.use('/user', user)
 router.use('/admin', admin)

@@ -7,8 +7,10 @@ const purposes = ['拍賣', '學術研究', '洽購', '其他']
 const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
 const timezone = require('dayjs/plugin/timezone')
+const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(isBetween)
 dayjs.tz.setDefault('Asia/Taipei')
 
 const reservationController = {
@@ -128,6 +130,49 @@ const reservationController = {
         req.flash('success_messages', `Received reservation on ${date} ${date_time} `)
       }
       res.redirect('./reservations')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  editReservation: async(req, res, next) => {
+    try {
+      const userId = helpers.getUser(req)?.id || null
+      const { reservationId } = req.params
+      const { visitor_num, date, date_time, description } = req.body
+
+      const reservation = await Reservation.findByPk(reservationId)
+      if (!reservation) throw new Error('Reservation does not exist')
+      if (reservation.UserId !== userId) throw new Error('Permission Denied')
+      if (!visitor_num || !date || !date_time) throw new Error('Incomplete input')
+
+      // check date is within 1 month
+      const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
+      const tomorrow = dayjs.tz().add(1, 'day')
+      const nextMonth = dayjs.tz().add(1, 'month')
+      if (!time.isBetween(tomorrow, nextMonth)) throw new Error('Invalid date selected')
+
+      // check if date duplicates
+      const date_limit = { min: tomorrow.format('YYYY-MM-DD'), max: nextMonth.format('YYYY-MM-DD') }
+      const reservations = await Reservation.findAll({
+        where: { 
+          time: {[Op.between]: [date_limit.min, date_limit.max]},
+          id: {[Op.ne]: reservationId }
+        },
+        attributes: ['id', 'time'],
+        raw: true
+      })
+      if (reservations.some(res => res.time.valueOf() === time.valueOf())) throw new Error('Selected time has been reserved')
+
+      // update reservation
+      await reservation.update({
+        visitor_num: Number(visitor_num),
+        description, time
+      })
+
+      req.flash('success_messages', `Updated reservation on ${date} ${date_time} `)
+
+      return res.redirect('/reservations')
     } catch (error) {
       console.log(error)
       next(error)
