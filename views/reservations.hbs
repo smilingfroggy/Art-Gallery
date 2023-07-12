@@ -46,9 +46,11 @@
                   修改時間
                 </button>
               </a>
+              {{#ifWeekLater this.date}}
               <form action="/reservations/{{this.id}}?_method=DELETE" method="post">
                 <button type="submit" class="btn btn-outline-danger btn-sm">取消</button>
               </form>
+              {{/ifWeekLater}}
             </div>
           </td>
 

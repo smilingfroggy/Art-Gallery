@@ -1,3 +1,5 @@
+const dayjs = require('dayjs')
+
 module.exports = { 
   compareLength: function (artworks, num, options) {
     if (artworks.length > num) return options.fn(this)
@@ -22,6 +24,15 @@ module.exports = {
   },
   toggleOptions: function (searchings, options) {
     if (searchings?.height || searchings?.width || searchings?.depth || searchings?.shape || searchings?.year) {
+      return options.fn(this)
+    }
+    return options.inverse(this)
+  },
+  ifWeekLater: function(date, options) {
+    date = new Date(date)
+    let nextWeek = dayjs().add(1, 'week')
+  
+    if (date.valueOf() >= nextWeek.valueOf()) {
       return options.fn(this)
     }
     return options.inverse(this)
