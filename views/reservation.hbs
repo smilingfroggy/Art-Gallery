@@ -9,6 +9,7 @@
       {{else}}
       <form class="needs-validation mb-5" id="reservation_form" action="/reservations" method="post" novalidate>
       {{/if}}
+        <fieldset {{#if readOnly}}disabled{{/if}}>
           <div class="mb-3 row">
             <label for="name" class="col-sm-2 col-form-label" align="center">聯絡人姓名
               <span class="requiredInput">*</span>
@@ -133,11 +134,20 @@
                 rows="5" placeholder="如有其他需求請在此註明">{{reservation.description}}</textarea>
             </div>
           </div>
-        </form>
+        </fieldset>
+      </form>
 
-        <div class="row justify-content-center">
+      <div class="row justify-content-center">
+        {{#unless readOnly}}
         <button class="btn btn-success col-sm-6" type="submit" form="reservation_form">Submit</button>
-        </div>
+        {{/unless}}
+
+        {{#if readOnly}}
+        <a href="/payment" class="col-sm-6">
+          <button class="btn btn-warning col-12" type="button">付款</button>
+        </a>
+        {{/if}}
+      </div>
     </div>
   </div>
 </div>

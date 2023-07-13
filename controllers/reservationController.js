@@ -38,6 +38,37 @@ const reservationController = {
       next(error)
     }
   },
+  getReservation: async (req, res, next) => {
+    try {
+      const userId = helpers.getUser(req)?.id || null
+      const { reservationId } = req.params
+
+      const reservation = await Reservation.findByPk(reservationId, {
+        where: { UserId: userId },
+        attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
+        include: { model: Collection, attributes: ['id', 'name'] },
+        raw: true, nest: true
+      })
+      if (!reservation) throw new Error('Reservation not exist')
+      if (reservation.UserId !== userId) throw new Error('Permission Denied')
+
+      reservation.date = dayjs.tz(reservation.time).format('YYYY-MM-DD')  // '2023-07-28'
+      reservation.time = dayjs.tz(reservation.time).format('HH:mm')       // '16:30'
+
+      // show checked option of collection
+      const collections = [{
+        name: reservation.Collection.name,
+        work_count: reservation.work_count
+      }]
+
+      return res.render('reservation', { 
+        reservation, reservedDates: '[]', purposes, collections, readOnly: true 
+      })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
   createReservation: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req)?.id || null
@@ -56,19 +87,21 @@ const reservationController = {
       const date_limit = { min: tomorrow, max: nextMonth }
 
       // find available date & slot
-      const reservedDates = await Reservation.findAll({
+      let reservedDates = await Reservation.findAll({
         where: { time: { [Op.between]: [date_limit.min, date_limit.max]}},
-        attributes: ['time'],
+        attributes: ['id', 'time'],
         raw: true
       })
 
-      reservedDates.forEach(date => {
-        let time = date.time
-        date.date = dayjs.tz(time).format('YYYY-MM-DD')
-        date.time = dayjs.tz(time).format('HH:mm')
+      reservedDates.forEach(reserve => {
+        let time = reserve.time
+        reserve.date = dayjs.tz(time).format('YYYY-MM-DD')
+        reserve.time = dayjs.tz(time).format('HH:mm')
       })
-
+      
       if (reservationId) {    // edit reservation
+        reservedDates = reservedDates.filter(reserve => reserve.id !== Number(reservationId))   // exclude itself
+        
         // get reservation info
         const currentReservation = await Reservation.findByPk(reservationId, {
           where: { UserId: userId },

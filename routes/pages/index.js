@@ -38,6 +38,7 @@ router.get('/reservations', authenticated, reservationController.getReservations
 router.get('/reservations/create', authenticated, reservationController.createReservation)
 router.post('/reservations', authenticated, reservationController.postReservation)
 router.get('/reservations/:reservationId/edit', authenticated, reservationController.createReservation)
+router.get('/reservations/:reservationId', reservationController.getReservation)
 router.put('/reservations/:reservationId', authenticated, reservationController.editReservation)
 router.delete('/reservations/:reservationId', authenticated, reservationController.deleteReservation)  // cancel reservation
 
