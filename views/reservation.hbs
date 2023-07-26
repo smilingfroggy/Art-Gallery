@@ -137,16 +137,21 @@
         </fieldset>
       </form>
 
-      <div class="row justify-content-center">
+      <div class="row justify-content-center mx-auto">
         {{#unless readOnly}}
         <button class="btn btn-success col-sm-6" type="submit" form="reservation_form">Submit</button>
         {{/unless}}
 
         {{#if readOnly}}
-        <a href="/payment" class="col-sm-6">
-          <button class="btn btn-warning col-12" type="button">付款</button>
+        <a href="/reservations/{{reservation.id}}/payment" class="col-sm-6">
+          <button class="btn btn-warning col-12"  type="button">下一步：付款</button>
         </a>
         {{/if}}
+
+        {{!-- TODO: --}}
+        {{#ifEqual status 'paid'}}
+        <h4>已為您保留時段！</h4>
+        {{/ifEqual}}
       </div>
     </div>
   </div>

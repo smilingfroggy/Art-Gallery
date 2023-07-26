@@ -1,0 +1,29 @@
+<div class="container-fluid mt-5 d-flex justify-content-center" >
+
+  <div class="card" style="width: 50rem;">
+    <div class="card-header d-flex justify-content-center">
+      <h5 class="mt-2">確認預約</h5>
+    </div>
+    <div class="card-body">
+      <p>人數：{{reservation.visitor_num}}</p>
+      <p>時間：{{reservation.date}} {{reservation.time}}</p>
+      <p>姓名：{{reservation.contact_person}}</p>
+      <p>電話：{{reservation.phone}}</p>
+      <p>總金額：{{payment.tradeData.Amt}}NTD</p>
+      <br>
+
+      {{!-- Payment Info --}}
+      <form class="d-flex justify-content-center" action="https://ccore.newebpay.com/MPG/mpg_gateway" method="post">
+      {{!-- Test API URL --}}
+        <fieldset class="d-none">
+          <input name="MerchantID" value="{{payment.tradeData.MerchantID}}">
+          <input name="Version" value="{{payment.tradeData.Version}}">
+          <input name="TradeInfo" value="{{payment.TradeInfo}}">
+          <input name="TradeSha" value="{{payment.TradeSha}}">
+        </fieldset>
+        <button class="btn btn-success col-sm-6 mx-auto" type="submit">進行付款</button>
+      </form>
+    </div>
+  </div>
+
+</div>

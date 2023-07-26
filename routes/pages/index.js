@@ -8,6 +8,7 @@ const artistController = require('../../controllers/artistController')
 const collectionController = require('../../controllers/collectionController')
 const exhibitionController = require('../../controllers/exhibitionController')
 const reservationController = require('../../controllers/reservationController')
+const paymentController = require('../../controllers/paymentController')
 const { authenticated } = require('../../middleware/auth')
 const { generalErrorHandler } = require('../../middleware/error-handler')
 
@@ -42,6 +43,7 @@ router.get('/reservations/:reservationId', reservationController.getReservation)
 router.put('/reservations/:reservationId', authenticated, reservationController.editReservation)
 router.delete('/reservations/:reservationId', authenticated, reservationController.deleteReservation)  // cancel reservation
 
+router.get('/reservations/:reservationId/payment', authenticated, paymentController.getPayment)
 router.use('/user', user)
 router.use('/admin', admin)
 router.use('/auth', auth)
