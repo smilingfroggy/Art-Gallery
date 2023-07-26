@@ -3,6 +3,7 @@ const { Reservation, Collection } = db
 const { Op } = require('sequelize')  
 const helpers = require('../helpers/auth-helpers')
 const purposes = ['拍賣', '學術研究', '洽購', '其他']
+const reservationService = require('../services/reservationService')
 
 const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
@@ -43,17 +44,9 @@ const reservationController = {
       const userId = helpers.getUser(req)?.id || null
       const { reservationId } = req.params
 
-      const reservation = await Reservation.findByPk(reservationId, {
-        where: { UserId: userId },
-        attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
-        include: { model: Collection, attributes: ['id', 'name'] },
-        raw: true, nest: true
-      })
+      const reservation = await reservationService.getReservation(userId, reservationId)
       if (!reservation) throw new Error('Reservation not exist')
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
-
-      reservation.date = dayjs.tz(reservation.time).format('YYYY-MM-DD')  // '2023-07-28'
-      reservation.time = dayjs.tz(reservation.time).format('HH:mm')       // '16:30'
 
       // show checked option of collection
       const collections = [{
@@ -82,17 +75,10 @@ const reservationController = {
       })
 
       // date limit within 1 month
-      const tomorrow = dayjs.tz().add(1, 'day').format('YYYY-MM-DD')
-      const nextMonth = dayjs.tz().add(1, 'month').format('YYYY-MM-DD')
-      const date_limit = { min: tomorrow, max: nextMonth }
-
+      const date_limit = reservationService.getDateLimit()
+      
       // find available date & slot
-      let reservedDates = await Reservation.findAll({
-        where: { time: { [Op.between]: [date_limit.min, date_limit.max]}},
-        attributes: ['id', 'time'],
-        raw: true
-      })
-
+      let reservedDates = await reservationService.getMonthReservations()
       reservedDates.forEach(reserve => {
         let time = reserve.time
         reserve.date = dayjs.tz(time).format('YYYY-MM-DD')
@@ -103,18 +89,10 @@ const reservationController = {
         reservedDates = reservedDates.filter(reserve => reserve.id !== Number(reservationId))   // exclude itself
         
         // get reservation info
-        const currentReservation = await Reservation.findByPk(reservationId, {
-          where: { UserId: userId },
-          attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
-          include: { model: Collection, attributes: ['id', 'name'] },
-          raw: true, nest: true
-        })
+        const currentReservation = await reservationService.getReservation(userId, reservationId)
         if (!currentReservation) throw new Error('Reservation not exist')
         if (currentReservation.UserId !== userId) throw new Error('Permission Denied')
 
-        currentReservation.date = dayjs.tz(currentReservation.time).format('YYYY-MM-DD')  // '2023-07-28'
-        currentReservation.time = dayjs.tz(currentReservation.time).format('HH:mm')       // '16:30'
-        
         return res.render('reservation', {
           collections, purposes, date_limit,
           reservedDates: JSON.stringify(reservedDates), // for <script> {{{reservedDates}}}
@@ -150,17 +128,11 @@ const reservationController = {
       const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
       
       // check date is within 1 month
-      const tomorrow = dayjs.tz().add(1, 'day') // .format('YYYY-MM-DD')
-      const nextMonth = dayjs.tz().add(1, 'month') //.format('YYYY-MM-DD')
-      if (!time.isBetween(tomorrow, nextMonth)) throw new Error('Invalid date selected')
-
+      const date_limit = reservationService.getDateLimit()
+      if (!time.isBetween(date_limit.min, date_limit.max)) throw new Error('Invalid date selected')
+      
       // check if date duplicates
-      const date_limit = { min: tomorrow.format('YYYY-MM-DD'), max: nextMonth.format('YYYY-MM-DD') }
-      const reservations = await Reservation.findAll({
-        where: { time: { [Op.between]: [date_limit.min, date_limit.max] }},
-        attributes: ['id', 'time'],
-        raw: true
-      })
+      const reservations = await reservationService.getMonthReservations()
       if (reservations.some(res => res.time.valueOf() === time.valueOf())) throw new Error('Selected time has been reserved')
 
       // check collection validity
@@ -196,12 +168,10 @@ const reservationController = {
 
       // check date is within 1 month
       const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
-      const tomorrow = dayjs.tz().add(1, 'day')
-      const nextMonth = dayjs.tz().add(1, 'month')
-      if (!time.isBetween(tomorrow, nextMonth)) throw new Error('Invalid date selected')
+      const date_limit = reservationService.getDateLimit()
+      if (!time.isBetween(date_limit.min, date_limit.max)) throw new Error('Invalid date selected')
 
       // check if date duplicates
-      const date_limit = { min: tomorrow.format('YYYY-MM-DD'), max: nextMonth.format('YYYY-MM-DD') }
       const reservations = await Reservation.findAll({
         where: { 
           time: {[Op.between]: [date_limit.min, date_limit.max]},
