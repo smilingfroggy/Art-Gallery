@@ -44,6 +44,8 @@ router.put('/reservations/:reservationId', authenticated, reservationController.
 router.delete('/reservations/:reservationId', authenticated, reservationController.deleteReservation)  // cancel reservation
 
 router.get('/reservations/:reservationId/payment', authenticated, paymentController.getPayment)
+router.post('/newebpay/callback', paymentController.postPaymentResult)
+
 router.use('/user', user)
 router.use('/admin', admin)
 router.use('/auth', auth)

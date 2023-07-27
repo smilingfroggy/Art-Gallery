@@ -24,7 +24,9 @@ module.exports = (sequelize, DataTypes) => {
     time: DataTypes.DATE,
     work_count: DataTypes.INTEGER,
     purpose: DataTypes.STRING,
-    description: DataTypes.STRING
+    description: DataTypes.STRING,
+    status: DataTypes.BOOLEAN,
+    sn: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Reservation',

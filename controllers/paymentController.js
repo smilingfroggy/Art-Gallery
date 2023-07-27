@@ -1,6 +1,6 @@
 const crypto = require('node:crypto')
 const helpers = require('../helpers/auth-helpers')
-const reservationService = require('../services/reservationService')
+const { Reservation } = require('../models')
 
 const MerchantID = process.env.MERCHANT_ID
 const HashKey = process.env.HASH_KEY
@@ -16,9 +16,14 @@ const paymentController = {
       const userEmail = helpers.getUser(req)?.email
       const { reservationId } = req.params
 
-      const reservation = await reservationService.getReservation(userId, reservationId)
+      let reservation = await Reservation.findByPk(reservationId, {
+        attributes: ['id', 'UserId', 'time', 'visitor_num', 'purpose', 'contact_person', 'phone']
+      })
       if (!reservation) throw new Error('Reservation not exist')
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
+      const MerchantOrderNo = `ID${reservationId}_${Date.now()}`
+      await reservation.update({ sn: MerchantOrderNo })
+      reservation = reservation.toJSON()
 
       // tradeInfo
       let tradeData = {
@@ -26,7 +31,7 @@ const paymentController = {
         TimeStamp: Date.now(),
         Version: '2.0',
         RespondType: 'JSON',
-        MerchantOrderNo: `ID${reservationId}_${Date.now()}`,
+        MerchantOrderNo,  // sn
         Amt: 200,
         NotifyURL,
         ReturnURL,
@@ -43,6 +48,41 @@ const paymentController = {
       }
 
       return res.render('payment', { reservation, payment })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  postPaymentResult: async (req, res, next) => {
+    try {
+      // const type = req.query.from
+      const { Status, MerchantID: MerchantID_req, TradeInfo, TradeSha } = req.body
+      if (!Status || !TradeInfo || !TradeSha || MerchantID != MerchantID_req) throw new Error('資料不正確')
+      if (Status !== 'SUCCESS') throw new Error('交易失敗，請重新付款')
+
+      // decrypt
+      const decipher = crypto.createDecipheriv('aes-256-cbc', HashKey, HashIV)
+      let decryptTradeInfo = decipher.update(TradeInfo, 'hex', 'utf8')
+      decipher.setAutoPadding(false)
+      decryptTradeInfo += decipher.final('utf8')
+      // remove ASCII 0-31 & parse
+      decryptTradeInfo = decryptTradeInfo.replace(/[\x00-\x1F\x7F]/g, "")
+      decryptTradeInfo = JSON.parse(decryptTradeInfo)
+
+      const { MerchantOrderNo } = decryptTradeInfo.Result
+      // MPG no need to validate check code ?
+      const checkCode = getCheckCode(decryptTradeInfo)
+
+      // update DB reservation status
+      const reservationId = Number(MerchantOrderNo.split('_')[0].slice(2,))
+      const reservation = await Reservation.findOne({ where: {
+        id: reservationId,
+        sn: MerchantOrderNo
+      }})
+      await reservation.update({ status: true })
+
+      req.flash('success_messages', `付款完成，已為您保留時段`)
+      return res.redirect('/reservations')
     } catch (error) {
       console.log(error)
       next(error)
@@ -70,6 +110,13 @@ function shaEncrypt(dataAes) {
   hash.update(dataAes)
   let dataSha = hash.digest('hex').toUpperCase()
   return dataSha
+}
+
+function getCheckCode(tradeInfo) {
+  const { MerchantID, Amt, TradeNo, MerchantOrderNo } = tradeInfo.Result
+  let tradeObj = { Amt, MerchantID, MerchantOrderNo, TradeNo }
+  let tradeSha = shaEncrypt(getTradeInfo(tradeObj))
+  return tradeSha
 }
 
 module.exports = paymentController
