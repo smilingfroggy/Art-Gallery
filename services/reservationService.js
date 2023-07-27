@@ -1,15 +1,7 @@
 const db = require('../models')
 const { Reservation, Collection } = db
 const { Op } = require('sequelize')
-
-const dayjs = require('dayjs')
-const utc = require('dayjs/plugin/utc')
-const timezone = require('dayjs/plugin/timezone')
-const isBetween = require('dayjs/plugin/isBetween')
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(isBetween)
-dayjs.tz.setDefault('Asia/Taipei')
+const dateHelpers = require('../helpers/date-helpers')
 
 const reservationService = {
   getReservation: async (userId, reservationId) => {
@@ -20,15 +12,13 @@ const reservationService = {
       raw: true, nest: true
     })
 
-    reservation.date = dayjs.tz(reservation.time).format('YYYY-MM-DD')  // '2023-07-28'
-    reservation.time = dayjs.tz(reservation.time).format('HH:mm')       // '16:30'
-
+    reservation.date = dateHelpers.getDateString(reservation.time) // YYYY/MM/DD
+    reservation.time = dateHelpers.getTimeString(reservation.time) // HH:mm
     return reservation
   },
   getMonthReservations: async() => {
     try {
-      // date limit within 1 month:  { min: tomorrow, max: nextMonth }
-      const date_limit = getDateLimit()
+      const date_limit = dateHelpers.getDateLimit()
 
       // find available date & slot
       const reservedDates = await Reservation.findAll({
@@ -43,15 +33,7 @@ const reservationService = {
     } catch (error) {
       console.log(error)
     }
-  },
-  getDateLimit
-}
-
-function getDateLimit() {
-  const tomorrow = dayjs.tz().add(1, 'day').format('YYYY-MM-DD')
-  const nextMonth = dayjs.tz().add(1, 'month').format('YYYY-MM-DD')
-  const date_limit = { min: tomorrow, max: nextMonth }
-  return date_limit
+  }
 }
 
 module.exports = reservationService

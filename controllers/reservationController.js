@@ -4,15 +4,7 @@ const { Op } = require('sequelize')
 const helpers = require('../helpers/auth-helpers')
 const purposes = ['拍賣', '學術研究', '洽購', '其他']
 const reservationService = require('../services/reservationService')
-
-const dayjs = require('dayjs')
-const utc = require('dayjs/plugin/utc')
-const timezone = require('dayjs/plugin/timezone')
-const isBetween = require('dayjs/plugin/isBetween')
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(isBetween)
-dayjs.tz.setDefault('Asia/Taipei')
+const dateHelpers = require('../helpers/date-helpers')
 
 const reservationController = {
   getReservations: async (req, res, next) => {
@@ -27,9 +19,8 @@ const reservationController = {
       })
 
       reservations.forEach(reserve => {
-        let time = dayjs.tz(reserve.time)
-        reserve.date = time.format('YYYY/MM/DD')
-        reserve.timeSlot = time.format('HH:mm')
+        reserve.date = dateHelpers.getDateString(reserve.time) // YYYY/MM/DD
+        reserve.timeSlot = dateHelpers.getTimeString(reserve.time) // HH:mm
         reserve.description = reserve.description.length ? (reserve.description.slice(0, 20) + '...') : ""
       })
 
@@ -75,14 +66,13 @@ const reservationController = {
       })
 
       // date limit within 1 month
-      const date_limit = reservationService.getDateLimit()
+      const date_limit = dateHelpers.getDateLimit()
       
       // find available date & slot
       let reservedDates = await reservationService.getMonthReservations()
       reservedDates.forEach(reserve => {
-        let time = reserve.time
-        reserve.date = dayjs.tz(time).format('YYYY-MM-DD')
-        reserve.time = dayjs.tz(time).format('HH:mm')
+        reserve.date = dateHelpers.getDateString(reserve.time) // YYYY-MM-DD
+        reserve.time = dateHelpers.getTimeString(reserve.time) // HH:mm
       })
       
       if (reservationId) {    // edit reservation
@@ -125,13 +115,10 @@ const reservationController = {
       
       const collectionId = collection_select_count.split(',')[0]
       const work_count = collection_select_count.split(',')[1]
-      const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
-      
-      // check date is within 1 month
-      const date_limit = reservationService.getDateLimit()
-      if (!time.isBetween(date_limit.min, date_limit.max)) throw new Error('Invalid date selected')
-      
-      // check if date duplicates
+      const time = dateHelpers.getDateObj(`${date} ${date_time}`) // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
+
+      // check date is within 1 month or duplicated
+      if (!dateHelpers.checkWithinMonth(time)) throw new Error('Invalid date selected')
       const reservations = await reservationService.getMonthReservations()
       if (reservations.some(res => res.time.valueOf() === time.valueOf())) throw new Error('Selected time has been reserved')
 
@@ -166,12 +153,9 @@ const reservationController = {
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
       if (!visitor_num || !date || !date_time) throw new Error('Incomplete input')
 
-      // check date is within 1 month
-      const time = dayjs.tz(`${date} ${date_time}`)  // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
-      const date_limit = reservationService.getDateLimit()
-      if (!time.isBetween(date_limit.min, date_limit.max)) throw new Error('Invalid date selected')
-
-      // check if date duplicates
+      // check date is within 1 month or duplicated
+      const time = dateHelpers.getDateObj(`${date} ${date_time}`)
+      if (!dateHelpers.checkWithinMonth(time)) throw new Error('Invalid date selected')
       const reservations = await Reservation.findAll({
         where: { 
           time: {[Op.between]: [date_limit.min, date_limit.max]},
@@ -206,8 +190,8 @@ const reservationController = {
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
 
       // only delete reserves 1 week later
-      if (reservation.time < dayjs().add(1,'week')) throw new Error('Cancellation is forbidden')
-      const time = dayjs.tz(reservation.time).format('YYYY-MM-DD HH:mm')
+      if (dateHelpers.checkWithinWeek(reservation.time)) throw new Error('Cancellation is forbidden')
+      const time = dateHelpers.getDateTimeString()  // YYYY-MM-DD HH:mm
 
       await reservation.destroy()
       req.flash('success_messages', `Cancelled reservation on ${time}`)

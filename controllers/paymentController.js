@@ -1,6 +1,7 @@
 const crypto = require('node:crypto')
 const helpers = require('../helpers/auth-helpers')
 const { Reservation } = require('../models')
+const dateHelpers = require('../helpers/date-helpers')
 
 const MerchantID = process.env.MERCHANT_ID
 const HashKey = process.env.HASH_KEY
@@ -24,6 +25,7 @@ const paymentController = {
       const MerchantOrderNo = `ID${reservationId}_${Date.now()}`
       await reservation.update({ sn: MerchantOrderNo })
       reservation = reservation.toJSON()
+      reservation.time = dateHelpers.getDateTimeString(reservation.time)
 
       // tradeInfo
       let tradeData = {
@@ -69,11 +71,8 @@ const paymentController = {
       decryptTradeInfo = decryptTradeInfo.replace(/[\x00-\x1F\x7F]/g, "")
       decryptTradeInfo = JSON.parse(decryptTradeInfo)
 
-      const { MerchantOrderNo } = decryptTradeInfo.Result
-      // MPG no need to validate check code ?
-      const checkCode = getCheckCode(decryptTradeInfo)
-
       // update DB reservation status
+      const { MerchantOrderNo } = decryptTradeInfo.Result
       const reservationId = Number(MerchantOrderNo.split('_')[0].slice(2,))
       const reservation = await Reservation.findOne({ where: {
         id: reservationId,
@@ -110,13 +109,6 @@ function shaEncrypt(dataAes) {
   hash.update(dataAes)
   let dataSha = hash.digest('hex').toUpperCase()
   return dataSha
-}
-
-function getCheckCode(tradeInfo) {
-  const { MerchantID, Amt, TradeNo, MerchantOrderNo } = tradeInfo.Result
-  let tradeObj = { Amt, MerchantID, MerchantOrderNo, TradeNo }
-  let tradeSha = shaEncrypt(getTradeInfo(tradeObj))
-  return tradeSha
 }
 
 module.exports = paymentController
