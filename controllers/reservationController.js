@@ -13,15 +13,21 @@ const reservationController = {
 
       const reservations = await Reservation.findAll({
         where: { UserId: userId },
-        attributes: ['id', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
+        attributes: ['id', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count', 'status'],
         include: { model: Collection, attributes: ['id', 'name'] },
         raw: true, nest: true
       })
 
       reservations.forEach(reserve => {
-        reserve.date = dateHelpers.getDateString(reserve.time) // YYYY/MM/DD
+        reserve.date = dateHelpers.getDateString(reserve.time) // YYYY-MM-DD
         reserve.timeSlot = dateHelpers.getTimeString(reserve.time) // HH:mm
         reserve.description = reserve.description.length ? (reserve.description.slice(0, 20) + '...') : ""
+        if (!reserve.status) {
+          if (reserve.time < Date.now()) reserve.status = '逾期未付款'
+          else reserve.status = '待付款'
+        } else {
+          reserve.status = '預約完成'
+        }
       })
 
       return res.render('reservations', { reservations })
@@ -46,7 +52,7 @@ const reservationController = {
       }]
 
       return res.render('reservation', { 
-        reservation, reservedDates: '[]', purposes, collections, readOnly: true 
+        reservation, reservedDates: [], purposes, collections, readOnly: true
       })
     } catch (error) {
       console.log(error)
@@ -90,10 +96,6 @@ const reservationController = {
         })
       }
 
-      // return res.json({ 
-      //    statue: 'success', collections, purposes, date_limit,
-      //    reservedDates: JSON.stringify(reservedDates)
-      // })
       return res.render('reservation', { 
         collections, purposes, date_limit, 
         reservedDates: JSON.stringify(reservedDates) // for <script> {{{reservedDates}}}
@@ -136,7 +138,7 @@ const reservationController = {
       if (newReservation) {
         req.flash('success_messages', `Received reservation on ${date} ${date_time} `)
       }
-      res.redirect('./reservations')
+      res.redirect(`./reservations/${newReservation.id}`)
     } catch (error) {
       console.log(error)
       next(error)
@@ -153,9 +155,11 @@ const reservationController = {
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
       if (!visitor_num || !date || !date_time) throw new Error('Incomplete input')
 
-      // check date is within 1 month or duplicated
+      // check date is within 1 month, later than 1 week, or not duplicated
       const time = dateHelpers.getDateObj(`${date} ${date_time}`)
       if (!dateHelpers.checkWithinMonth(time)) throw new Error('Invalid date selected')
+      if (dateHelpers.checkWithinWeek(reservation.time)) throw new Error('Modification is not allowed')
+      const date_limit = dateHelpers.getDateLimit()
       const reservations = await Reservation.findAll({
         where: { 
           time: {[Op.between]: [date_limit.min, date_limit.max]},
@@ -191,7 +195,7 @@ const reservationController = {
 
       // only delete reserves 1 week later
       if (dateHelpers.checkWithinWeek(reservation.time)) throw new Error('Cancellation is forbidden')
-      const time = dateHelpers.getDateTimeString()  // YYYY-MM-DD HH:mm
+      const time = dateHelpers.getDateTimeString(reservation.time)  // YYYY-MM-DD HH:mm
 
       await reservation.destroy()
       req.flash('success_messages', `Cancelled reservation on ${time}`)

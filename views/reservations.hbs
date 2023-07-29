@@ -36,17 +36,22 @@
           </td>
           <td>{{this.visitor_num}}</td>
           <td>{{this.purpose}}</td>
-          <td>{{this.description}}</td>
-          <td> Status </td>
+          <td class="text-muted">{{this.description}}</td>
+          <td class="text-muted">{{this.status}}</td>
 
           <td>
             <div class="btn-group" role="group">
+              <a href="/reservations/{{this.id}}">
+                <button class="btn btn-outline-success btn-sm">
+                  查看
+                </button>
+              </a>
+              {{#ifWeekLater this.date}}
               <a href="/reservations/{{this.id}}/edit">
                 <button class="btn btn-outline-primary btn-sm">
                   修改時間
                 </button>
               </a>
-              {{#ifWeekLater this.date}}
               <form action="/reservations/{{this.id}}?_method=DELETE" method="post">
                 <button type="submit" class="btn btn-outline-danger btn-sm">取消</button>
               </form>
@@ -54,6 +59,10 @@
             </div>
           </td>
 
+        </tr>
+        {{else}}
+        <tr>
+          <td colspan="9" style="text-align: center; line-height: 8rem">尚無任何預約</td>
         </tr>
         {{/each}}
       </tbody>

@@ -18,10 +18,13 @@ const paymentController = {
       const { reservationId } = req.params
 
       let reservation = await Reservation.findByPk(reservationId, {
-        attributes: ['id', 'UserId', 'time', 'visitor_num', 'purpose', 'contact_person', 'phone']
+        attributes: ['id', 'UserId', 'time', 'visitor_num', 'purpose', 'contact_person', 'phone', 'status']
       })
       if (!reservation) throw new Error('Reservation not exist')
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
+      if (reservation.status) throw new Error('Paid already!')
+      if (reservation.time < Date.now()) throw new Error('Reservation is overdue')
+      
       const MerchantOrderNo = `ID${reservationId}_${Date.now()}`
       await reservation.update({ sn: MerchantOrderNo })
       reservation = reservation.toJSON()

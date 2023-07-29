@@ -17,7 +17,7 @@ function getDateLimit() {
 module.exports = {
   getDateString: (date) => {   // JS Date object
     let time = dayjs.tz(date)
-    return time.format('YYYY/MM/DD')
+    return time.format('YYYY-MM-DD')
   },
   getTimeString: (date) => {
     let time = dayjs.tz(date)

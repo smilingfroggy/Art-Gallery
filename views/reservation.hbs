@@ -9,7 +9,7 @@
       {{else}}
       <form class="needs-validation mb-5" id="reservation_form" action="/reservations" method="post" novalidate>
       {{/if}}
-        <fieldset {{#if readOnly}}disabled{{/if}}>
+        <fieldset {{#ifNotExpired reservation.date}}{{#if readOnly}}disabled{{/if}}{{else}}disabled{{/ifNotExpired}}>
           <div class="mb-3 row">
             <label for="name" class="col-sm-2 col-form-label" align="center">聯絡人姓名
               <span class="requiredInput">*</span>
@@ -138,20 +138,29 @@
       </form>
 
       <div class="row justify-content-center mx-auto">
-        {{#unless readOnly}}
+        {{#unless readOnly}}{{#ifNotExpired reservation.date}}
         <button class="btn btn-success col-sm-6" type="submit" form="reservation_form">Submit</button>
-        {{/unless}}
+        {{/ifNotExpired}}{{/unless}}
 
         {{#if readOnly}}
-        <a href="/reservations/{{reservation.id}}/payment" class="col-sm-6">
-          <button class="btn btn-warning col-12"  type="button">下一步：付款</button>
-        </a>
+          {{#unless reservation.status}}
+            {{#ifNotExpired reservation.date}}
+            <a href="/reservations/{{reservation.id}}/payment" class="col-sm-6">
+              <button class="btn btn-warning col-12"  type="button">下一步：付款</button>
+            </a>
+            {{else}}
+              <div class="alert alert-dark col-sm-8" align="center" role="alert">
+                逾期未付款
+              </div>
+            {{/ifNotExpired}}
+          {{/unless}}
+          {{#if reservation.status}}
+            <div class="alert alert-success col-sm-8" align="center" role="alert">
+              已為您保留時段
+            </div>
+          {{/if}}
         {{/if}}
 
-        {{!-- TODO: --}}
-        {{#ifEqual status 'paid'}}
-        <h4>已為您保留時段！</h4>
-        {{/ifEqual}}
       </div>
     </div>
   </div>

@@ -36,5 +36,10 @@ module.exports = {
       return options.fn(this)
     }
     return options.inverse(this)
+  },
+  ifNotExpired: function(date, options) {
+    date = new Date(date)
+    if (date < Date.now()) return options.inverse(this)
+    return options.fn(this)
   }
 }

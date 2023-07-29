@@ -7,12 +7,13 @@ const reservationService = {
   getReservation: async (userId, reservationId) => {
     const reservation = await Reservation.findByPk(reservationId, {
       where: { UserId: userId },
-      attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count'],
+      attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count', 'status'],
       include: { model: Collection, attributes: ['id', 'name'] },
       raw: true, nest: true
     })
 
-    reservation.date = dateHelpers.getDateString(reservation.time) // YYYY/MM/DD
+    if (!reservation) throw new Error('Reservation does not exist')
+    reservation.date = dateHelpers.getDateString(reservation.time) // YYYY-MM-DD
     reservation.time = dateHelpers.getTimeString(reservation.time) // HH:mm
     return reservation
   },
