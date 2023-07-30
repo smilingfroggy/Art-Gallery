@@ -39,7 +39,6 @@ module.exports = {
       },
       time: {
         allowNull: false,
-        unique: true,
         type: Sequelize.DATE
       },
       work_count: {
