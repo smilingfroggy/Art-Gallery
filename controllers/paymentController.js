@@ -24,7 +24,7 @@ const paymentController = {
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
       if (reservation.status) throw new Error('Paid already!')
       if (reservation.time < Date.now()) throw new Error('Reservation is overdue')
-      
+
       const MerchantOrderNo = `ID${reservationId}_${Date.now()}`
       await reservation.update({ sn: MerchantOrderNo })
       reservation = reservation.toJSON()
@@ -41,7 +41,8 @@ const paymentController = {
         NotifyURL,
         ReturnURL,
         Email: userEmail,
-        ItemDesc: 'Reservation'
+        ItemDesc: 'Reservation',
+        OrderComment: '請注意：此為測試平台，請使用測試信用卡卡號：4000-2211-1111-1111'
       }
       let tradeStr = getTradeInfo(tradeData)
       let aesTradeInfo = aesEncrypt(tradeStr)
