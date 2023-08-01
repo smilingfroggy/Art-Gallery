@@ -51,6 +51,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   const user_rawData = await User.findByPk(id, {
+    attributes: ['id', 'email', 'isAdmin'],
     include: {
       model: Collection, attributes: ['id', 'name'],
       include: { model: Artwork, as: 'JoinedArtworks', attributes: ['id'], through: { attributes: [] } }
