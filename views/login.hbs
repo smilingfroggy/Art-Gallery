@@ -6,13 +6,15 @@
     <form action="/user/login" method="POST" style="width: 540px">
       <div class="form-row mb-3">
         <label class="form-label" for="email">Email</label>
-        <input class="form-control" id="email" type="text" name="email" class="form-control" placeholder="Email"
+        <input class="form-control" id="email" type="email" name="email" class="form-control" placeholder="Email"
           required autofocus>
       </div>
       <div class="form-row mb-3">
         <label class="form-label" for="password">Password</label>
         <input class="form-control" id="password" type="password" name="password" class="form-control"
           placeholder="Password" required>
+      <p class="fw-light"><em><small> Forgot password? <a href="/user/forgot-password">Reset password</a> </small></em></p>
+
       </div>
       <div class="d-grid mb-3">
         <button class="btn btn-primary" type="submit">Submit</button>

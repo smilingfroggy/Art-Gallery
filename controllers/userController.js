@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const { User, Collection } = db
+const { User } = db
 const helpers = require('../helpers/auth-helpers')
 const userService = require('../services/userService')
 
@@ -53,6 +53,46 @@ const userController = {
 
       req.flash('success_messages', 'Updated Successfully')
       return res.redirect('back')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  },
+  forgotPassword: async (req, res, next) => {
+    try {
+      const { email } = req.body
+      if (!email) throw new Error('Please provide complete messages')
+
+      const user = await User.findOne({ where: { email }})
+      if (!user) throw new Error('No user with this email')
+      
+      // generate OTP
+      const random = Math.random().toString(36).slice(-8)
+      const expiredAt = Date.now() + 1000 * 60 * 10 // 10 mins
+      await user.update({ otp: random, expiredAt: expiredAt })
+      
+      // send email
+      const nodemailer = require('nodemailer')
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS
+        }
+      })
+      await transporter.verify()
+
+      const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: user.email,
+        subject: 'Art-Gallery Reset Password',
+        html: `<h3>Your OTP is: </h3> <strong> ${random} </strong> <br><br> <h3>Expired in ten minutes.</h3>`
+      }
+      await transporter.sendMail(mailOptions)
+      console.log('Email sent')
+
+      req.flash('success_messages', 'Email was sent successfully. Please check your email')
+      return res.redirect('/user/reset-password')
     } catch (error) {
       console.log(error)
       next(error)
