@@ -97,6 +97,29 @@ const userController = {
       console.log(error)
       next(error)
     }
+  },
+  resetPassword: async (req, res, next) => {
+    try {
+      const { email, otp, password, passwordCheck } = req.body
+      if (!email || !otp || !password || !passwordCheck) throw new Error('Please provide complete messages')
+      if (password !== passwordCheck) throw new Error('Passwords do not match')
+
+      // verify email & OTP
+      let user = await User.findOne({ where: { email }})
+      if (!user) throw new Error('No user with this email')
+      if (otp !== user.otp) throw new Error('OTP is incorrect')
+      if (Date.now() > user.expiredAt) {
+        req.flash('error_messages', 'OTP is expired')
+        return res.redirect('/user/forgot-password')
+      }
+
+      await user.update({ password: bcrypt.hashSync(password, 10) })
+      req.flash('success_messages', 'Password reset successfully')
+      return res.redirect('/user/login')
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
   }
 }
 

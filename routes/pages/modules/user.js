@@ -14,6 +14,8 @@ router.get('/profile', authenticated, userController.getProfile)
 router.put('/profile', authenticated, userController.putProfile)
 router.get('/forgot-password', (req, res) => res.render('forgot_password'))
 router.post('/forgot-password', userController.forgotPassword)
+router.get('/reset-password', (req, res) => res.render('reset_password'))
+router.post('/reset-password', userController.resetPassword)
 router.use('/', generalErrorHandler)
 
 
