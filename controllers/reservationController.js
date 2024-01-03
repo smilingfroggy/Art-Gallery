@@ -98,7 +98,8 @@ const reservationController = {
 
       return res.render('reservation', { 
         collections, purposes, date_limit, 
-        reservedDates: JSON.stringify(reservedDates) // for <script> {{{reservedDates}}}
+        reservedDates: JSON.stringify(reservedDates), // for <script> {{{reservedDates}}}
+        RECAPTCHA_SITEKEY: process.env.RECAPTCHA_SITEKEY
       })
     } catch (error) {
       console.log(error)

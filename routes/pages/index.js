@@ -11,6 +11,7 @@ const reservationController = require('../../controllers/reservationController')
 const paymentController = require('../../controllers/paymentController')
 const { authenticated } = require('../../middleware/auth')
 const { generalErrorHandler } = require('../../middleware/error-handler')
+const verifyCaptcha = require('../../middleware/recaptcha')
 
 /* GET home page. */
 router.get('/', exhibitionController.getExhibitions)
@@ -37,7 +38,7 @@ router.put('/collections/artworks/:artworkId', authenticated, collectionControll
 
 router.get('/reservations', authenticated, reservationController.getReservations)
 router.get('/reservations/create', authenticated, reservationController.createReservation)
-router.post('/reservations', authenticated, reservationController.postReservation)
+router.post('/reservations', authenticated, verifyCaptcha, reservationController.postReservation)
 router.get('/reservations/:reservationId/edit', authenticated, reservationController.createReservation)
 router.get('/reservations/:reservationId', reservationController.getReservation)
 router.put('/reservations/:reservationId', authenticated, reservationController.editReservation)

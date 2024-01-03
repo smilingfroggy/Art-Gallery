@@ -11,6 +11,7 @@ async function verifyCaptcha(req, res, next) {
       console.log('reCAPTCHA verification failed', response.data['error-codes'])
       throw new Error('reCAPTCHA verification failed')
     }
+    console.log('reCAPTCHA verification succeeded')
     next()
   } catch (error) {
     console.log(error)

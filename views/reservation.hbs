@@ -134,6 +134,14 @@
                 rows="5" placeholder="如有其他需求請在此註明">{{reservation.description}}</textarea>
             </div>
           </div>
+
+          {{!-- reCAPTCHA --}}
+          <div class="mb-3 row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-10">
+              <div class="g-recaptcha" data-sitekey="{{RECAPTCHA_SITEKEY}}"></div>
+            </div>
+          </div>
         </fieldset>
       </form>
 
