@@ -63,17 +63,6 @@ const userController = {
       const { email } = req.body
       if (!email) throw new Error('Please provide complete messages')
       
-      // verify reCAPTCHA
-      const axios = require('axios')
-      const secret = process.env.RECAPTCHA_SECRET
-      const reCAPTCHA_response = req.body['g-recaptcha-response']
-      const reCAPTCHA_Verify_URL = 'https://www.google.com/recaptcha/api/siteverify'
-      const response = await axios.post(`${reCAPTCHA_Verify_URL}?secret=${secret}&response=${reCAPTCHA_response}`)
-      if (!response.data.success) {
-        console.log('reCAPTCHA verification failed', response.data['error-codes'])
-        throw new Error('reCAPTCHA verification failed')
-      }
-      
       const user = await User.findOne({ where: { email }})
       if (!user) throw new Error('No user with this email')
       
