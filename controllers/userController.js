@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User } = db
 const helpers = require('../helpers/auth-helpers')
+const emailService = require('../services/emailService')
 const userService = require('../services/userService')
 
 const userController = {
@@ -72,23 +73,8 @@ const userController = {
       await user.update({ otp: random, expiredAt: expiredAt })
       
       // send email
-      const nodemailer = require('nodemailer')
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.GMAIL_USER,
-          pass: process.env.GMAIL_PASS
-        }
-      })
-      await transporter.verify()
-
-      const mailOptions = {
-        from: process.env.GMAIL_USER,
-        to: user.email,
-        subject: 'Art-Gallery Reset Password',
-        html: `<h3>Your OTP is: </h3> <strong> ${random} </strong> <br><br> <h3>Expired in ten minutes.</h3>`
-      }
-      await transporter.sendMail(mailOptions)
+      let mailContent = `<h3>Your OTP is: </h3> <strong> ${random} </strong> <br><br> <h3>Expired in ten minutes.</h3>`
+      await emailService.sendEmail(email, 'Art-Gallery Reset Password', mailContent)
       console.log('Email sent')
 
       req.flash('success_messages', 'Email was sent successfully. Please check your email')

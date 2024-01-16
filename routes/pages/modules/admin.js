@@ -3,6 +3,7 @@ const router = express.Router()
 const adminExhController = require('../../../controllers/adminExhController')
 const adminArtworkController = require('../../../controllers/adminArtworkController')
 const adminArtistController = require('../../../controllers/adminArtistController')
+const emailController = require('../../../controllers/emailController')
 const { authenticatedAdmin } = require('../../../middleware/auth')
 const upload = require('../../../middleware/multer')
 const { adminErrorHandler } = require('../../../middleware/error-handler')
@@ -40,6 +41,9 @@ router.post('/artists', authenticatedAdmin, upload.array('image', 10), adminArti
 router.put('/artists/:artistId', authenticatedAdmin, upload.array('image', 10), adminArtistController.putArtist)
 router.delete('/artists/:artistId', authenticatedAdmin, adminArtistController.deleteArtist)
 router.delete('/artists/:artistId/images', authenticatedAdmin, adminArtistController.deleteArtistImages)
+
+// test email
+router.post('/testemail', authenticatedAdmin, emailController.testEmail)
 
 router.use('/', adminErrorHandler)
 
