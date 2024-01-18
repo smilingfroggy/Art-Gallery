@@ -9,6 +9,7 @@ async function sendEmail (to, subject, html) {
       pass: process.env.GMAIL_PASS
     }
   })
+  // tests connection and authentication
   await transporter.verify()
 
   return transporter.sendMail({

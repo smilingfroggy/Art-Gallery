@@ -1,4 +1,5 @@
 const emailService = require('../services/emailService')
+const mailChecker = require('mailchecker')
 
 const emailController = {
   testEmail: async (req, res, next) => {
@@ -8,6 +9,7 @@ const emailController = {
       console.log('Sending test mail to ', email)
       if (!email || !subject) throw new Error('Please provide complete messages')
       if (subject.length > 30) throw new Error('Subject is too long')
+      if (!mailChecker.isValid(email)) throw new Error('Invalid email address')
 
       const message_body = `TLS <br>TextResult <br>Headers`
       await emailService.sendEmail(email, subject, message_body)
