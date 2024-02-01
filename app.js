@@ -13,7 +13,7 @@ const passport = require('./config/passport')
 const authHelpers = require('./helpers/auth-helpers')
 const logger = require('morgan');
 const { engine } = require('express-handlebars')
-const hbsHelpers = require('./config/handlebars-helpers')
+const hbsHelpers = require('./helpers/handlebars-helpers')
 const pages = require('./routes/pages/index');
 const apis = require('./routes/apis');
 
