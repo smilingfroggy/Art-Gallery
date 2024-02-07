@@ -1,0 +1,66 @@
+<div class="container-fluid mt-3">
+  <div class="d-flex mb-3 justify-content-end">
+    <a href="/admin/reservations/pasts"><button class="btn btn-success">Pasts</button></a>
+  </div>
+
+  {{!-- table of reservations --}}
+  <div class="table-responsive">
+    <table class="table table-striped table-hover ">
+      <thead>
+        <tr>
+          {{!-- <th scope="col">#</th> --}}
+          <th scope="col" style="min-width: 70px;">預約日期</th>
+          <th scope="col" style="min-width: 70px;">時間</th>
+          <th scope="col">預約帳號</th>
+          <th scope="col">聯絡人</th>
+          <th scope="col">聯絡方式</th>
+          <th scope="col">作品清單&件數</th>
+          <th scope="col">人數</th>
+          <th scope="col">目的</th>
+          <th scope="col">備註</th>
+          <th scope="col">狀態</th>
+          <th scope="col">SN</th>
+          <th scope="col"></th> <!--操作-->
+        </tr>
+      </thead>
+      <tbody>
+        {{#each reservations}}
+        <tr>
+          {{!-- <th scope="row">{{this.id}}</th> --}}
+          <td>{{this.date}}</td>
+          <td>{{this.timeSlot}}</td>
+          <td>{{this.User.name}}</td>   <!-- ADD -->
+          <td>{{this.contact_person}}</td>
+          <td>{{this.phone}}</td>
+          <td>{{this.Collection.name}} ({{this.work_count}}件)
+            <a class="ms-2" href="/collections/{{this.Collection.id}}">
+              <span style="font-size: small;"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+            </a>
+          </td>
+          <td>{{this.visitor_num}}</td>
+          <td>{{this.purpose}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.status}}</td>
+          <td>{{this.sn}}</td>
+
+          <td>
+            <div class="btn-group" role="group">
+              <a href="/admin/reservations/{{this.id}}">
+                <button class="btn btn-outline-success btn-sm">
+                  查看
+                </button>
+              </a>
+            </div>
+          </td>
+
+        </tr>
+        {{else}}
+        <tr>
+          <td colspan="9" style="text-align: center; line-height: 8rem">尚無任何預約</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+</div>

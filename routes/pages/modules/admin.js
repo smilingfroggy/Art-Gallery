@@ -4,6 +4,7 @@ const adminExhController = require('../../../controllers/adminExhController')
 const adminArtworkController = require('../../../controllers/adminArtworkController')
 const adminArtistController = require('../../../controllers/adminArtistController')
 const emailController = require('../../../controllers/emailController')
+const adminReserveController = require('../../../controllers/adminReserveController')
 const { authenticatedAdmin } = require('../../../middleware/auth')
 const upload = require('../../../middleware/multer')
 const { adminErrorHandler } = require('../../../middleware/error-handler')
@@ -42,8 +43,9 @@ router.put('/artists/:artistId', authenticatedAdmin, upload.array('image', 10), 
 router.delete('/artists/:artistId', authenticatedAdmin, adminArtistController.deleteArtist)
 router.delete('/artists/:artistId/images', authenticatedAdmin, adminArtistController.deleteArtistImages)
 
+router.get('/reservations', authenticatedAdmin, adminReserveController.getUpcomingReservations)
 // test email
-router.post('/testemail', authenticatedAdmin, emailController.testEmail)
+// router.post('/testemail', authenticatedAdmin, emailController.testEmail)
 
 router.use('/', adminErrorHandler)
 
