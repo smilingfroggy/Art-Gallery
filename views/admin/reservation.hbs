@@ -1,0 +1,81 @@
+<div class="container-fluid mt-5">
+  <div class="card mb-5">
+    <div class="card-header d-flex justify-content-center">
+      <h5 class="mt-2">申請內容</h5>
+    </div>
+    <div class="card-body row d-flex justify-content-between">
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">聯絡人姓名</div>
+        <div class="col-sm-9">{{reservation.contact_person}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">手機</div>
+        <div class="col-sm-9">{{reservation.phone}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">來訪人數</div>
+        <div class="col-sm-9">{{reservation.visitor_num}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">預約日期</div>
+        <div class="col-sm-9">{{reservation.date}} {{reservation.timeSlot}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">預約目的</div>
+        <div class="col-sm-9">{{reservation.purpose}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">備註</div>
+        <div class="col-sm-9"> {{reservation.description}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">狀態</div>
+        <div class="col-sm-9">{{reservation.status}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-center">
+      <h5 class="my-2">預約清單</h5>
+    </div>
+    <div class="card-body">
+      <h5 class="m-3" align="center">
+        {{reservation.Collection.name}} ({{reservation.work_count}}件)
+      </h5>
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">品號</th>
+            <th scope="col">藝術家</th>
+            <th scope="col">品名</th>
+            <th scope="col">創作時間</th>
+            <th scope="col">媒材</th>
+            <th scope="col">尺寸</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each reservation.Collection.JoinedArtworks}}
+          <tr>
+            <th scope="row">{{@index}}</th>
+            <td>{{this.serialNumber}}</td>
+            <td>{{this.artistName}}</td>
+            <td>{{this.name}}</td>
+            <td>{{this.creationTime}}</td>
+            <td>{{this.Medium.name}}</td>
+            <td>{{this.size}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
