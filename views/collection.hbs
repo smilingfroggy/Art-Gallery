@@ -178,25 +178,33 @@
       const collection_name = document.querySelector('.banner-title').innerText
       const work_count = document.getElementById('workCount').innerText
 
-      Swal.fire({
-        title: 'Are you sure?',
-        text: `確定要刪除 ${collection_name}，${work_count}？`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: '刪除！'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire(
-            '已刪除!',
-            `${collection_name}，${work_count}件作品`,
-            'success'
-          ).then(result => {
-            delete_collection_form.submit()
-          })
-        }
-      })
+      if ({{collection.hasReservation}}) {
+        Swal.fire({
+          title: "Unable to delete",
+          text: "This collection has been reserved. It's not allowed to delete.",
+          icon: "warning"
+        })
+      } else {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: `確定要刪除 ${collection_name}，${work_count}？`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: '刪除！'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire(
+              '已刪除!',
+              `${collection_name}，${work_count}件作品`,
+              'success'
+            ).then(result => {
+              delete_collection_form.submit()
+            })
+          }
+        })
+      }
     })
   }
 

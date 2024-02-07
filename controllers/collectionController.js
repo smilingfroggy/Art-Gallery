@@ -1,5 +1,5 @@
 const db = require('../models');
-const { Artwork, ArtworkImage, Collection, CollectionArtwork, Medium, User } = db
+const { Artwork, ArtworkImage, Collection, CollectionArtwork, Medium, User, Reservation } = db
 const helpers = require('../helpers/auth-helpers')
 const { Op, Sequelize } = require('sequelize')
 const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
@@ -107,7 +107,8 @@ const collectionController = {
               { model: ArtworkImage, attributes: ['id', 'url', 'type'] },
               { model: Medium, attributes: ['name'] }
             ]
-          }
+          },
+          { model: Reservation, attributes: ['id'], limit: 1 }
         ]
       })
       if (!collection_rawData) {
@@ -126,6 +127,7 @@ const collectionController = {
       })
       collection.workCount = collection.JoinedArtworks.length
       collection.editable = ownership && notFavorite
+      collection.hasReservation = !!collection.Reservations.length
 
       return res.render('collection', { collection })
     } catch (error) {
@@ -183,11 +185,14 @@ const collectionController = {
       const collection_rawData = await Collection.findByPk(collectionId, {
         include: [
           { model: User, attributes: ['id'] },
-          { model: Artwork, as: 'JoinedArtworks', through: { attributes: [] }, attributes: ['id'] }
+          { model: Artwork, as: 'JoinedArtworks', through: { attributes: [] }, attributes: ['id'] },
+          { model: Reservation, attributes: ['id'] }
         ]
       })
       if (!collection_rawData) throw new Error('Please provide valid collection Id')
       if (collection_rawData.User.id !== userId) throw new Error('Permission denied')
+      if (collection_rawData.name === 'Favorite') throw new Error('Favorite cannot be deleted')
+      if (collection_rawData.Reservations.length) throw new Error('Collection cannot be deleted if it has reservation')
 
       const collection = JSON.parse(JSON.stringify(collection_rawData))
       const workCount = collection.JoinedArtworks.length
