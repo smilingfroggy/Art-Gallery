@@ -75,7 +75,7 @@
         <tbody>
           {{#each reservation.Collection.JoinedArtworks}}
           <tr>
-            <th scope="row">{{@index}}</th>
+            <th scope="row">{{increment @index}}</th>
             <td>{{this.serialNumber}}</td>
             <td>{{this.artistName}}</td>
             <td>{{this.name}}</td>

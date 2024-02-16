@@ -41,5 +41,8 @@ module.exports = {
     date = new Date(date)
     if (date < Date.now()) return options.inverse(this)
     return options.fn(this)
+  },
+  increment: function(value, options) {
+    return parseInt(value) + 1
   }
 }

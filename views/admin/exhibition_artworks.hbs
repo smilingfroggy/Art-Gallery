@@ -36,7 +36,7 @@
       <tbody>
         {{#each exhibition.ContainedArtworks}}
         <tr>
-          <th scope="row">{{@index}}</th>
+          <th scope="row">{{increment @index}}</th>
           <td>
             <img src="{{this.ArtworkImages.[0].[url]}}" alt="{{this.name}}"
               style="width: 100px; max-height: 150px; object-fit: cover">
