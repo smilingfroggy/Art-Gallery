@@ -1,13 +1,16 @@
 const db = require('../models')
 const { Reservation, Collection } = db
 const { Op } = require('sequelize')
+const sequelize = require('sequelize')
 const dateHelpers = require('../helpers/date-helpers')
 
 const reservationService = {
   getReservation: async (userId, reservationId) => {
     const reservation = await Reservation.findByPk(reservationId, {
       where: { UserId: userId },
-      attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count', 'status'],
+      attributes: ['id', 'UserId', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'status',
+        [sequelize.literal(`(SELECT COUNT(*) FROM collectionArtworks AS ca WHERE ca.CollectionId = collection.id)`), 'work_count']
+      ],
       include: { model: Collection, attributes: ['id', 'name'] },
       raw: true, nest: true
     })

@@ -1,6 +1,7 @@
 const db = require('../models')
 const { Reservation, Collection } = db
-const { Op } = require('sequelize')  
+const { Op } = require('sequelize')
+const sequelize = require('sequelize')
 const helpers = require('../helpers/auth-helpers')
 const purposes = ['拍賣', '學術研究', '洽購', '其他']
 const reservationService = require('../services/reservationService')
@@ -11,13 +12,20 @@ const reservationController = {
     try {
       const userId = helpers.getUser(req)?.id || null
 
-      const reservations = await Reservation.findAll({
+      let reservations = await Reservation.findAll({
         where: { UserId: userId },
-        attributes: ['id', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'work_count', 'status'],
-        include: { model: Collection, attributes: ['id', 'name'] },
-        raw: true, nest: true
+        attributes: ['id', 'contact_person', 'phone', 'time', 'visitor_num', 'purpose', 'description', 'status'],
+        include: { 
+          model: Collection, 
+          attributes: ['id', 'name', 
+            // count artworks in each collection
+            [sequelize.literal(`(SELECT COUNT(*) FROM collectionArtworks AS ca WHERE ca.CollectionId = collection.id)`), 'work_count']
+          ]
+        },
+        nest: true
       })
-
+      
+      reservations = JSON.parse(JSON.stringify(reservations))
       reservations.forEach(reserve => {
         reserve.date = dateHelpers.getDateString(reserve.time) // YYYY-MM-DD
         reserve.timeSlot = dateHelpers.getTimeString(reserve.time) // HH:mm
@@ -117,7 +125,6 @@ const reservationController = {
       if (contact_person.length > 20 || phone.length > 10 || visitor_num > 8) throw new Error('Invalid input')
       
       const collectionId = collection_select_count.split(',')[0]
-      const work_count = collection_select_count.split(',')[1]
       const time = dateHelpers.getDateObj(`${date} ${date_time}`) // '2023-07-07 13:30' -> 2023-07-16T16:30:00+08:00Z
 
       // check date is within 1 month or duplicated
@@ -133,7 +140,6 @@ const reservationController = {
         UserId: userId,
         CollectionId: Number(collectionId),
         visitor_num: Number(visitor_num),
-        work_count: Number(work_count), 
         contact_person, phone, purpose, description, time
       })
       if (newReservation) {

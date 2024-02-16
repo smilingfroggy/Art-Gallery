@@ -22,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     visitor_num: DataTypes.INTEGER,
     time: DataTypes.DATE,
-    work_count: DataTypes.INTEGER,
     purpose: DataTypes.STRING,
     description: DataTypes.STRING,
     status: DataTypes.BOOLEAN,

@@ -108,7 +108,7 @@ const collectionController = {
               { model: Medium, attributes: ['name'] }
             ]
           },
-          { model: Reservation, attributes: ['id'], limit: 1 }
+          { model: Reservation, attributes: ['id'], limit: 1 }  // to check if collection has reservation
         ]
       })
       if (!collection_rawData) {
