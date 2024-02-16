@@ -1,7 +1,6 @@
 const dateHelpers = require('../helpers/date-helpers')
 const { Reservation, Artwork, User, Collection, Medium } = require('../models')
-const { Op } = require('sequelize')
-const sequelize = require('sequelize')
+const { Op, Sequelize } = require('sequelize')
 
 const adminReserveController = {
   getUpcomingReservations: async (req, res, next) => {
@@ -11,9 +10,10 @@ const adminReserveController = {
         attributes: ['id', 'contact_person', 'phone', 'visitor_num', 'time', 'purpose', 'description', 'status', 'sn'],
         include: [
           { model: User, attributes: ['name', 'email'] },
-          { model: Collection, attributes: ['id', 'name', 
-            [sequelize.literal(`(SELECT COUNT(*) FROM collectionArtworks AS ca WHERE ca.CollectionId = collection.id)`), 'work_count']
-          ]}
+          {
+            model: Collection, attributes: ['id', 'name', 'privacy',
+            [Sequelize.literal(`(SELECT COUNT(*) FROM collectionArtworks AS ca WHERE ca.CollectionId = collection.id)`), 'work_count']]
+          }
         ],
         where: { time: { [Op.gt]: Date.now() } },
         order: [['time', 'ASC']],
@@ -29,10 +29,10 @@ const adminReserveController = {
         } else {
           reservation.status = '預約完成'
         }
-
+        reservation.description = reservation.description.length ? reservation.description.slice(0, 10) + '...' : ''
       })
 
-      return res.render('admin/reservations', {reservations})
+      return res.render('admin/reservations', { reservations })
     } catch (error) {
       console.log(error)
       next(error)
@@ -45,10 +45,10 @@ const adminReserveController = {
 
       // get reservation and associated collection, artworks, and user
       let reservation = await Reservation.findByPk(reservationId, {
-        attributes: ['id', 'contact_person', 'phone', 'visitor_num', 'time', 'purpose', 'description', 'status', 'sn'],
+        attributes: ['id', 'contact_person', 'phone', 'visitor_num', 'time', 'purpose', 'description', 'status', 'sn', 'createdAt'],
         include: [{ model: User, attributes: ['name', 'email'] },
         {
-          model: Collection, attributes: ['id', 'name'], include:
+          model: Collection, attributes: ['id', 'name', 'description'], include:
           {
             model: Artwork,
             as: 'JoinedArtworks',
@@ -72,6 +72,7 @@ const adminReserveController = {
         reservation.status = '預約完成'
       }
       reservation.work_count = reservation.Collection.JoinedArtworks.length
+      reservation.createdAt = dateHelpers.getDateString(reservation.createdAt)
 
       reservation.Collection.JoinedArtworks.forEach(work => {
         work.creationTime = work.creationTime ? new Date(work.creationTime).getFullYear() : ""
@@ -84,6 +85,41 @@ const adminReserveController = {
       next(error)
     }
   },
+  getPastReservations: async (req, res, next) => {
+    try {
+      // get all past reservations, order by time DESC
+      const reservations = await Reservation.findAll({
+        attributes: ['id', 'contact_person', 'phone', 'visitor_num', 'time', 'purpose', 'description', 'status', 'sn'],
+        include: [
+          { association: 'User', attributes: ['name', 'email'] },
+          { association: 'Collection', attributes: ['id', 'name', 'privacy',
+            [Sequelize.literal(`(SELECT COUNT(*) FROM collectionArtworks AS ca WHERE ca.CollectionId = collection.id)`), 'work_count']] 
+          }
+        ],
+        where: { time: { [Op.lt]: Date.now() } },
+        order: [['time', 'DESC']],
+        raw: true,
+        nest: true
+      })
+
+      // organize reservation's date, time, status
+      reservations.forEach(reservation => {
+        reservation.date = dateHelpers.getDateString(reservation.time) // YYYY-MM-DD
+        reservation.timeSlot = dateHelpers.getTimeString(reservation.time) // HH:mm
+        if (!reservation.status) {
+          reservation.status = '逾期未付款'
+        } else {
+          reservation.status = '預約完成'
+        }
+        reservation.description = reservation.description.length ? reservation.description.slice(0, 10) + '...' : ''
+      })
+
+      return res.render('admin/reservations', { reservations })
+    } catch (error) {
+      console.log(error)
+      next(error)
+    }
+  }
 }
 
 

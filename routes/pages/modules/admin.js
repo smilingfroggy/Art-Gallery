@@ -44,6 +44,7 @@ router.delete('/artists/:artistId', authenticatedAdmin, adminArtistController.de
 router.delete('/artists/:artistId/images', authenticatedAdmin, adminArtistController.deleteArtistImages)
 
 router.get('/reservations', authenticatedAdmin, adminReserveController.getUpcomingReservations)
+router.get('/reservations/pasts', authenticatedAdmin, adminReserveController.getPastReservations)
 router.get('/reservations/:reservationId', authenticatedAdmin, adminReserveController.getReservation)
 
 // test email

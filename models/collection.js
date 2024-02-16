@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     UserId: DataTypes.INTEGER,
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
-    privacy: DataTypes.INTEGER,
+    privacy: DataTypes.INTEGER,  // 0: private, 1: access only with URL, 2: public
     url: DataTypes.STRING
   }, {
     sequelize,

@@ -1,6 +1,7 @@
 <div class="container-fluid mt-3">
   <div class="d-flex mb-3 justify-content-end">
-    <a href="/admin/reservations/pasts"><button class="btn btn-success">Pasts</button></a>
+    <a href="/admin/reservations" class="mx-3"><button class="btn btn-success">Upcoming</button></a>
+    <a href="/admin/reservations/pasts"><button class="btn btn-secondary">Past</button></a>
   </div>
 
   {{!-- table of reservations --}}
@@ -34,9 +35,11 @@
           <td>{{this.phone}}</td>
           <td>
             {{this.Collection.name}} ({{this.Collection.work_count}} 件)
+            {{#if this.Collection.privacy}}
             <a class="ms-2" href="/collections/{{this.Collection.id}}">
               <span style="font-size: small;"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
             </a>
+            {{/if}}
           </td>
           <td>{{this.visitor_num}}</td>
           <td>{{this.purpose}}</td>

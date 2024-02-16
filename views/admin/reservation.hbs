@@ -38,6 +38,16 @@
         <div class="col-sm-3" align="center">狀態</div>
         <div class="col-sm-9">{{reservation.status}}</div>
       </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">付款 SN</div>
+        <div class="col-sm-9">{{reservation.sn}}</div>
+      </div>
+
+      <div class="mb-3 row">
+        <div class="col-sm-3" align="center">申請時間</div>
+        <div class="col-sm-9">{{reservation.createdAt}}</div>
+      </div>
     </div>
   </div>
 
@@ -49,6 +59,7 @@
       <h5 class="m-3" align="center">
         {{reservation.Collection.name}} ({{reservation.work_count}}件)
       </h5>
+      <p align="center">{{reservation.Collection.description}}</p>
       <table class="table table-bordered table-hover">
         <thead>
           <tr>
