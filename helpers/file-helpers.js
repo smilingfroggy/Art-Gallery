@@ -12,13 +12,16 @@ const imgurFileHandler = file => {
       type: 'stream'
     })
       .then(img => {
+        if (!img || img.success === false) return resolve(null)
         resolve(img?.data.link || null)
       })
       .catch(err => reject(err))
   })
 }
 
+const imgurErrorMsg = 'Some images failed to upload due to unsupported file type or large file sizes'
 
 module.exports = {
-  imgurFileHandler
+  imgurFileHandler,
+  imgurErrorMsg
 }

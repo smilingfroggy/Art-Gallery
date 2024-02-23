@@ -1,4 +1,4 @@
-const { imgurFileHandler } = require('../helpers/file-helpers')
+const { imgurFileHandler, imgurErrorMsg } = require('../helpers/file-helpers')
 const db = require('../models');
 const { Artwork, Exhibition, Medium, Artist, ArtworkImage, ArtworkArtist, ArtworkSubject, Subject } = db
 const { Op } = require('sequelize')
@@ -121,7 +121,7 @@ const adminArtworkController = {
       // 若數量只有一個也轉換成陣列
       artist_select = typeof artist_select === 'string' ? [artist_select] : artist_select
       // original SubjectTags_select: ['1', '3'] || '1' || undefined
-      if (typeof SubjectTags_select === undefined) SubjectTags_select = []
+      if (SubjectTags_select === undefined) SubjectTags_select = []
       if (typeof SubjectTags_select === 'string') SubjectTags_select = [SubjectTags_select]
       newWorkId = newWork.id
 
@@ -139,7 +139,11 @@ const adminArtworkController = {
         }))
       ])
     }).then(([filesPath, ...results]) => {
-      const createData = filesPath.map(path => {
+      const createData = filesPath.filter(path => {
+        // imgurFileHandler returns string or null
+        if (typeof path !== 'string') req.flash('warning_messages', { message: imgurErrorMsg })
+        return typeof path === 'string'
+      }).map(path => {
         return {
           ArtworkId: newWorkId,
           url: path,
@@ -204,7 +208,7 @@ const adminArtworkController = {
       // original artist_select: ['1', '2'] || 1
       artist_select = typeof artist_select === 'string' ? [artist_select] : artist_select
       // original SubjectTags_select: ['1', '3'] || '1' || undefined
-      if (typeof SubjectTags_select === undefined) SubjectTags_select = []
+      if (SubjectTags_select === undefined) SubjectTags_select = []
       if (typeof SubjectTags_select === 'string') SubjectTags_select = [SubjectTags_select]
 
 
@@ -243,7 +247,11 @@ const adminArtworkController = {
         }))
       ])
     }).then(([filesPath, ...results]) => {
-      const createData = filesPath.map(path => {
+      const createData = filesPath.filter(path => {
+        // imgurFileHandler returns string or null
+        if (typeof path !== 'string') req.flash('warning_messages', { message: imgurErrorMsg })
+        return typeof path === 'string'
+      }).map(path => {
         return {
           ArtworkId: artworkId,
           url: path,
@@ -255,7 +263,6 @@ const adminArtworkController = {
     }).then(() => {
       return res.redirect(`/admin/artworks/${artworkId}`)
     }).catch(error => {
-      console.log('error happened', error)
       return next(error)
     })
   },

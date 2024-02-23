@@ -1,7 +1,7 @@
 const db = require('../models');
 const { Artwork, Exhibition, ExhibitionImage, Medium, ArtworkImage, ExhibitionArtwork, Subject } = db
 const { Op, Sequelize } = require('sequelize')
-const { imgurFileHandler } = require('../helpers/file-helpers')
+const { imgurFileHandler, imgurErrorMsg } = require('../helpers/file-helpers')
 const { IMAGE_NOT_AVAILABLE } = require('../helpers/image-helpers')
 
 const adminExhController = {
@@ -106,20 +106,22 @@ const adminExhController = {
       ])
         .then(async ([exhibition, ...filesPath]) => {
           if (!exhibition) throw new Error('Exhibition does not exist!')
-
-          for (let i = 0; i < filesPath.length; i++) {
-            await ExhibitionImage.create({
+          const createData = filesPath.filter(path => {
+            if (typeof path !== 'string') req.flash('warning_messages', { message: imgurErrorMsg })
+            return typeof path === 'string'
+          }).map(path => {
+            return {
               ExhibitionId: exhibitionId,
-              url: filesPath[i],
+              url: path,
               type,
               description
-            })
-          }
+            }
+          })
+          await ExhibitionImage.bulkCreate(createData)
           res.redirect('back')
         })
         .catch(error => next(error))
     } catch (error) {
-      console.log(error)
       next(error)
     }
   },

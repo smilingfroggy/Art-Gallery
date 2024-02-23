@@ -45,7 +45,7 @@
       <div class="row justify-content-end">
         <form action="/admin/exhibitions/{{exhibition.id}}/images?_method=PUT" id="imageForm"
           class="col-9 col-sm-6 col-lg-4 d-inline-block needs-validation" method="post" enctype="multipart/form-data" novalidate>
-          <label class="form-label" for="exhImage">請上傳檔案，一次最多10張</label>
+          <label class="form-label" for="exhImage">請上傳檔案（20MB以下 JPEG/PNG），一次最多10張</label>
           <input class="form-control form-control-sm" type="file" name="exhImage" id="exhImage" style="max-width: 400px;" multiple required>
           <div class="invalid-feedback">請至少上傳一個檔案，勿超過10張</div>
           <select class="form-select form-select-sm" name="type" aria-label=".form-select-sm" style="max-width: 400px;">

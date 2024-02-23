@@ -1,4 +1,4 @@
-const { imgurFileHandler } = require('../helpers/file-helpers')
+const { imgurFileHandler, imgurErrorMsg } = require('../helpers/file-helpers')
 const db = require('../models');
 const { Artwork, Artist, ArtistImage } = db
 const sequelize = require('sequelize')
@@ -60,17 +60,19 @@ const adminArtistController = {
       if (files.length) {
         Promise.all(files.map(file => imgurFileHandler(file)))
           .then(async filesPath => {
-            await ArtistImage.bulkCreate(filesPath.map(path => {
+            const createData = filesPath.filter(path => {
+              if (typeof path !== 'string') req.flash('warning_messages', { message: imgurErrorMsg })
+              return typeof path === 'string'
+            }).map(path => {
               return {
                 ArtistId: artistId,
                 url: path,
                 type,
                 description
               }
-            }))
-          })
-          .then(() => {
-            req.flash('success_messages', `Updated ${name} profile`)
+            })
+            const bulkCreateImg = await ArtistImage.bulkCreate(createData)
+            req.flash('success_messages', `Updated ${name} profile and ${bulkCreateImg.length} images.`)
             return res.redirect(`/admin/artists/${artistId}`)
           })
           .catch(error => next(error))
@@ -101,18 +103,20 @@ const adminArtistController = {
           name, otherName, birthYear, deathYear, introduction
         })
       ]).then(async ([filesPath, newArtist]) => {
-        const bulkCreateImg = await ArtistImage.bulkCreate(filesPath.map(path => {
+        const createData = filesPath.filter(path => {
+          if (typeof path !== 'string') req.flash('warning_messages', { message: imgurErrorMsg })
+          return typeof path === 'string'
+        }).map(path => {
           return {
             ArtistId: newArtist.id,
             url: path,
             type,
-            description,
+            description
           }
-        }))
-        console.log('created: ', bulkCreateImg.length)
-        return newArtist
-      }).then((newArtist) => {
-        req.flash('success_messages', `Created ${name} profile`)
+        })
+
+        const bulkCreateImg = await ArtistImage.bulkCreate(createData)
+        req.flash('success_messages', `Created ${name} profile and ${bulkCreateImg.length} image`)
         return res.redirect(`/admin/artists/${newArtist.id}`)
       }).catch(error => console.log(error))
     } catch (error) {
