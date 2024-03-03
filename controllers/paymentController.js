@@ -61,11 +61,14 @@ const paymentController = {
   },
   postPaymentResult: async (req, res, next) => {
     try {
-      // const type = req.query.from
+      const type = req.query.from
       const { Status, MerchantID: MerchantID_req, TradeInfo, TradeSha } = req.body
       if (!Status || !TradeInfo || !TradeSha || MerchantID != MerchantID_req) throw new Error('資料不正確')
       if (Status !== 'SUCCESS') throw new Error('交易失敗，請重新付款')
-
+      if (type === 'ReturnURL') {
+        req.flash('success_messages', `付款完成，已為您保留時段`)
+        return res.redirect('/reservations')
+      }
       // decrypt
       const decipher = crypto.createDecipheriv('aes-256-cbc', HashKey, HashIV)
       let decryptTradeInfo = decipher.update(TradeInfo, 'hex', 'utf8')
@@ -83,9 +86,7 @@ const paymentController = {
         sn: MerchantOrderNo
       }})
       await reservation.update({ status: true })
-
-      req.flash('success_messages', `付款完成，已為您保留時段`)
-      return res.redirect('/reservations')
+      return res.end()
     } catch (error) {
       console.log(error)
       next(error)
