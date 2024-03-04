@@ -38,8 +38,11 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, done) => {
         where: { privacy: 2 }
       }
     })
-    userData = userData.toJSON()
-    return done(null, userData)
+    if (userData) {
+      userData = userData.toJSON()
+      return done(null, userData)
+    }
+    return done(null, false)
   } catch (err) {
     return done(err, false)
   }
@@ -68,6 +71,7 @@ passport.deserializeUser(async (id, done) => {
       user.addedArtworks.add(work.id)
     })
   })
+  console.log('==== deserializeUser ====')
   return done(null, user)
 })
 

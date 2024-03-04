@@ -29,10 +29,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+const cookieOptions = { maxAge: 1800000 }
+if (process.env.NODE_ENV === 'google_cloud') {
+  cookieOptions.secure = true
+  cookieOptions.sameSite = 'none'
+  app.set('trust proxy', 1)  // for secure cookie in GCP
+}
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: cookieOptions
 }))
 app.use(passport.initialize())
 app.use(passport.session())
