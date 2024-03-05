@@ -71,6 +71,15 @@
             </li>
             {{/if}}
             {{#if user}}
+            {{#if user.isAdmin}}
+            <li class="nav-item mx-2">
+              <form class="dropdown-item" action="/user/logout" method="post" id="logout" title="Logout">
+                <button class="btn btn-sm" type="submit" form="logout">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+              </form>
+            </li>
+            {{else}}
             <li class="nav-item ms-2 me-5 dropdown">
 
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
@@ -92,6 +101,7 @@
                 </li>
               </ul>
             </li>
+            {{/if}}
             {{else}}
             <li class="nav-item mx-2">
               <a id="login" class="nav-link" href="/user/login"><i class="fa-solid fa-circle-user"></i></a>

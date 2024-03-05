@@ -11,6 +11,7 @@ const reservationController = {
   getReservations: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req)?.id || null
+      if (helpers.getUser(req)?.isAdmin) return res.redirect('/admin/reservations')
 
       let reservations = await Reservation.findAll({
         where: { UserId: userId },
@@ -48,6 +49,8 @@ const reservationController = {
     try {
       const userId = helpers.getUser(req)?.id || null
       const { reservationId } = req.params
+      if (!reservationId) throw new Error('Invalid reservationId')
+      if (helpers.getUser(req)?.isAdmin) return res.redirect(`/admin/reservations/${reservationId}`)
 
       const reservation = await reservationService.getReservation(userId, reservationId)
       if (!reservation) throw new Error('Reservation not exist')
@@ -70,7 +73,10 @@ const reservationController = {
   createReservation: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req)?.id || null
-      const { reservationId } = req.params    // edit reservation
+      const { reservationId } = req.params    // if it's going to edit reservation
+      if (reservationId && !Number(reservationId)) throw new Error('Invalid reservationId')
+      if (helpers.getUser(req)?.isAdmin) return res.redirect('/admin/reservations')
+      if (reservationId && !userId) throw new Error('Permission Denied')
 
       // find user's all collections
       const collections = helpers.getUser(req)?.Collections
@@ -117,6 +123,7 @@ const reservationController = {
   postReservation: async (req, res, next) => {
     try {
       const userId = helpers.getUser(req)?.id || null
+      if (helpers.getUser(req)?.isAdmin) return res.redirect('/admin/reservations')
 
       const { contact_person, phone, collection_select_count, visitor_num, date, date_time, purpose, description } = req.body
 
@@ -156,6 +163,8 @@ const reservationController = {
       const userId = helpers.getUser(req)?.id || null
       const { reservationId } = req.params
       const { visitor_num, date, date_time, description } = req.body
+      if (!reservationId || !Number(reservationId)) throw new Error('Invalid reservation')
+      if (helpers.getUser(req)?.isAdmin) return res.redirect(`/admin/reservations/${reservationId}`)
 
       const reservation = await Reservation.findByPk(reservationId)
       if (!reservation) throw new Error('Reservation does not exist')
@@ -195,6 +204,8 @@ const reservationController = {
     try {
       const userId = helpers.getUser(req)?.id || null
       const { reservationId } = req.params
+      if (!reservationId || !Number(reservationId)) throw new Error('Invalid reservation')
+      if (helpers.getUser(req)?.isAdmin) return res.redirect('/admin/reservations')
       
       const reservation = await Reservation.findByPk(reservationId)
       if (!reservation) throw new Error('Reservation does not exist')

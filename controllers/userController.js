@@ -32,6 +32,11 @@ const userController = {
   getProfile: async (req, res, next) => {
     try {
       const user = helpers.getUser(req)
+      if (user.isAdmin) {
+        req.flash('error_messages', 'Permission Denied')
+        return res.redirect('back')
+      }
+      console.log(user)
       return res.render('profile', user )
     } catch (error) {
       console.log(error)
@@ -44,6 +49,10 @@ const userController = {
       const { name, password, passwordCheck } = req.body
       if (!name || !password || !passwordCheck) throw new Error('Please provide complete messages')
       if (password !== passwordCheck) throw new Error('Passwords do not match')
+      if (helpers.getUser(req).isAdmin) {
+        req.flash('error_messages', 'Permission Denied')
+        return res.redirect('back')
+      }
 
       await User.update({
         name,

@@ -16,13 +16,17 @@ const paymentController = {
       const userId = helpers.getUser(req)?.id
       const userEmail = helpers.getUser(req)?.email
       const { reservationId } = req.params
+      if (!reservationId || !Number(reservationId)) throw new Error('Invalid reservation')
 
       let reservation = await Reservation.findByPk(reservationId, {
         attributes: ['id', 'UserId', 'time', 'visitor_num', 'purpose', 'contact_person', 'phone', 'status']
       })
       if (!reservation) throw new Error('Reservation not exist')
       if (reservation.UserId !== userId) throw new Error('Permission Denied')
-      if (reservation.status) throw new Error('Paid already!')
+      if (reservation.status) {
+        req.flash('error_messages', 'Paid already!')
+        return res.redirect(`/reservations/${reservationId}`)
+      }
       if (reservation.time < Date.now()) throw new Error('Reservation is overdue')
 
       const MerchantOrderNo = `ID${reservationId}_${Date.now()}`
@@ -81,10 +85,12 @@ const paymentController = {
       // update DB reservation status
       const { MerchantOrderNo } = decryptTradeInfo.Result
       const reservationId = Number(MerchantOrderNo.split('_')[0].slice(2,))
-      const reservation = await Reservation.findOne({ where: {
-        id: reservationId,
-        sn: MerchantOrderNo
-      }})
+      const reservation = await Reservation.findOne({
+        where: {
+          id: reservationId,
+          sn: MerchantOrderNo
+        }
+      })
       await reservation.update({ status: true })
       return res.end()
     } catch (error) {
